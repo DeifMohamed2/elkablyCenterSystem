@@ -156,7 +156,7 @@ hr {
         <div class="col-12">
           <div class="card my-4">
                <div class="card-header pb-0 p-3">
-                <select name="" id="devices" >
+                <select name="" id="devicesSelected" >
                   <option value="device1">Device1</option>
                   <option value="device2">Device2</option>
                 </select>
@@ -336,58 +336,63 @@ const devices = {
       "BuWXtE5k5iTzVkJhZB6S/2Nvf79q86JMxZPNwAhtg1EjzOHq3dIaxUQE3EPpExgH \n" +
       "3GSYi1ys3Q4Q73n36+2or429 \n"+
       "-----END PRIVATE KEY----- \n",
-      certificate: "-----BEGIN CERTIFICATE-----\n" +
-      "MIIECzCCAvOgAwIBAgIGAZPWzBTJMA0GCSqGSIb3DQEBCwUAMIGiMQswCQYDVQQG \n" +
-      "EwJVUzELMAkGA1UECAwCTlkxEjAQBgNVBAcMCUNhbmFzdG90YTEbMBkGA1UECgwS \n" +
-      "UVogSW5kdXN0cmllcywgTExDMRswGQYDVQQLDBJRWiBJbmR1c3RyaWVzLCBMTEMx \n" +
-      "HDAaBgkqhkiG9w0BCQEWDXN1cHBvcnRAcXouaW8xGjAYBgNVBAMMEVFaIFRyYXkg \n" +
-      "RGVtbyBDZXJ0MB4XDTI0MTIxNjIyNDUxOVoXDTQ0MTIxNjIyNDUxOVowgaIxCzAJ \n" +
-      "BgNVBAYTAlVTMQswCQYDVQQIDAJOWTESMBAGA1UEBwwJQ2FuYXN0b3RhMRswGQYD \n" +
-      "VQQKDBJRWiBJbmR1c3RyaWVzLCBMTEMxGzAZBgNVBAsMElFaIEluZHVzdHJpZXMs \n" +
-      "IExMQzEcMBoGCSqGSIb3DQEJARYNc3VwcG9ydEBxei5pbzEaMBgGA1UEAwwRUVog \n" +
-      "VHJheSBEZW1vIENlcnQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDh \n" +
-      "cl5K2hTFZVGTSrX6kysAAALnYk4c3Apq3/PEmlNRbl7/A+e63wZNmeaOOwqapem5 \n" +
-      "gOcF3Q0i5afmNXRAh7/tCUnmPLyFVGR7uMfk0eKIuihZPBkMI3t1LZXj7JS+L4ra \n" +
-      "0NpeECoXevVXZJA7HyTk1Q2jLeZuR0L5fINtiigfs25Lmr3SC1xp0eYmZ8MSuwYQ \n" +
-      "nCeaieS6w5c7jS8wRdWG+fBk9Us8P6V3vPQG7d5tj2+5Qw7wD/wqXXlIuBnFExdD \n" +
-      "FRx6JllEOi+OK3BIV0QhtOd4eELcWbVo1JiXyGsVDnNYee3Eq7uTAPVvRbzL+yBl \n" +
-      "Y6ToCwmSDMgQbT4A0JnDAgMBAAGjRTBDMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD \n" +
-      "VR0PAQH/BAQDAgEGMB0GA1UdDgQWBBTX3kKIaxhM+tczaaW6DxtsnaTFlDANBgkq \n" +
-      "hkiG9w0BAQsFAAOCAQEAmxols+AZ/eVrjyOHFiJv1aHQGCjRyrxvdLX+X6LMS1Vt \n" +
-      "FobxoCdnGyb0GKliPF55RsJjenkPIYpssbQG6ZzfqB4CZ/JZfGwvtvcbvqktVCPa \n" +
-      "0dP7V4gQfC+BzBVaG/DaiJvRUobfrFI6Jnp3qRQ4WPkKNBBt0/htg+oo7QGw5PHv \n" +
-      "00Ok2X05JAbJKNAw/hJO8y0AC4WzIlKIrKYv1mG7AipzDvPABC3KZNFHo3qD+U/Y \n" +
-      "UI4yviUFFHD+4c+HAZj6huuv+VwNy9O6azH4ywBz27uhzJJcxQCZXIOzNajEwZIz \n" +
-      "Y3/OoEVfSzhIahEncoWbtSHT5jBW62TzfQyhGDjrZg== \n" +
-      "-----END CERTIFICATE----- \n" 
+      certificate:"-----BEGIN CERTIFICATE-----\n"+
+      "MIIECzCCAvOgAwIBAgIGAZPWAs14MA0GCSqGSIb3DQEBCwUAMIGiMQswCQYDVQQG \n " +
+      "EwJVUzELMAkGA1UECAwCTlkxEjAQBgNVBAcMCUNhbmFzdG90YTEbMBkGA1UECgwS \n " +
+      "UVogSW5kdXN0cmllcywgTExDMRswGQYDVQQLDBJRWiBJbmR1c3RyaWVzLCBMTEMx \n " +
+      "HDAaBgkqhkiG9w0BCQEWDXN1cHBvcnRAcXouaW8xGjAYBgNVBAMMEVFaIFRyYXkg \n " +
+      "RGVtbyBDZXJ0MB4XDTI0MTIxNjE5MDUyOFoXDTQ0MTIxNjE5MDUyOFowgaIxCzAJ \n " +
+      "BgNVBAYTAlVTMQswCQYDVQQIDAJOWTESMBAGA1UEBwwJQ2FuYXN0b3RhMRswGQYD \n " +
+      "VQQKDBJRWiBJbmR1c3RyaWVzLCBMTEMxGzAZBgNVBAsMElFaIEluZHVzdHJpZXMs \n " +
+      "IExMQzEcMBoGCSqGSIb3DQEJARYNc3VwcG9ydEBxei5pbzEaMBgGA1UEAwwRUVog \n " +
+      "VHJheSBEZW1vIENlcnQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC7 \n " +
+      "XIuA79aM5eY/v4NMvQmmJJ9QS6HcGFlOjiqu88WLtzNyftT7ZWvzPgvcEXu+0h+I \n " +
+      "kKRyo0ZfI214+qEN6xFtLzzESGLMNJEzRl4vokP/MgpsrWQ8lr8RMU7nvfj+WF2B \n " +
+      "HN6p4tngMA94vwjE1UTU9jh9T/rw9/gvYlj1UZAWSm85CTIrQBLZx6Nf73AtbbF0 \n " +
+      "PmC1ENslB05prQh9GEJMpw845o97zmPK/6CKB2BXBILl8J1L9KI1cmBjXMenXNAu \n " +
+      "7hcnTCl/TKCDbQ6VQN5zvvHyC2cFMpIJ35CkOzpP/H/dxOhCCGgjZOsatIzidLKD \n " +
+      "lDUwYVFdH9BIAjzPlbbfAgMBAAGjRTBDMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD \n " +
+      "VR0PAQH/BAQDAgEGMB0GA1UdDgQWBBTBzNMz176yMqIdxTHUWK5EElBXyzANBgkq \n " +
+      "hkiG9w0BAQsFAAOCAQEAKRq0rG//ndZTZ1OcGy231ZUtrl6hqSoe0eE6SbtZOZ1t \n " +
+      "L4+isqyzvzmCluZEXLqzBdQXcdIC8o9STP+GMlnzaI6J+PiKNDn1OowPGDu3s1Xv \n " +
+      "r70wCs/hFGBk97geYlD0gQzWmhE9gS8IDJGUx3dT5aSQhKFlN/OIo7SzQkGhw4CP \n " +
+      "052eyDvgKmR7AHXg3ighL/OQX2bo4T2M91eyNYCg8t9afgJnDpBhFiK5jze/y6M2 \n " +
+      "OzZG1hMDdVlonv2Sz/62LXee4vfhLcsjBugmoINmJREcDegR6u+thhBnvre71FKa \n " +
+      "J5e2N55tR9cSIi2Md4/FgDDJ71QagtE1p3M79kCnkA== \n " +
+      "-----END CERTIFICATE----- \n "
 
       },
   };
 
 
 
-let selectedDevice = devices.device2;
+
+
+document.getElementById('devicesSelected').addEventListener('change',()=>{
+let selectedDevice = devices[document.getElementById('devicesSelected').value];
 qz.security.setSignatureAlgorithm("SHA512"); // Since 2.1
-  qz.security.setSignaturePromise(function(toSign) {
-  return function(resolve, reject) {
-  try {
-  var pk = KEYUTIL.getKey(selectedDevice.privateKey);
-  var sig = new KJUR.crypto.Signature({"alg": "SHA512withRSA"}); // Use "SHA1withRSA" for QZ Tray 2.0 and older
-  sig.init(pk);
-  sig.updateString(toSign);
-  var hex = sig.sign();
-  console.log("DEBUG: \n\n" + stob64(hextorstr(hex)));
-  resolve(stob64(hextorstr(hex)));
-  } catch (err) {
-  console.error(err);
-  reject(err);
-  }
-  };
+qz.security.setSignaturePromise(function(toSign) {
+return function(resolve, reject) {
+try {
+var pk = KEYUTIL.getKey(selectedDevice.privateKey);
+var sig = new KJUR.crypto.Signature({"alg": "SHA512withRSA"}); // Use "SHA1withRSA" for QZ Tray 2.0 and older
+sig.init(pk);
+sig.updateString(toSign);
+var hex = sig.sign();
+console.log("DEBUG: \n\n" + stob64(hextorstr(hex)));
+resolve(stob64(hextorstr(hex)));
+} catch (err) {
+console.error(err);
+reject(err);
+}
+};
 });
 
 qz.security.setCertificatePromise(function(resolve, reject) {
-  resolve(selectedDevice.certificate);
+resolve(selectedDevice.certificate);
 });
+
+})
 
   </script>
 
