@@ -156,11 +156,7 @@ hr {
         <div class="col-12">
           <div class="card my-4">
                <div class="card-header pb-0 p-3">
-                <select name="" id="devicesSelected" >
-                  <option value="">choose Device</option>
-                  <option  value="device1">Device1</option>
-                  <option value="device2">Device2</option>
-                </select>
+            
                 <form id="attendStudentForm">
                     <div class="row">
                       <div class="col-2 d-flex align-items-center">
@@ -369,8 +365,7 @@ const devices = {
 
 
 
-document.getElementById('devicesSelected').addEventListener('change',()=>{
-let selectedDevice = devices[document.getElementById('devicesSelected').value];
+let selectedDevice = devices.device1;
 qz.security.setSignatureAlgorithm("SHA512"); // Since 2.1
 qz.security.setSignaturePromise(function(toSign) {
 return function(resolve, reject) {
@@ -393,7 +388,28 @@ qz.security.setCertificatePromise(function(resolve, reject) {
 resolve(selectedDevice.certificate);
 });
 
-})
+let selectedDevice2 = devices.device2;
+qz.security.setSignaturePromise(function(toSign) {
+return function(resolve, reject) {
+try {
+var pk = KEYUTIL.getKey(selectedDevice2.privateKey);
+var sig = new KJUR.crypto.Signature({"alg": "SHA512withRSA"}); // Use "SHA1withRSA" for QZ Tray 2.0 and older
+sig.init(pk);
+sig.updateString(toSign);
+var hex = sig.sign();
+console.log("DEBUG: \n\n" + stob64(hextorstr(hex)));
+resolve(stob64(hextorstr(hex)));
+} catch (err) {
+console.error(err);
+reject(err);
+}
+};
+});
+
+qz.security.setCertificatePromise(function(resolve, reject) {
+resolve(selectedDevice2.certificate);
+});
+
 
   </script>
 
