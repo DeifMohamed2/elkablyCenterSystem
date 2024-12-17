@@ -157,7 +157,7 @@ function printReceipt(data = {}) {
         return;
     }
 
-    const config = qz.configs.create('Xprinter'); // Replace with your printer name
+    const config = qz.configs.create('XP-80C'); // Replace with your printer name
 
     const printData = [
         { type: 'raw', format: 'command', data: receiptContent },
