@@ -43,11 +43,13 @@ async function attendStudent(event) {
           searchStudent.focus();
         } else {
         spinner.classList.add('d-none');
-
+      attendStudentForm.reset();
         message.textContent = responseData.message;
          searchStudent.focus();
+         
         }
     } catch (error) {
+        attendStudentForm.reset();
         searchStudent.focus();
         spinner.classList.add('d-none');
         console.error('Error attending student:', error);
