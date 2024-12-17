@@ -60,6 +60,12 @@ app.use(session({
 // Custom middlfsdfeware to make io accessible in all routes
 
 
+// Serve the digital certificate
+app.get('/assets/signing/digital-certificate.txt', (req, res) => {
+  res.sendFile(path.join(__dirname, 'assets/signing/digital-certificate.txt'));
+});
+
+
 app.use('/', mainRoute);
 app.use('/admin', adminRoute);
 app.use('/employee', employeeRoute);

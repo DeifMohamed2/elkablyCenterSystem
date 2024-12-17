@@ -488,12 +488,24 @@ hr {
   </main>
 
   <!--   Core JS Files   -->
+
+  
+
   <script src="https://unpkg.com/qz-tray"></script>
 
   <!-- <script type="text/javascript" src="js/qz-tray.js"></script> -->
   <!-- Required scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/11.1.0/jsrsasign-all-min.js"></script>
+  
+  <script>
+        qz.security.setCertificatePromise(function(resolve, reject) {
+        fetch("assets/signing/digital-certificate.txt", {cache: 'no-store', headers: {'Content-Type': 'text/plain'}})
+        .then(function(data) { data.ok ? resolve(data.text()) : reject(data.text()); });
+        });
+  </script>
   <script type="text/javascript" >
+
+
     var privateKey = "-----BEGIN PRIVATE KEY----- \n" +
     "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC7XIuA79aM5eY/ \n" +
     "v4NMvQmmJJ9QS6HcGFlOjiqu88WLtzNyftT7ZWvzPgvcEXu+0h+IkKRyo0ZfI214 \n" +
