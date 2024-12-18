@@ -75,9 +75,10 @@ window.addEventListener('beforeunload', () => {
 
 function printReceipt(data = {}) {
     const {
-        studentName = 'N/A',
-        studentAmount = 0,
-        date = new Date().toLocaleDateString(),
+      studentName = 'N/A',
+      studentAmount = 0,
+      date = new Date().toLocaleDateString() + new Date().toLocaleTimeString(),
+    
     } = data;
 
     // English labels for the receipt
@@ -112,46 +113,57 @@ function printReceipt(data = {}) {
 
     // Build receipt content
     const receiptContent =
-        ESC_RESET +
-        ESC_ALIGN_CENTER +
-        ESC_BOLD +
-        ESC_DOUBLE_SIZE +
-        englishLabels.title +
-        ESC_FEED_LINE +
-        ESC_NORMAL_SIZE +
-        ESC_FEED_LINE +
-        ESC_ALIGN_CENTER +
-        englishLabels.phone +
-        ESC_FEED_LINE +
-        ESC_FEED_LINE +
-        lineSeparator +
-        ESC_FEED_LINE +
-        formatTableRow(englishLabels.date, date) +
-        ESC_FEED_LINE +
-        lineSeparator +
-        ESC_FEED_LINE +
-        formatTableRow(englishLabels.teacherName, data['studentTeacher']?.teacherName || 'N/A') +
-        ESC_FEED_LINE +
-        lineSeparator +
-        ESC_FEED_LINE +
-        formatTableRow(englishLabels.subject, data['studentTeacher']?.subjectName || 'N/A') +
-        ESC_FEED_LINE +
-        lineSeparator +
-        ESC_FEED_LINE +
-        formatTableRow(englishLabels.studentName, studentName) +
-        ESC_FEED_LINE +
-        lineSeparator +
-        ESC_FEED_LINE +
-        formatTableRow(englishLabels.payment, `${studentAmount} EGP`) +
-        ESC_FEED_LINE +
-        lineSeparator +
-        ESC_FEED_LINE +
-        ESC_ALIGN_CENTER +
-        ESC_BOLD +
-        ESC_NORMAL_SIZE +
-        englishLabels.thankYou +
-        ESC_FEED_LINE +
-        ESC_FEED_LINE;
+      ESC_RESET +
+      ESC_ALIGN_CENTER +
+      ESC_BOLD +
+      ESC_DOUBLE_SIZE +
+      englishLabels.title +
+      ESC_FEED_LINE +
+      ESC_ALIGN_CENTER +
+      ESC_BOLD +
+      ESC_DOUBLE_SIZE +
+     'Center (GTA)' +
+      ESC_FEED_LINE +
+      ESC_NORMAL_SIZE +
+      ESC_FEED_LINE +
+      ESC_ALIGN_CENTER +
+      englishLabels.phone +
+      ESC_FEED_LINE +
+      ESC_FEED_LINE +
+      lineSeparator +
+      ESC_FEED_LINE +
+      formatTableRow(englishLabels.date, date) +
+      ESC_FEED_LINE +
+      lineSeparator +
+      ESC_FEED_LINE +
+      formatTableRow(
+        englishLabels.teacherName,
+        data['studentTeacher']?.teacherName || 'N/A'
+      ) +
+      ESC_FEED_LINE +
+      lineSeparator +
+      ESC_FEED_LINE +
+      formatTableRow(
+        englishLabels.subject,
+        data['studentTeacher']?.subjectName || 'N/A'
+      ) +
+      ESC_FEED_LINE +
+      lineSeparator +
+      ESC_FEED_LINE +
+      formatTableRow(englishLabels.studentName, studentName) +
+      ESC_FEED_LINE +
+      lineSeparator +
+      ESC_FEED_LINE +
+      formatTableRow(englishLabels.payment, `${studentAmount} EGP`) +
+      ESC_FEED_LINE +
+      lineSeparator +
+      ESC_FEED_LINE +
+      ESC_ALIGN_CENTER +
+      ESC_BOLD +
+      ESC_NORMAL_SIZE +
+      englishLabels.thankYou +
+      ESC_FEED_LINE +
+      ESC_FEED_LINE;
 
     // Print receipt
     if (!isQzConnected) {
