@@ -74,113 +74,116 @@ window.addEventListener('beforeunload', () => {
 });
 
 function printReceipt(data = {}) {
-    const {
-      studentName = 'N/A',
-      studentAmount = 0,
-      date = new Date().toLocaleDateString() +" "+ new Date().toLocaleTimeString(),
-    
-    } = data;
+  const {
+    studentName = 'N/A',
+    studentAmount = 0,
+    date = new Date().toLocaleDateString() +
+      ' ' +
+      new Date().toLocaleTimeString(),
+  } = data;
 
-    // English labels for the receipt
-    const englishLabels = {
-        title: 'ELKABLY CENTER',
-        phone: ' +201234567890', // Example phone number
-        date: 'Date',
-        teacherName: 'Teacher Name',
-        subject: 'Subject',
-        studentName: 'Student Name',
-        payment: 'Amount Paid',
-        thankYou: 'Thank you for choosing our center!',
-    };
+  // English labels for the receipt
+  const englishLabels = {
+    title: 'ELKABLY CENTER',
+    phone: ' +201234567890', // Example phone number
+    date: 'Date',
+    teacherName: 'Teacher Name',
+    subject: 'Subject',
+    studentName: 'Student Name',
+    payment: 'Amount Paid',
+    thankYou: 'Thank you for choosing our center!',
+  };
 
-    // ESC/POS Printer Commands
-    const ESC_ALIGN_CENTER = '\x1B\x61\x01'; // Center align
-    const ESC_DOUBLE_SIZE = '\x1B\x21\x30'; // Double font size
-    const ESC_BOLD = '\x1B\x45\x01'; // Bold text
-    const ESC_NORMAL_SIZE = '\x1B\x21\x00'; // Normal font size
-    const ESC_CUT = '\x1D\x56\x42\x00'; // Full paper cut
-    const ESC_FEED_LINE = '\x0A'; // Line feed
-    const ESC_RESET = '\x1B\x40'; // Reset printer
+  // ESC/POS Printer Commands
+  const ESC_ALIGN_CENTER = '\x1B\x61\x01'; // Center align
+  const ESC_DOUBLE_SIZE = '\x1B\x21\x30'; // Double font size
+  const ESC_DOUBLE2_SIZE = '\x1B\x21\x20'; // Double font size
+  const ESC_BOLD = '\x1B\x45\x01'; // Bold text
+  const ESC_NORMAL_SIZE = '\x1B\x21\x00'; // Normal font size
+  const ESC_CUT = '\x1D\x56\x42\x00'; // Full paper cut
+  const ESC_FEED_LINE = '\x0A'; // Line feed
+  const ESC_RESET = '\x1B\x40'; // Reset printer
 
-    const lineSeparator = '-'.repeat(48); // Table line separator
+  const lineSeparator = '-'.repeat(48); // Table line separator
 
-    function formatTableRow(field, value) {
-        const totalWidth = 48;
-        const left = field.padEnd(20, ' ');
-        const right = value.toString().padStart(20, ' ');
-        return `| ${left} | ${right} |`;
-    }
+  function formatTableRow(field, value) {
+    const totalWidth = 48;
+    const left = field.padEnd(20, ' ');
+    const right = value.toString().padStart(20, ' ');
+    return `| ${left} | ${right} |`;
+  }
 
-    // Build receipt content
-    const receiptContent =
-      ESC_RESET +
-      ESC_ALIGN_CENTER +
-      ESC_BOLD +
-      ESC_DOUBLE_SIZE +
-      englishLabels.title +
-      ESC_FEED_LINE +
-      ESC_ALIGN_CENTER +
-      ESC_BOLD +
-      ESC_DOUBLE_SIZE +
-     'Center (GTA)' +
-      ESC_FEED_LINE +
-      ESC_NORMAL_SIZE +
-      ESC_FEED_LINE +
-      ESC_ALIGN_CENTER +
-      englishLabels.phone +
-      ESC_FEED_LINE +
-      ESC_FEED_LINE +
-      lineSeparator +
-      ESC_FEED_LINE +
-      formatTableRow(englishLabels.date, date) +
-      ESC_FEED_LINE +
-      lineSeparator +
-      ESC_FEED_LINE +
-      formatTableRow(
-        englishLabels.teacherName,
-        data['studentTeacher']?.teacherName || 'N/A'
-      ) +
-      ESC_FEED_LINE +
-      lineSeparator +
-      ESC_FEED_LINE +
-      formatTableRow(
-        englishLabels.subject,
-        data['studentTeacher']?.subjectName || 'N/A'
-      ) +
-      ESC_FEED_LINE +
-      lineSeparator +
-      ESC_FEED_LINE +
-      formatTableRow(englishLabels.studentName, studentName) +
-      ESC_FEED_LINE +
-      lineSeparator +
-      ESC_FEED_LINE +
-      formatTableRow(englishLabels.payment, `${studentAmount} EGP`) +
-      ESC_FEED_LINE +
-      lineSeparator +
-      ESC_FEED_LINE +
-      ESC_ALIGN_CENTER +
-      ESC_BOLD +
-      ESC_NORMAL_SIZE +
-      englishLabels.thankYou +
-      ESC_FEED_LINE +
-      ESC_FEED_LINE;
+  // Build receipt content
+  const receiptContent =
+    ESC_RESET +
+    ESC_ALIGN_CENTER +
+    ESC_BOLD +
+    ESC_DOUBLE_SIZE +
+    englishLabels.title +
+    ESC_FEED_LINE +
+    ESC_ALIGN_CENTER +
+    ESC_BOLD +
+    ESC_DOUBLE2_SIZE +
+    'Center (GTA)' +
+    ESC_FEED_LINE +
+    ESC_NORMAL_SIZE +
+    ESC_FEED_LINE +
+    ESC_ALIGN_CENTER +
+    englishLabels.phone +
+    ESC_FEED_LINE +
+    ESC_FEED_LINE +
+    lineSeparator +
+    ESC_FEED_LINE +
+    formatTableRow(englishLabels.date, date) +
+    ESC_FEED_LINE +
+    lineSeparator +
+    ESC_FEED_LINE +
+    formatTableRow(
+      englishLabels.teacherName,
+      data['studentTeacher']?.teacherName || 'N/A'
+    ) +
+    ESC_FEED_LINE +
+    lineSeparator +
+    ESC_FEED_LINE +
+    formatTableRow(
+      englishLabels.subject,
+      data['studentTeacher']?.subjectName || 'N/A'
+    ) +
+    ESC_FEED_LINE +
+    lineSeparator +
+    ESC_FEED_LINE +
+    formatTableRow(englishLabels.studentName, studentName) +
+    ESC_FEED_LINE +
+    lineSeparator +
+    ESC_FEED_LINE +
+    formatTableRow(englishLabels.payment, `${studentAmount} EGP`) +
+    ESC_FEED_LINE +
+    lineSeparator +
+    ESC_FEED_LINE +
+    ESC_ALIGN_CENTER +
+    ESC_BOLD +
+    ESC_NORMAL_SIZE +
+    englishLabels.thankYou +
+    ESC_FEED_LINE +
+    ESC_FEED_LINE;
 
-    // Print receipt
-    if (!isQzConnected) {
-        message.textContent = 'QZ Tray is not connected. Please connect and try again.';
-        return;
-    }
+  // Print receipt
+  if (!isQzConnected) {
+    message.textContent =
+      'QZ Tray is not connected. Please connect and try again.';
+    return;
+  }
 
-    const config = qz.configs.create('XP-80C (copy 1)'); // Replace with your printer name
+  const config = qz.configs.create('XP-80C (copy 1)'); // Replace with your printer name
 
-    const printData = [
-        { type: 'raw', format: 'command', data: receiptContent },
-        { type: 'raw', format: 'command', data: ESC_CUT }, // Cut paper
-    ];
+  const printData = [
+    { type: 'raw', format: 'command', data: receiptContent },
+    { type: 'raw', format: 'command', data: ESC_CUT }, // Cut paper
+  ];
 
-    qz.print(config, printData)
-        .then(() => console.log('Receipt printed successfully.'))
-        .catch((error) => console.error('Print error:', error));
+  qz.print(config, printData)
+    .then(() => console.log('Receipt printed successfully.'))
+    .catch((error) => console.error('Print error:', error));
 }
 
 
