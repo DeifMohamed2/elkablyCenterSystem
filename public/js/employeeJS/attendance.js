@@ -112,12 +112,19 @@ function printReceipt(data = {}) {
     const right = value.toString().padStart(20, ' ');
     return `| ${left} | ${right} |`;
   }
-  let LOGO = process.env.LOGO;
+  let logoBase64 = './logo.txt'
+  const logoBinary = base64ToBinary(logoBase64);
   // Build receipt content
   const receiptContent =
    
     ESC_RESET +
     ESC_ALIGN_CENTER +
+    String.fromCharCode(
+      logoBinary.length & 0xFF,
+      (logoBinary.length >> 8) & 0xFF,
+      0,
+      0
+    ) +
     LOGO+
     ESC_BOLD +
     ESC_DOUBLE_SIZE +
