@@ -405,9 +405,12 @@ const updateTeacher = async (req, res) => {
 // ======================================== Attendance ======================================== //
 
 const getAttendance = (req, res) => {
+  const employee = req.employee;
+  console.log(employee.device);
     res.render('employee/attendance', {
         title: 'Attendance',
         path: '/employee/attendance',
+        device : employee.device
     });
 }
 

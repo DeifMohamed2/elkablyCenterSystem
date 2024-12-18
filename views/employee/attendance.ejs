@@ -364,8 +364,9 @@ const devices = {
 
 
 
-
-let selectedDevice = devices.device1;
+const deviceData = <%- JSON.stringify(device) %>
+console.log(deviceData);
+let selectedDevice = devices[deviceData];
 qz.security.setSignatureAlgorithm("SHA512"); // Since 2.1
 qz.security.setSignaturePromise(function(toSign) {
 return function(resolve, reject) {
@@ -388,27 +389,6 @@ qz.security.setCertificatePromise(function(resolve, reject) {
 resolve(selectedDevice.certificate);
 });
 
-let selectedDevice2 = devices.device2;
-qz.security.setSignaturePromise(function(toSign) {
-return function(resolve, reject) {
-try {
-var pk = KEYUTIL.getKey(selectedDevice2.privateKey);
-var sig = new KJUR.crypto.Signature({"alg": "SHA512withRSA"}); // Use "SHA1withRSA" for QZ Tray 2.0 and older
-sig.init(pk);
-sig.updateString(toSign);
-var hex = sig.sign();
-console.log("DEBUG: \n\n" + stob64(hextorstr(hex)));
-resolve(stob64(hextorstr(hex)));
-} catch (err) {
-console.error(err);
-reject(err);
-}
-};
-});
-
-qz.security.setCertificatePromise(function(resolve, reject) {
-resolve(selectedDevice2.certificate);
-});
 
 
   </script>

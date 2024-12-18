@@ -53,6 +53,10 @@ const employeeSchema = new Schema(
       default: [],
       required: false,
     },
+    device: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );
