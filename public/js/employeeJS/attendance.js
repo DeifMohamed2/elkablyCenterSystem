@@ -124,6 +124,7 @@ function printReceipt(data = {}) {
     ESC_ALIGN_CENTER +
     ESC_BOLD +
     ESC_DOUBLE2_SIZE +
+    ESC_FEED_LINE +
     'Center (GTA)' +
     ESC_FEED_LINE +
     ESC_NORMAL_SIZE +
