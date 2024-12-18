@@ -112,20 +112,29 @@ function printReceipt(data = {}) {
     const right = value.toString().padStart(20, ' ');
     return `| ${left} | ${right} |`;
   }
-  let logoBase64 = './logo.txt'
+  let logoBase64 = './logo.txt';
+  // Function to decode Base64 to binary
+  function base64ToBinary(base64) {
+    const binaryString = atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
+  }
   const logoBinary = base64ToBinary(logoBase64);
   // Build receipt content
   const receiptContent =
-   
     ESC_RESET +
     ESC_ALIGN_CENTER +
     String.fromCharCode(
-      logoBinary.length & 0xFF,
-      (logoBinary.length >> 8) & 0xFF,
+      logoBinary.length & 0xff,
+      (logoBinary.length >> 8) & 0xff,
       0,
       0
     ) +
-    LOGO+
+    LOGO +
     ESC_BOLD +
     ESC_DOUBLE_SIZE +
     englishLabels.title +
