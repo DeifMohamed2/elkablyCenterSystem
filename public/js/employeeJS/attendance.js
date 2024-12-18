@@ -77,7 +77,7 @@ function printReceipt(data = {}) {
     const {
       studentName = 'N/A',
       studentAmount = 0,
-      date = new Date().toLocaleDateString() + new Date().toLocaleTimeString(),
+      date = new Date().toLocaleDateString() +" "+ new Date().toLocaleTimeString(),
     
     } = data;
 
