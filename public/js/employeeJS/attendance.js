@@ -112,11 +112,13 @@ function printReceipt(data = {}) {
     const right = value.toString().padStart(20, ' ');
     return `| ${left} | ${right} |`;
   }
-
+  let LOGO = process.env.LOGO;
   // Build receipt content
   const receiptContent =
+   
     ESC_RESET +
     ESC_ALIGN_CENTER +
+    LOGO+
     ESC_BOLD +
     ESC_DOUBLE_SIZE +
     englishLabels.title +
