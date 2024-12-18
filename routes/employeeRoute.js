@@ -83,6 +83,8 @@ router.get('/attendance', authMiddleware, employeeController.getAttendance);
 
 router.post('/attend-student', authMiddleware, employeeController.attendStudent);
 
+router.get('/getDeviceData', authMiddleware, employeeController.getDeviceData);
+
 router.get('/get-attended-students', authMiddleware, employeeController.getAttendedStudents);
 
 router.delete('/delete-attend-student/:id', authMiddleware, employeeController.deleteAttendStudent);

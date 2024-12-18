@@ -414,6 +414,11 @@ const getAttendance = (req, res) => {
     });
 }
 
+const getDeviceData = async (req, res) => {
+  const employee = req.employee;
+  res.send({ device: employee.device });
+};
+
 function getDateTime() {
     const today = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'Africa/Cairo', // Egypt's time zone
@@ -1534,6 +1539,7 @@ module.exports = {
     getStudent,
     updateStudent,
     addStudent,
+    getDeviceData,
     searchStudent,
 
     // Teacher
