@@ -84,7 +84,7 @@ function printReceipt(data = {}) {
 
   // English labels for the receipt
   const englishLabels = {
-    title: 'ELKABLY CENTER',
+    title: 'GTA CENTER',
     phone: ' +201234567890', // Example phone number
     date: 'Date',
     teacherName: 'Teacher Name',
@@ -123,11 +123,8 @@ function printReceipt(data = {}) {
     englishLabels.title +
     ESC_FEED_LINE +
     ESC_ALIGN_CENTER +
-    ESC_BOLD +
-    ESC_DOUBLE2_SIZE +
-    ESC_FEED_LINE +
-    'Center (GTA)' +
-    ESC_FEED_LINE +
+ 
+
     ESC_NORMAL_SIZE +
     ESC_FEED_LINE +
     ESC_ALIGN_CENTER +
@@ -176,7 +173,7 @@ function printReceipt(data = {}) {
     return;
   }
 
-  const config = qz.configs.create('XP-80C'); // Replace with your printer name
+  const config = qz.configs.create('XP-80C (copy 1)'); // Replace with your printer name
 
   const printData = [
     { type: 'raw', format: 'command', data: receiptContent },

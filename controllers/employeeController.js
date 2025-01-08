@@ -8,7 +8,6 @@ const ExcelJS = require('exceljs');
 
 
 const waapi = require('@api/waapi');
-const { over } = require('lodash');
 const waapiAPI = process.env.WAAPIAPI;
 waapi.auth(waapiAPI);
 
@@ -1071,15 +1070,15 @@ const downloadAndSendExcelForTeacher = async (req, res) => {
     const fileName = `Attendance_Report_${teacherName}_${new Date().toISOString().split('T')[0]}.xlsx`;
 
     // Send the file via WhatsApp API
-    // await waapi.postInstancesIdClientActionSendMedia(
-    //   {
-    //     mediaBase64: base64Excel, // Base64-encoded Excel file
-    //     chatId: `2${teacherPhoneNumber}@c.us`,
-    //     mediaName: fileName,
-    //     mediaCaption: `Attendance Report for ${teacherName} - ${new Date().toDateString()}`,
-    //   },
-    //   { id: '3421302' } // Replace with actual instance ID if required
-    // );
+    await waapi.postInstancesIdClientActionSendMedia(
+      {
+        mediaBase64: base64Excel, // Base64-encoded Excel file
+        chatId: `2${teacherPhoneNumber}@c.us`,
+        mediaName: fileName,
+        mediaCaption: `Attendance Report for ${teacherName} - ${new Date().toDateString()}`,
+      },
+      { id: '3421302' } // Replace with actual instance ID if required
+    );
     console.log('Excel file sent via WhatsApp');
 
     // Export the Excel file as a downloadable attachment
