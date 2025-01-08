@@ -735,7 +735,65 @@ const getKPIs = async (req, res) => {
 }
 
 
+// ================================= END KPIs ================================ //
 
+// ================================= Billing ================================ //
+
+const admin_billing_Get = async (req, res) => {
+     res.render('admin/adminBilling', {
+       title: 'Billing',
+       path: '/admin/Admin-billing',
+     });
+};
+
+
+const Admin_addBill = (req, res) => {
+    const { billName, billAmount, billNote, billPhoto } = req.body;
+
+    if (billAmount < 0) {
+        res.status(400).send({ message: 'لازم Amount يكون اكبر من 0' });
+        return;
+    }
+
+    if (billName.length < 3) {
+        res.status(400).send({ message: 'اسم الفاتوره لازم يكون اكتر من 3 احرف' });
+        return
+    }
+
+    const bill = new Billing({
+      billName,
+      billAmount,
+      billNote,
+      billPhoto,
+      employee: '674f4a6658bf4795e24ab04a',
+    });
+
+    bill
+        .save()
+        .then((result) => {
+            res.status(201).send(result);
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(400).send({ message: 'هناك مشكله فنيه' });
+        });
+}
+
+
+const Admin_getAllBills = async (req, res) => {
+  try {
+    const allBills = await Billing.find({ employee: '674f4a6658bf4795e24ab04a' }).sort({
+      createdAt: -1,
+      });
+    console.log(allBills);
+    res.send(allBills);
+  }catch (error) {
+    console.error('Error fetching bills:', error);
+    res
+      .status(500)
+      .send({ error: 'An error occurred while fetching bills' });
+  }  
+}
 
 
 // ================================= LogOut ================================ //
@@ -764,7 +822,6 @@ module.exports = {
   getTeachers,
   getTeacher,
   updateTeacher,
-  
 
   billing_Get,
   allBills,
@@ -774,6 +831,9 @@ module.exports = {
   addKpi,
   getKPIs,
 
+  admin_billing_Get,
+  Admin_addBill,
+  Admin_getAllBills,
   // logOut,
   logOut,
 };

@@ -22,6 +22,12 @@ const teacherSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    paymentType : {
+      type: String,
+      enum: ['perSession', 'perCourse'],
+      required: true,
+    },
+
     schedule: {
       type: Map, // A map to represent the days of the week
       of: [

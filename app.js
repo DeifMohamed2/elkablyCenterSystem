@@ -20,14 +20,13 @@ app.use(express.json());
 
 // CONECT to mongodb
 // let io
-const dbURI =
-  'mongodb+srv://3devWay:1qaz2wsx@cluster0.5orkagp.mongodb.net/elkablyCenter?retryWrites=true&w=majority&appName=Cluster0';
+const dbURI = 'mongodb://localhost:27017/ElkablyCenter';
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then((result) => {
      app.listen(8600);
-    
 
-    console.log('connected to db and listening on port 8400');
+     
+     console.log('connected to db and listening on port 8600');
     }).catch((err) => {
         console.log(err)
     })

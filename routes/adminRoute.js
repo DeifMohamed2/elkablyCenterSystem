@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 const jwtSecret = process.env.JWT_SECRET;
 
 const adminController = require('../controllers/adminController.js');
+const employeeController = require('../controllers/employeeController.js'); 
+
 
 const authMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
@@ -69,6 +71,14 @@ router.post('/add-kpi', authMiddleware, adminController.addKpi);
 router.get('/all-kpis', authMiddleware, adminController.getKPIs);
 
 // router.get('/kpi-data', authMiddleware, adminController.kpiData);
+
+// Billing Route
+
+router.get('/Admin-billing', authMiddleware, adminController.admin_billing_Get);
+
+router.post('/Admin-add-bill', authMiddleware, adminController.Admin_addBill);
+
+router.get('/Admin-get-all-bills', authMiddleware, adminController.Admin_getAllBills);
 
 
 

@@ -3,12 +3,12 @@ const Billing = require('../models/billing');
 const Teacher = require('../models/teacher');
 const Student = require('../models/student');
 const Attendance = require('../models/attendance');
+const qrcode = require('qrcode');
 const ExcelJS = require('exceljs');
 
 
 const waapi = require('@api/waapi');
-const { get } = require('lodash');
-const { path } = require('pdfkit');
+const { over } = require('lodash');
 const waapiAPI = process.env.WAAPIAPI;
 waapi.auth(waapiAPI);
 
@@ -124,7 +124,16 @@ const getStudent = async (req, res) => {
 }
 
 const updateStudent = async (req, res) => {
-  const { studentName, studentPhoneNumber, studentParentPhone, studentTeacher ,subject , studentAmount } = req.body;
+  const {
+    studentName,
+    studentPhoneNumber,
+    studentParentPhone,
+    studentTeacher,
+    subject,
+    studentAmount,
+    amountRemaining,
+    installmentAmount,
+  } = req.body;
 
   if (studentName.length < 3) {
       res.status(400).send({ message: 'اسم الطالب لازم يكون اكتر من 3 احرف' });
@@ -154,9 +163,49 @@ const updateStudent = async (req, res) => {
     studentTeacher,
     subject,
     studentAmount,
+    amountRemaining,
+
   }).populate('studentTeacher' , 'teacherName');
 
+  student.amountRemaining -= installmentAmount;
+  student.paidHistory.push({
+    amount: installmentAmount,
+    date: new Date(),
+  });
+
+  await student.save();
   res.send(student);
+}
+
+
+async function sendQRCode(chatId, message, studentCode) {
+  try {
+    // Generate a high-quality QR code in Base64 format
+    const qrData = await qrcode.toDataURL(studentCode, {
+      margin: 2, // White border around the QR code
+      scale: 10, // Scale factor (default is 4, increase for better quality)
+      width: 500, // Adjust width for higher resolution (optional)
+    });
+    const base64Image = qrData.split(',')[1]; // Extract only the Base64 data
+
+    console.log('Generated QR Code Base64:', base64Image);
+    console.log('Sending to Chat ID:', chatId);
+
+    // const response = await waapi.postInstancesIdClientActionSendMedia(
+    //   {
+    //     chatId: chatId, // Target chat ID
+    //     mediaBase64: base64Image,
+    //     mediaName: 'qrcode.png',
+    //     mediaCaption: message,
+    //     asSticker: false, // Set true if you want to send as a sticker
+    //   },
+    //   { id: '34202' } // Replace with your actual instance ID
+    // );
+
+    console.log('QR code sent successfully:', response.data);
+  } catch (error) {
+    console.error('Error sending QR code:', error);
+  }
 }
 
 const addStudent = async (req , res) => {
@@ -166,6 +215,7 @@ const addStudent = async (req , res) => {
       studentParentPhone,
       studentTeacher,
       subject,
+      paymentType,
       studentAmount,
     } = req.body;
 
@@ -195,6 +245,12 @@ const addStudent = async (req , res) => {
         return;
     }
 
+    if (!paymentType) {
+        res.status(400).send({ message: 'يجب اختيار نوع الدفع' });
+        return;
+    }
+
+    const studentCode = Math.floor(Math.random() * (6000 - 1000 + 1)) + 1000;
     const student = new Student({
       studentName,
       studentPhoneNumber,
@@ -202,12 +258,19 @@ const addStudent = async (req , res) => {
       studentTeacher,
       subject,
       studentAmount,
+      amountRemaining: studentAmount,
+      studentCode: studentCode,
+      paymentType,
     });
 
     student
         .save()
-        .then((result) => {
-            res.status(201).send(result);
+        .then(async (result) => {
+            const populatedStudent = await result.populate('studentTeacher', 'teacherName');
+            const message = `Student Name: ${populatedStudent.studentName}\nTeacher: ${populatedStudent.studentTeacher.teacherName}\nSubject: ${populatedStudent.subject}\nAmount: ${populatedStudent.studentAmount}\nStudent Code: ${populatedStudent.studentCode}`;
+            sendQRCode(`2${populatedStudent.studentPhoneNumber}@c.us`, `Scan the QR code to check in\n\n${message}`, populatedStudent.studentCode);
+
+            res.status(201).send(populatedStudent);
         })
         .catch((err) => {
             console.log(err);
@@ -224,7 +287,7 @@ const searchStudent = async (req, res) => {
     // Build the query dynamically
     const query = {};
     if (search) {
-      query.studentPhoneNumber = search; // Filter by phone number if provided
+      query.studentCode = search; // Filter by phone number if provided
     }
     if (teacher) {
       query.studentTeacher = teacher; // Filter by teacher if provided
@@ -257,6 +320,16 @@ const teacher_Get = (req, res) => {
   res.render('employee/teacher', { title: 'Add Teacher', path: '/employee/teacher' });
 };
 
+const getTeachers = async (req, res) => {
+  try {
+    const teachers = await Teacher.find();
+    res.status(200).json(teachers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'حدث خطأ ما، يرجى المحاولة مرة أخرى.' });
+  }
+};
+
 const addTeacher = async (req, res) => {
   try {
     const {
@@ -265,6 +338,7 @@ const addTeacher = async (req, res) => {
       subjectName,
       schedule,
       teacherFees,
+      paymentType,
     } = req.body;
 
     console.log(req.body); // Debugging: Log the incoming request data
@@ -317,6 +391,7 @@ const addTeacher = async (req, res) => {
       teacherPhoneNumber: teacherPhoneNumber.trim(),
       subjectName: subjectName.trim(),
       teacherFees : teacherFees,
+      paymentType,
       schedule,
     });
 
@@ -333,16 +408,6 @@ const addTeacher = async (req, res) => {
       error: 'حدث خطأ ما، يرجى المحاولة مرة أخرى.',
       details: error.message,
     });
-  }
-};
-
-const getTeachers = async (req, res) => {
-  try {
-    const teachers = await Teacher.find();
-    res.status(200).json(teachers);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'حدث خطأ ما، يرجى المحاولة مرة أخرى.' });
   }
 };
 
@@ -431,11 +496,10 @@ const attendStudent = async (req, res) => {
 
   try {
   
-    
-
+   
     // Find student based on barcode or phone number
     const student = await Student.findOne({
-      $or: [{ barCode: searchStudent }, { studentPhoneNumber: searchStudent }],
+      $or: [{ barCode: searchStudent }, { studentCode: searchStudent }],
     }).populate('studentTeacher', 'teacherName subjectName teacherFees');
 
     if (!student) {
@@ -508,7 +572,7 @@ const getAttendedStudents = async (req, res) => {
       path: 'studentsPresent', // Populate student details
       populate: {
         path: 'studentTeacher', // Populate the teacher field for each student
-        select: 'teacherName subjectName teacherFees', // Include teacher fees
+        select: 'teacherName subjectName teacherFees paymentType', // Include teacher fees
       },
     });
 
@@ -526,13 +590,12 @@ const getAttendedStudents = async (req, res) => {
     for (const student of attendance.studentsPresent) {
       const teacher = student.studentTeacher;
 
+   
       if (!teacher) {
         continue; // Skip if no teacher data is available
       }
 
-      // Add the student's amount to the overall total
-      totalAmountFromAllStudents += student.studentAmount;
-
+     
       const teacherId = teacher._id.toString();
 
       // Initialize teacher's data if not already present
@@ -541,20 +604,31 @@ const getAttendedStudents = async (req, res) => {
           teacherId: teacher._id,
           teacherName: teacher.teacherName,
           subjectName: teacher.subjectName,
+          paymentType: teacher.paymentType,
           totalAmount: 0, // Total actual amount collected from students
           totalFees: 0, // Total calculated fees for the teacher
           netProfit: 0, // Net profit (calculated later)
+          totalStudents: 0, // Number of students
         };
       }
+      console.log(teacher.paymentType);
+      if (teacher.paymentType == 'perSession') {
+        // Add the student's amount to the overall total
+        totalAmountFromAllStudents += student.studentAmount;
 
-      // Add the student's amount to the teacher's total amount
-      teacherData[teacherId].totalAmount += student.studentAmount;
+        // Add the student's amount to the teacher's total amount
+        teacherData[teacherId].totalAmount += student.studentAmount;
 
-      // Calculate the teacher's fees (number of students * teacher fees)
-      teacherData[teacherId].totalFees += teacher.teacherFees;
+        // Calculate the teacher's fees (number of students * teacher fees)
+        teacherData[teacherId].totalFees += teacher.teacherFees;
 
-      // Add to the overall total fees
-      totalFeesFromAllTeachers += teacher.teacherFees;
+        // Add to the overall total fees
+        totalFeesFromAllTeachers += teacher.teacherFees;
+
+      }
+      // Increment the number of students for the teacher
+      teacherData[teacherId].totalStudents += 1;
+
     }
 
     // Calculate net profit for each teacher
@@ -630,7 +704,7 @@ const downloadAttendanceExcel = async (req, res) => {
       path: 'studentsPresent',
       populate: {
         path: 'studentTeacher',
-        select: 'teacherName subjectName teacherFees', // Include teacher details
+        select: 'teacherName subjectName teacherFees paymentType', // Include teacher details
       },
     });
 
@@ -716,11 +790,13 @@ const downloadAttendanceExcel = async (req, res) => {
       const studentPhoneNumber = student.studentPhoneNumber;
       const studentAmount = student.studentAmount;
       const teacherFees = student.studentTeacher.teacherFees;
-
+      const amountRemaining = student.amountRemaining;
       if (!teacherData[teacherName]) {
         teacherData[teacherName] = {
           students: [],
+          paymentType: student.studentTeacher.paymentType,
           totalAmount: 0,
+          totalAmountRemaining: 0,
           totalFees: 0,
           totalProfit: 0,
         };
@@ -731,16 +807,18 @@ const downloadAttendanceExcel = async (req, res) => {
         studentPhoneNumber,
         studentAmount,
         teacherFees,
+        amountRemaining,
         netProfit: studentAmount - teacherFees,
       });
-
       teacherData[teacherName].totalAmount += studentAmount;
+      teacherData[teacherName].totalAmountRemaining += amountRemaining;
       teacherData[teacherName].totalFees += teacherFees;
       teacherData[teacherName].totalProfit += studentAmount - teacherFees;
-
-      overallTotalAmount += studentAmount;
-      overallTotalFees += teacherFees;
-      overallTotalProfit += studentAmount - teacherFees;
+      if (student.paymentType == 'perSession') {
+        overallTotalAmount += studentAmount;
+        overallTotalFees += teacherFees;
+        overallTotalProfit += studentAmount - teacherFees;
+      }
     }
 
     // Populate data by teacher
@@ -750,28 +828,29 @@ const downloadAttendanceExcel = async (req, res) => {
       worksheet.getCell(`A${rowIndex}`).value = teacherName;
       worksheet.getCell(`A${rowIndex}`).style = headerStyle;
       rowIndex++;
-
+      const isTeacherPerSession = teacherData[teacherName].paymentType == 'perSession';
       // Column headers for student data
       worksheet.getRow(rowIndex).values = [
         'Student Name',
         'Phone Number',
         'Amount (EGP)',
-        'Center Fees (EGP)',
-        'Teacher Fees (EGP)',
+        isTeacherPerSession ? 'Center Fees (EGP)' : 'Amount Remaining (EGP)',
+        isTeacherPerSession ?'Teacher Fees (EGP)':'',
       ];
       worksheet
         .getRow(rowIndex)
         .eachCell((cell) => (cell.style = columnHeaderStyle));
       rowIndex++;
-
+    
       // Add student data rows
       teacherData[teacherName].students.forEach((student) => {
+          console.log(student.studentAmount);
         worksheet.getRow(rowIndex).values = [
           student.studentName,
           student.studentPhoneNumber,
           student.studentAmount,
-          student.teacherFees,
-          student.netProfit,
+          isTeacherPerSession ? student.teacherFees : student.studentAmount,
+          isTeacherPerSession ? student.netProfit:'',
         ];
         worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = cellStyle));
         rowIndex++;
@@ -782,8 +861,10 @@ const downloadAttendanceExcel = async (req, res) => {
         `Total for ${teacherName}`,
         '',
         teacherData[teacherName].totalAmount,
-        teacherData[teacherName].totalFees,
-        teacherData[teacherName].totalProfit,
+        isTeacherPerSession
+          ? teacherData[teacherName].totalFees
+          : teacherData[teacherName].totalAmountRemaining,
+        isTeacherPerSession ? teacherData[teacherName].totalProfit:'',
       ];
       worksheet
         .getRow(rowIndex)
@@ -907,7 +988,7 @@ const downloadAndSendExcelForTeacher = async (req, res) => {
     };
 
     // Add header
-    worksheet.mergeCells('A1:E1');
+    worksheet.mergeCells('A1:F1');
     worksheet.getCell(
       'A1'
     ).value = `Attendance Report for ${new Date().toDateString()}`;
@@ -916,18 +997,20 @@ const downloadAndSendExcelForTeacher = async (req, res) => {
       alignment: { horizontal: 'center', vertical: 'middle' },
       fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '4472C4' } },
     };
-
+    const isTeacherSession = teacher.paymentType == 'perSession';
     // Add column headers
     worksheet.getRow(2).values = [
       'Student Name',
       'Phone Number',
       'Amount (EGP)',
-      'Center Fees (EGP)',
-      'Teacher Fees (EGP)',
+      isTeacherSession ? `Center Fees (EGP)` : 'Amount Remaining (EGP)',
+      isTeacherSession ? 'Teacher Fees (EGP)' : '',
+      'Total Students',
     ];
     worksheet.getRow(2).eachCell((cell) => (cell.style = columnHeaderStyle));
 
     let totalAmount = 0;
+    let totalAmountRemaining =0
     let totalFees = 0;
     let totalProfit = 0;
     let rowIndex = 3;
@@ -943,17 +1026,18 @@ const downloadAndSendExcelForTeacher = async (req, res) => {
 
       const studentAmount = student.studentAmount;
       const teacherFees = student.studentTeacher.teacherFees;
-
+      const studentAmountRemaining = student.amountRemaining;
       worksheet.getRow(rowIndex).values = [
         student.studentName,
         student.studentPhoneNumber,
         studentAmount,
-        teacherFees,
-        studentAmount - teacherFees,
+        isTeacherSession ? teacherFees : student.amountRemaining,
+        isTeacherSession? studentAmount - teacherFees :'',
       ];
       worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = cellStyle));
 
       totalAmount += studentAmount;
+      totalAmountRemaining += studentAmountRemaining;
       totalFees += teacherFees;
       totalProfit += studentAmount - teacherFees;
 
@@ -965,8 +1049,9 @@ const downloadAndSendExcelForTeacher = async (req, res) => {
       'Total',
       '',
       totalAmount,
-      totalFees,
-      totalProfit,
+      isTeacherSession ? totalFees :totalAmountRemaining ,
+      isTeacherSession ? totalProfit : '',
+      attendance.studentsPresent.filter(student => student.studentTeacher._id.toString() === id).length,
     ];
     worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = totalRowStyle));
 
@@ -977,6 +1062,7 @@ const downloadAndSendExcelForTeacher = async (req, res) => {
       { width: 20 }, // Amount
       { width: 20 }, // Fees
       { width: 20 }, // Net Profit
+      { width: 20 }, // Total Students
     ];
 // Create the Excel workbook
     const buffer = await workbook.xlsx.writeBuffer();
@@ -985,15 +1071,15 @@ const downloadAndSendExcelForTeacher = async (req, res) => {
     const fileName = `Attendance_Report_${teacherName}_${new Date().toISOString().split('T')[0]}.xlsx`;
 
     // Send the file via WhatsApp API
-    await waapi.postInstancesIdClientActionSendMedia(
-      {
-        mediaBase64: base64Excel, // Base64-encoded Excel file
-        chatId: `2${teacherPhoneNumber}@c.us`,
-        mediaName: fileName,
-        mediaCaption: `Attendance Report for ${teacherName} - ${new Date().toDateString()}`,
-      },
-      { id: '24954' } // Replace with actual instance ID if required
-    );
+    // await waapi.postInstancesIdClientActionSendMedia(
+    //   {
+    //     mediaBase64: base64Excel, // Base64-encoded Excel file
+    //     chatId: `2${teacherPhoneNumber}@c.us`,
+    //     mediaName: fileName,
+    //     mediaCaption: `Attendance Report for ${teacherName} - ${new Date().toDateString()}`,
+    //   },
+    //   { id: '3421302' } // Replace with actual instance ID if required
+    // );
     console.log('Excel file sent via WhatsApp');
 
     // Export the Excel file as a downloadable attachment
@@ -1033,16 +1119,17 @@ const handelAttendance = async (req, res) => {
   });
 }
 const getAttendanceByDate = async (req, res) => {
-  const { date } = req.query;
+  const { date  } = req.query;
   try {
-   
+    // console.log(today);
+    // Find today's attendance record
     const attendance = await Attendance.findOne({
       date: date,
     }).populate({
       path: 'studentsPresent', // Populate student details
       populate: {
         path: 'studentTeacher', // Populate the teacher field for each student
-        select: 'teacherName subjectName teacherFees', // Include teacher fees
+        select: 'teacherName subjectName teacherFees paymentType', // Include teacher fees
       },
     });
 
@@ -1064,9 +1151,6 @@ const getAttendanceByDate = async (req, res) => {
         continue; // Skip if no teacher data is available
       }
 
-      // Add the student's amount to the overall total
-      totalAmountFromAllStudents += student.studentAmount;
-
       const teacherId = teacher._id.toString();
 
       // Initialize teacher's data if not already present
@@ -1075,20 +1159,29 @@ const getAttendanceByDate = async (req, res) => {
           teacherId: teacher._id,
           teacherName: teacher.teacherName,
           subjectName: teacher.subjectName,
+          paymentType: teacher.paymentType,
           totalAmount: 0, // Total actual amount collected from students
           totalFees: 0, // Total calculated fees for the teacher
           netProfit: 0, // Net profit (calculated later)
+          totalStudents: 0, // Number of students
         };
       }
+      console.log(teacher.paymentType);
+      if (teacher.paymentType == 'perSession') {
+        // Add the student's amount to the overall total
+        totalAmountFromAllStudents += student.studentAmount;
 
-      // Add the student's amount to the teacher's total amount
-      teacherData[teacherId].totalAmount += student.studentAmount;
+        // Add the student's amount to the teacher's total amount
+        teacherData[teacherId].totalAmount += student.studentAmount;
 
-      // Calculate the teacher's fees (number of students * teacher fees)
-      teacherData[teacherId].totalFees += teacher.teacherFees;
+        // Calculate the teacher's fees (number of students * teacher fees)
+        teacherData[teacherId].totalFees += teacher.teacherFees;
 
-      // Add to the overall total fees
-      totalFeesFromAllTeachers += teacher.teacherFees;
+        // Add to the overall total fees
+        totalFeesFromAllTeachers += teacher.teacherFees;
+      }
+      // Increment the number of students for the teacher
+      teacherData[teacherId].totalStudents += 1;
     }
 
     // Calculate net profit for each teacher
@@ -1117,23 +1210,22 @@ const getAttendanceByDate = async (req, res) => {
 const downloadAttendanceExcelByDate = async (req, res) => {
   const { date } = req.query;
   try {
-
- 
+    console.log(getDateTime());
     const attendance = await Attendance.findOne({
       date: date,
     }).populate({
       path: 'studentsPresent',
       populate: {
         path: 'studentTeacher',
-        select: 'teacherName subjectName teacherFees', // Include teacher details
+        select: 'teacherName subjectName teacherFees paymentType', // Include teacher details
       },
     });
 
     if (!attendance) {
-      
       return res.status(404).json({ message: 'No attendance record found' });
     }
 
+    console.log(attendance);
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Attendance Report');
@@ -1210,11 +1302,13 @@ const downloadAttendanceExcelByDate = async (req, res) => {
       const studentPhoneNumber = student.studentPhoneNumber;
       const studentAmount = student.studentAmount;
       const teacherFees = student.studentTeacher.teacherFees;
-
+      const amountRemaining = student.amountRemaining;
       if (!teacherData[teacherName]) {
         teacherData[teacherName] = {
           students: [],
+          paymentType: student.studentTeacher.paymentType,
           totalAmount: 0,
+          totalAmountRemaining: 0,
           totalFees: 0,
           totalProfit: 0,
         };
@@ -1225,16 +1319,18 @@ const downloadAttendanceExcelByDate = async (req, res) => {
         studentPhoneNumber,
         studentAmount,
         teacherFees,
+        amountRemaining,
         netProfit: studentAmount - teacherFees,
       });
-
       teacherData[teacherName].totalAmount += studentAmount;
+      teacherData[teacherName].totalAmountRemaining += amountRemaining;
       teacherData[teacherName].totalFees += teacherFees;
       teacherData[teacherName].totalProfit += studentAmount - teacherFees;
-
-      overallTotalAmount += studentAmount;
-      overallTotalFees += teacherFees;
-      overallTotalProfit += studentAmount - teacherFees;
+      if (student.paymentType == 'perSession') {
+        overallTotalAmount += studentAmount;
+        overallTotalFees += teacherFees;
+        overallTotalProfit += studentAmount - teacherFees;
+      }
     }
 
     // Populate data by teacher
@@ -1244,14 +1340,15 @@ const downloadAttendanceExcelByDate = async (req, res) => {
       worksheet.getCell(`A${rowIndex}`).value = teacherName;
       worksheet.getCell(`A${rowIndex}`).style = headerStyle;
       rowIndex++;
-
+      const isTeacherPerSession =
+        teacherData[teacherName].paymentType == 'perSession';
       // Column headers for student data
       worksheet.getRow(rowIndex).values = [
         'Student Name',
         'Phone Number',
         'Amount (EGP)',
-        'Center Fees (EGP)',
-        'Teacher Fees (EGP)',
+        isTeacherPerSession ? 'Center Fees (EGP)' : 'Amount Remaining (EGP)',
+        isTeacherPerSession ? 'Teacher Fees (EGP)' : '',
       ];
       worksheet
         .getRow(rowIndex)
@@ -1260,12 +1357,13 @@ const downloadAttendanceExcelByDate = async (req, res) => {
 
       // Add student data rows
       teacherData[teacherName].students.forEach((student) => {
+        console.log(student.studentAmount);
         worksheet.getRow(rowIndex).values = [
           student.studentName,
           student.studentPhoneNumber,
           student.studentAmount,
-          student.teacherFees,
-          student.netProfit,
+          isTeacherPerSession ? student.teacherFees : student.studentAmount,
+          isTeacherPerSession ? student.netProfit : '',
         ];
         worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = cellStyle));
         rowIndex++;
@@ -1276,8 +1374,10 @@ const downloadAttendanceExcelByDate = async (req, res) => {
         `Total for ${teacherName}`,
         '',
         teacherData[teacherName].totalAmount,
-        teacherData[teacherName].totalFees,
-        teacherData[teacherName].totalProfit,
+        isTeacherPerSession
+          ? teacherData[teacherName].totalFees
+          : teacherData[teacherName].totalAmountRemaining,
+        isTeacherPerSession ? teacherData[teacherName].totalProfit : '',
       ];
       worksheet
         .getRow(rowIndex)
@@ -1286,15 +1386,15 @@ const downloadAttendanceExcelByDate = async (req, res) => {
     }
 
     // Overall totals
-    worksheet.mergeCells(`A${rowIndex+1}:B${rowIndex+1}`);
-    worksheet.getCell(`A${rowIndex+1}`).value = 'Overall Total';
-    worksheet.getCell(`A${rowIndex+1}`).style = totalRowStyle;
-    worksheet.getCell(`C${rowIndex+1}`).value = overallTotalAmount;
-    worksheet.getCell(`C${rowIndex+1}`).style = totalRowStyle;
-    worksheet.getCell(`D${rowIndex+1}`).value = overallTotalFees;
-    worksheet.getCell(`D${rowIndex+1}`).style = totalRowStyle;
-    worksheet.getCell(`E${rowIndex+1}`).value = overallTotalProfit;
-    worksheet.getCell(`E${rowIndex+1}`).style = totalRowStyle;
+    worksheet.mergeCells(`A${rowIndex + 1}:B${rowIndex + 1}`);
+    worksheet.getCell(`A${rowIndex + 1}`).value = 'Overall Total';
+    worksheet.getCell(`A${rowIndex + 1}`).style = totalRowStyle;
+    worksheet.getCell(`C${rowIndex + 1}`).value = overallTotalAmount;
+    worksheet.getCell(`C${rowIndex + 1}`).style = totalRowStyle;
+    worksheet.getCell(`D${rowIndex + 1}`).value = overallTotalFees;
+    worksheet.getCell(`D${rowIndex + 1}`).style = totalRowStyle;
+    worksheet.getCell(`E${rowIndex + 1}`).value = overallTotalProfit;
+    worksheet.getCell(`E${rowIndex + 1}`).style = totalRowStyle;
 
     // Set column widths
     worksheet.columns = [
@@ -1400,7 +1500,7 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
     };
 
     // Add header
-    worksheet.mergeCells('A1:E1');
+    worksheet.mergeCells('A1:F1');
     worksheet.getCell(
       'A1'
     ).value = `Attendance Report for ${new Date().toDateString()}`;
@@ -1409,18 +1509,20 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
       alignment: { horizontal: 'center', vertical: 'middle' },
       fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '4472C4' } },
     };
-
+    const isTeacherSession = teacher.paymentType == 'perSession';
     // Add column headers
     worksheet.getRow(2).values = [
       'Student Name',
       'Phone Number',
       'Amount (EGP)',
-      'Center Fees (EGP)',
-      'Teacher Fees (EGP)',
+      isTeacherSession ? `Center Fees (EGP)` : 'Amount Remaining (EGP)',
+      isTeacherSession ? 'Teacher Fees (EGP)' : '',
+      'Total Students',
     ];
     worksheet.getRow(2).eachCell((cell) => (cell.style = columnHeaderStyle));
 
     let totalAmount = 0;
+    let totalAmountRemaining = 0;
     let totalFees = 0;
     let totalProfit = 0;
     let rowIndex = 3;
@@ -1436,17 +1538,18 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
 
       const studentAmount = student.studentAmount;
       const teacherFees = student.studentTeacher.teacherFees;
-
+      const studentAmountRemaining = student.amountRemaining;
       worksheet.getRow(rowIndex).values = [
         student.studentName,
         student.studentPhoneNumber,
         studentAmount,
-        teacherFees,
-        studentAmount - teacherFees,
+        isTeacherSession ? teacherFees : student.amountRemaining,
+        isTeacherSession ? studentAmount - teacherFees : '',
       ];
       worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = cellStyle));
 
       totalAmount += studentAmount;
+      totalAmountRemaining += studentAmountRemaining;
       totalFees += teacherFees;
       totalProfit += studentAmount - teacherFees;
 
@@ -1458,8 +1561,11 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
       'Total',
       '',
       totalAmount,
-      totalFees,
-      totalProfit,
+      isTeacherSession ? totalFees : totalAmountRemaining,
+      isTeacherSession ? totalProfit : '',
+      attendance.studentsPresent.filter(
+        (student) => student.studentTeacher._id.toString() === id
+      ).length,
     ];
     worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = totalRowStyle));
 
@@ -1470,36 +1576,41 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
       { width: 20 }, // Amount
       { width: 20 }, // Fees
       { width: 20 }, // Net Profit
+      { width: 20 }, // Total Students
     ];
-// Create the Excel workbook
+    // Create the Excel workbook
     const buffer = await workbook.xlsx.writeBuffer();
     const base64Excel = buffer.toString('base64'); // Convert the Excel buffer to a Base64 string
 
-    const fileName = `Attendance_Report_${teacherName}_${new Date().toISOString().split('T')[0]}.xlsx`;
+    const fileName = `Attendance_Report_${teacherName}_${
+      new Date().toISOString().split('T')[0]
+    }.xlsx`;
 
     // Send the file via WhatsApp API
-    await waapi.postInstancesIdClientActionSendMedia(
-      {
-        mediaBase64: base64Excel, // Base64-encoded Excel file
-        chatId: `2${teacherPhoneNumber}@c.us`,
-        mediaName: fileName,
-        mediaCaption: `Attendance Report for ${teacherName} - ${new Date().toDateString()}`,
-      },
-      { id: '24954' } // Replace with actual instance ID if required
-    );
+    // await waapi.postInstancesIdClientActionSendMedia(
+    //   {
+    //     mediaBase64: base64Excel, // Base64-encoded Excel file
+    //     chatId: `2${teacherPhoneNumber}@c.us`,
+    //     mediaName: fileName,
+    //     mediaCaption: `Attendance Report for ${teacherName} - ${new Date().toDateString()}`,
+    //   },
+    //   { id: '3421302' } // Replace with actual instance ID if required
+    // );
     console.log('Excel file sent via WhatsApp');
 
     // Export the Excel file as a downloadable attachment
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
     res.setHeader(
       'Content-Disposition',
       `attachment; filename="Attendance_Report_${new Date().toDateString()}.xlsx"`
     );
-    
+
     // Write the Excel file to the response stream
     await workbook.xlsx.write(res);
     res.end();
-
   } catch (error) {
     console.error('Error processing the Excel file:', error);
     // Send a response only once, in case of an error

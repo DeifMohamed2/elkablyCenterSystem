@@ -11,6 +11,7 @@ const teachersSummaryRow = document.getElementById('teachersSummaryRow');
 const downloadExcelBtn = document.getElementById('downloadExcelBtn');
 const attendanceDate = document.getElementById('date');
 
+
 // Function to add addStudentsToTable to the tbody
 
 const addStudentsToTable = (students) => {
@@ -81,41 +82,61 @@ attendanceByDateForm.onsubmit = async (event) => {
 const teachersSummary = (teachers) => {
   teachersSummaryRow.innerHTML = ''; // Clear existing rows
   teachers.forEach((teacher, index) => {
+    let innerHTMLs= '';
+    if(teacher.paymentType == 'perSession'){
+      innerHTMLs = `
+        <p class="text-sm mb-0 text-capitalize">المبلغ الكلي</p>
+        <h4 class="mb-0" dir="ltr">${teacher.totalAmount} EGP</h4>
+        <p class="text-sm mb-0 text-capitalize mt-3">نسبة السنتر</p>
+        <h4 class="mb-0" dir="ltr">${teacher.totalFees} EGP</h4>
+        <p class="text-sm mb-0 text-capitalize mt-3">المبلغ بعد خصم النسبة</p>
+        <h4 class="mb-0" dir="ltr">${teacher.netProfit} EGP</h4>
+     
+      `
+    }
     // Add teacher cards
     teachersSummaryRow.innerHTML += `
              <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
                   <div class="card">
-                    <div class="card-header d-flex justify-content-between p-3 pt-2">
-                      <div class="text-start pt-1">
-                        <h3 class="mb-0 text-capitalize">${teacher.teacherName}</h3>
+                    <div class="card-header  p-3 pt-2 text-center">
+                      <div class="text-center pt-1">
+                        <h3 class="mb-0 text-capitalize">${
+                          teacher.teacherName
+                        }</h3>
+                        <h4 class="mb-0 text-capitalize ">( ${
+                          teacher.paymentType == 'perSession'
+                            ? 'Per Session'
+                            : 'Per Course'
+                        } )</h4>  
                       </div>
                     </div>
                     <hr class="dark horizontal my-0">
                     <div class="card-body text-center">
-                      <p class="text-sm mb-0 text-capitalize">المبلغ الكلي</p>
-                      <h4 class="mb-0" dir="ltr">${teacher.totalAmount} EGP</h4>
-                      <p class="text-sm mb-0 text-capitalize mt-3">نسبة السنتر</p>
-                      <h4 class="mb-0" dir="ltr">${teacher.totalFees} EGP</h4>
-                      <p class="text-sm mb-0 text-capitalize mt-3">المبلغ بعد خصم النسبة</p>
-                      <h4 class="mb-0" dir="ltr">${teacher.netProfit} EGP</h4>
-                      <button type="button" class="btn bg-gradient-dark mt-3 sendExcelBtn" data-teacher-id="${teacher.teacherId}">
+                       <p class="text-sm mb-0 text-capitalize"> عدد الطلاب</p>
+                      <h4 class="mb-0" dir="ltr">${teacher.totalStudents} </h4>
+                        ${innerHTMLs}
+                        <button type="button" class="btn bg-gradient-dark mt-3 sendExcelBtn" data-teacher-id="${
+                             teacher.teacherId
+                         }">
                         <i class="material-symbols-rounded text-sm">send</i>&nbsp;&nbsp;ارسال نسخة اكسل
                       </button>
                     </div>
                   </div>
                 </div>
             `;
-    const sendExcelBtns = document.querySelectorAll('.sendExcelBtn');
-    sendExcelBtns.forEach((button) => {
-      button.addEventListener('click', async (event) => {
-        const teacherId = event.target.getAttribute('data-teacher-id');
-        const originalText = event.target.innerHTML;
-        event.target.innerHTML = 'جاري التحميل...';
-        await downloadAndSendExcelForTeacher(teacherId, teacher.teacherName);
-        event.target.innerHTML = originalText;
-      });
-    });
+            const sendExcelBtns = document.querySelectorAll('.sendExcelBtn');
+            sendExcelBtns.forEach((button) => {
+                button.addEventListener('click', async (event) => {
+                    const teacherId = event.target.getAttribute('data-teacher-id');
+                    const originalText = event.target.innerHTML;
+                    event.target.innerHTML = 'جاري التحميل...';
+                    await downloadAndSendExcelForTeacher(teacherId, teacher.teacherName);
+                    event.target.innerHTML = originalText;
+                });
+            });
+
   });
+
 
 };
 

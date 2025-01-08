@@ -57,9 +57,12 @@ const addStudentToTable = (student) => {
     <td class="text-center">${student.studentName}</td>
     <td class="text-center">${student.studentPhoneNumber}</td>
     <td class="text-center">${student.studentParentPhone}</td>
-    <td class="text-center">${student.studentAmount}</td>
+    <td class="text-center">${student.studentCode}</td>
     <td class="text-center">${student.subject}</td>
     <td class="text-center">${student.studentTeacher['teacherName']}</td>
+    <td class="text-center">${student.paymentType =='perSession' ? 'Per Session':'Per Course' }</td>
+    <td class="text-center">${student.studentAmount}</td>
+    <td class="text-center">${student.amountRemaining ?student.amountRemaining:'N/A' }</td>
     <td class="align-middle text-center">
       <button class="edit-student-btn mt-2" data-id="${student._id}" 
       data-bs-toggle="modal" data-bs-target="#editStudentModal">Edit</button>
@@ -121,6 +124,15 @@ const openEditModal = async (id) => {
 
     document.getElementById('editSubject').value = student.subject;
 
+    document.getElementById('modalPaymentType').innerHTML = student.paymentType =='perSession' ? 'Per Session':'Per Course';
+
+    document.getElementById('installmentAmountDiv').style.display = student.paymentType =='perSession' ? 'none':'block';
+
+    document.getElementById('amountRemainingDiv').style.display = student.paymentType =='perSession' ? 'none':'block';
+
+    document.getElementById('editAmountRemaining').value = student.amountRemaining ?student.amountRemaining:'N/A';
+    
+    document.getElementById('installmentAmount').value = '';
     // Set the teacher in the select dropdown
     const teacherSelect = document.getElementById('editTeacherName');
     const teacherId = student.studentTeacher._id; // Ensure this is the ID of the teacher
@@ -128,6 +140,7 @@ const openEditModal = async (id) => {
     teacherSelect.value = teacherId;
 
     document.getElementById('editStudentId').value = student._id;
+    
   } catch (error) {
     console.error('Error fetching student details:', error);
     errorMessage.classList.add('show');
@@ -149,6 +162,10 @@ const saveEditStudent = async () => {
   const editStudentAmount = document.getElementById('editStudentAmount').value;
   const editSubject = document.getElementById('editSubject').value;
   const editTeacherName = document.getElementById('editTeacherName').value;
+  const editAmountRemaining = document.getElementById('editAmountRemaining').value;
+  const installmentAmount = document.getElementById('installmentAmount').value;
+
+
   const Id = document.getElementById('editStudentId').value;
 
   const data = {
@@ -158,6 +175,8 @@ const saveEditStudent = async () => {
     studentAmount: editStudentAmount,
     subject: editSubject,
     studentTeacher: editTeacherName,
+    amountRemaining: editAmountRemaining,
+    installmentAmount: installmentAmount,
   };
 
   try {
@@ -178,9 +197,12 @@ const saveEditStudent = async () => {
       row.cells[0].textContent = responseData.studentName;
       row.cells[1].textContent = responseData.studentPhoneNumber;
       row.cells[2].textContent = responseData.studentParentPhone;
-      row.cells[3].textContent = responseData.studentAmount;
+      row.cells[3].textContent = responseData.studentCode;
       row.cells[4].textContent = responseData.subject;
       row.cells[5].textContent = responseData.studentTeacher.teacherName;
+      row.cells[6].textContent = responseData.paymentType == 'perSession' ? 'Per Session' : 'Per Course';
+      row.cells[7].textContent = responseData.studentAmount;
+      row.cells[8].textContent = responseData.amountRemaining ? responseData.amountRemaining : 'N/A';
 
       clodeModalBtn.click();
       successToast.classList.add('show');

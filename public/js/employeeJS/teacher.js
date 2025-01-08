@@ -99,6 +99,7 @@ addTeacherForm.addEventListener('submit', async (e) => {
     document.getElementById('teacherPhoneNumber').value;
   const subjectName = document.getElementById('subjectName').value;
   const teacherFees = document.getElementById('teacherFees').value;
+  const paymentType = document.getElementById('paymentType').value;
 
   const schedule = {};
   document.querySelectorAll('#timeSlots > .row').forEach((dayDiv) => {
@@ -128,6 +129,7 @@ addTeacherForm.addEventListener('submit', async (e) => {
     subjectName,
     schedule,
     teacherFees,
+    paymentType,
   };
 
   console.log(data); // Log the updated data with roomID
@@ -182,6 +184,7 @@ const getTeachers = async () => {
          </td>
         <td class="align-middle text-center">${teacher.teacherPhoneNumber}</td>
         <td class="align-middle text-center">${teacher.subjectName}</td>
+        <td class="align-middle text-center">${teacher.paymentType == 'perSession' ? 'Per Session' : 'Per Course'  }</td>
         <td class="align-middle text-center">${teacher.teacherFees}</td>
         
    

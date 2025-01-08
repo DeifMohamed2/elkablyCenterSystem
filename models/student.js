@@ -10,7 +10,6 @@ const studentSchema = new Schema(
     studentPhoneNumber: {
       type: String,
       required: true,
-      unique: true,
     },
     studentParentPhone: {
       type: String,
@@ -34,10 +33,38 @@ const studentSchema = new Schema(
       type: Number,
       required: true,
     },
+    paymentType: {
+      type: String,
+      enum: ['perSession', 'perCourse'],
+      required: true,
+    },
+    amountRemaining: {
+      type: Number,
+      required: true,
+    },
+
+    paidHistory: [
+      {
+        amount: {
+          type: Number,
+          required: true,
+        },
+        date: {
+          type: Date,
+          required: true,
+        },
+      },
+    ],
     barCode: {
       type: String,
       required: false,
     },
+    studentCode: {
+      type: String,
+      required: false,
+      unique: true,
+    },
+
   },
   { timestamps: true }
 );

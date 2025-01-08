@@ -10,9 +10,9 @@
     <div class="collapse navbar-collapse px-0 w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav " >
         <li class="nav-item">
-          <a class="<%= path=='/admin/dashboard' ? 'nav-link active bg-gradient-dark text-white ':'nav-link text-dark ' %>" href="/admin/dashboard">
+          <a class="<%= path=='/admin/' ? 'nav-link active bg-gradient-dark text-white ':'nav-link text-dark ' %>" href="#">
             <i class="material-symbols-rounded opacity-10">dashboard</i>
-            <span class="nav-link-text me-1 fs-6">لوحة التحكم</span>
+            <span class="nav-link-text me-1 fs-6">لوحة التحكم (Under Development)</span>
           </a>
         </li>
         <li class="nav-item">
@@ -24,7 +24,13 @@
         <li class="nav-item">
           <a class="<%= path=='/admin/billing' ? 'nav-link active bg-gradient-dark text-white ':'nav-link text-dark ' %>" href="/admin/billing">
             <i class="material-symbols-rounded opacity-10">receipt_long</i>
-            <span class="nav-link-text me-1">الفواتير والملاحظات</span>
+            <span class="nav-link-text me-1">مراجعه والملاحظات </span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="<%= path=='/admin/Admin-billing' ? 'nav-link active bg-gradient-dark text-white ':'nav-link text-dark ' %>" href="/admin/Admin-billing">
+            <i class="material-symbols-rounded opacity-10">receipt_long</i>
+            <span class="nav-link-text me-1">اضف الفواتير والملاحظات </span>
           </a>
         </li>
         <li class="nav-item">

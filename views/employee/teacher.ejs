@@ -74,6 +74,7 @@
               <label for="editTeacherSubject" class="form-label">Subject</label>
               <input type="text" class="form-control border border-1 text-center" id="editTeacherSubject" required>
             </div>
+            
             <div class="mb-3">
               <label for="editTeacherFees" class="form-label">Fees ( Not Editable )</label>
               <input type="number" class="form-control border border-1 text-center" id="editTeacherFees" required readonly>
@@ -110,42 +111,7 @@
       <div class="row">
         <div class="col-lg-12">
           <div class="row">
-          
-            <!-- <div class="col-xl-6">
-              <div class="row">
-                <div class="col-md-6 col-6">
-                  <div class="card">
-                    <div class="card-header mx-4 p-3 text-center">
-                      <div class="icon icon-shape icon-lg bg-gradient-dark shadow text-center border-radius-lg">
-                        <i class="material-symbols-rounded opacity-10">account_balance</i>
-                      </div>
-                    </div>
-                    <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Salary</h6>
-                      <span class="text-xs">Belong Interactive</span>
-                      <hr class="horizontal dark my-3">
-                      <h5 class="mb-0">+$2000</h5>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6 col-6">
-                  <div class="card">
-                    <div class="card-header mx-4 p-3 text-center">
-                      <div class="icon icon-shape icon-lg bg-gradient-dark shadow text-center border-radius-lg">
-                        <i class="material-symbols-rounded opacity-10">account_balance_wallet</i>
-                      </div>
-                    </div>
-                    <div class="card-body pt-0 p-3 text-center">
-                      <h6 class="text-center mb-0">Paypal</h6>
-                      <span class="text-xs">Freelance Payment</span>
-                      <hr class="horizontal dark my-3">
-                      <h5 class="mb-0">$455.00</h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> -->
-           
+   
             <div class="col-md-12 mb-lg-0 mb-4">
            <form id="addTeacherForm">
             <div class="card mt-4">
@@ -179,6 +145,15 @@
                      <input type="text" class="form-control p-2 fs-5 text-center" placeholder="اسم المادة" id="subjectName" name="subjectName" required>
                     </div>
                   </div>
+
+                    <div class="col-md-3">
+                       <select class="form-select border border-2 rounded text-center" id="paymentType" name="paymentType" required>
+                         <option selected value="">اختر نوع الدفع</option>
+                         <option value="perSession"> Per Session </option>
+                         <option value="perCourse"> Per Course</option>
+                       </select>
+                  </div>
+
                   <div class="col-md-3">
                     <div class="input-group mb-3 border border-2 rounded">
                      <input type="number" class="form-control p-2 fs-5 text-center" placeholder="Fees " id="teacherFees" name="teacherFees" required>
@@ -215,6 +190,18 @@
                       <input class="form-check-input" type="checkbox" id="thursday" value="Thursday" onchange="toggleSchedule('Thursday')">
                       <label class="form-check-label" for="thursday">الخميس</label>
                     </div>
+
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" id="friday" value="Friday" onchange="toggleSchedule('Friday')">
+                      <label class="form-check-label" for="friday">الجمعة</label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" id="saturday" value="Saturday" onchange="toggleSchedule('Saturday')">
+                      <label class="form-check-label" for="saturday">السبت</label>
+                    </div>
+
+                    
 
                   </div>
                 </div>
@@ -258,6 +245,7 @@
                       <th class=" text-uppercase text-secondary text-m font-weight-bolder opacity-7">اسم المعلم</th>
                       <th class="text-uppercase text-secondary text-m  font-weight-bolder opacity-7">رقم الهاتف</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">اسم الماده</th>
+                      <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">نوع الدفع</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">Fees</th>
                       <!-- <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">صافي الارباح</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">صافي ارباح السنتر</th> -->
