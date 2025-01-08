@@ -8,7 +8,6 @@ const ExcelJS = require('exceljs');
 
 
 const waapi = require('@api/waapi');
-const { over } = require('lodash');
 const waapiAPI = process.env.WAAPIAPI;
 waapi.auth(waapiAPI);
 
@@ -191,16 +190,16 @@ async function sendQRCode(chatId, message, studentCode) {
     console.log('Generated QR Code Base64:', base64Image);
     console.log('Sending to Chat ID:', chatId);
 
-    // const response = await waapi.postInstancesIdClientActionSendMedia(
-    //   {
-    //     chatId: chatId, // Target chat ID
-    //     mediaBase64: base64Image,
-    //     mediaName: 'qrcode.png',
-    //     mediaCaption: message,
-    //     asSticker: false, // Set true if you want to send as a sticker
-    //   },
-    //   { id: '34202' } // Replace with your actual instance ID
-    // );
+    const response = await waapi.postInstancesIdClientActionSendMedia(
+      {
+        chatId: chatId, // Target chat ID
+        mediaBase64: base64Image,
+        mediaName: 'qrcode.png',
+        mediaCaption: message,
+        asSticker: false, // Set true if you want to send as a sticker
+      },
+      { id: '34202' } // Replace with your actual instance ID
+    );
 
     console.log('QR code sent successfully:', response.data);
   } catch (error) {
@@ -1587,15 +1586,15 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
     }.xlsx`;
 
     // Send the file via WhatsApp API
-    // await waapi.postInstancesIdClientActionSendMedia(
-    //   {
-    //     mediaBase64: base64Excel, // Base64-encoded Excel file
-    //     chatId: `2${teacherPhoneNumber}@c.us`,
-    //     mediaName: fileName,
-    //     mediaCaption: `Attendance Report for ${teacherName} - ${new Date().toDateString()}`,
-    //   },
-    //   { id: '3421302' } // Replace with actual instance ID if required
-    // );
+    await waapi.postInstancesIdClientActionSendMedia(
+      {
+        mediaBase64: base64Excel, // Base64-encoded Excel file
+        chatId: `2${teacherPhoneNumber}@c.us`,
+        mediaName: fileName,
+        mediaCaption: `Attendance Report for ${teacherName} - ${new Date().toDateString()}`,
+      },
+      { id: '3421302' } // Replace with actual instance ID if required
+    );
     console.log('Excel file sent via WhatsApp');
 
     // Export the Excel file as a downloadable attachment
