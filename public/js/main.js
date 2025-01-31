@@ -18,7 +18,7 @@ Form.addEventListener('submit', async (event) => {
     if (response.ok) {
         console.log(responseData);
         if(responseData.role === 'Admin'){
-            window.location.href = '/admin/dashboard';
+            window.location.href = '/admin/employee';
         }
         else if(responseData.role === 'Employee'){
             window.location.href = '/employee/dashboard';

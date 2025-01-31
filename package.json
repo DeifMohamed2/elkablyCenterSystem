@@ -46,5 +46,9 @@
     "uuid": "^11.0.3"
   },
   "description": "E-learning For Dr Alaa Sharaf",
-  "keywords": []
+  "keywords": [],
+  "devDependencies": {
+    "chai": "^5.1.2",
+    "mocha": "^11.0.1"
+  }
 }

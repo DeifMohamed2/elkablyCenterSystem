@@ -42,16 +42,25 @@ const studentSchema = new Schema(
       type: Number,
       required: true,
     },
-
+    amountRemainingSessions: {  
+      type: Number,
+      required: false,
+      default : 0,
+    },
     paidHistory: [
       {
         amount: {
           type: Number,
-          required: true,
+          required: false,
         },
         date: {
           type: Date,
-          required: true,
+          required: false,
+        },
+        employee: {
+          type: Schema.Types.ObjectId,
+          ref: 'Employee',
+          required: false,
         },
       },
     ],

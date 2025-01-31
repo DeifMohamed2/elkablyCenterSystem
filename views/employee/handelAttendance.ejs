@@ -164,12 +164,13 @@ hr {
                 
 
                         <div class="col-3">
-                          <input type="date" class="form-control border border-2 p-2 text-center fw-bold" id="date" name="date" required>
+                          <input type="date" class="form-control border border-2 p-2 text-center fw-bold" id="startDate" name="startDate" required>
                         </div>
-                        <!-- <div class="col-3">
-                          <input type="date" class="form-control border border-2 p-2 text-center fw-bold" id="toDate" name="toDate" required>
-                        </div> -->
 
+                        <div class="col-3">
+                          <input type="date" class="form-control border border-2 p-2 text-center fw-bold" id="endDate" name="endDate" required>
+                        </div>
+                
                   
                       <div class="col-5 text-end">
                         <button type="submit" class="btn bg-gradient-dark mb-0" id="reloadButton">
@@ -194,11 +195,13 @@ hr {
                   <thead>
                     <tr >
                       <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7" >اسم الطالب</th>
+                      <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7"> كود الطالب</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">رقم الهاتف</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">رقم هاتف ولي الامر</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">قيمه المبلغ</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">الماده</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">اسم المدرس</th>
+                      <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-9">اسم الموظف</th>
                       
 
                       
@@ -222,6 +225,12 @@ hr {
          <div class="row" id="teachersSummaryRow">
         
         </div>
+        <h4>
+          الموظفين
+        </h4>
+        <div class="row" id="employeesSummaryRow">
+          </div>
+
 
 
     </div>

@@ -1,11 +1,15 @@
 const addStudentForm = document.getElementById('addStudentForm');
 const spinner = document.getElementById('spinner');
 const successToast = document.getElementById('successToast');
+const messageToast = document.getElementById('messageToast');
 const errorMessage = document.getElementById('errorMessage');
 const searchStudent = document.getElementById('searchStudent');
 const filterTeacherSelection = document.getElementById('filterTeacherSelection');
 const searchButton = document.getElementById('searchButton');
 const studentTableBody = document.querySelector('#studentTable tbody'); // Target tbody
+const sendWaButton = document.getElementById('sendWaButton');
+const waTeacherSelection = document.getElementById('waTeacherSelection');
+const waMessage = document.getElementById('waMessage');
 
 async function addNewStudent(event) {
   event.preventDefault();
@@ -30,6 +34,7 @@ async function addNewStudent(event) {
     const responseData = await response.json();
     if (response.ok) {
       successToast.classList.add('show');
+      messageToast.innerHTML = 'تم اضافه الطالب بنجاح';
       addStudentForm.reset();
       spinner.classList.add('d-none');
     } else {
@@ -60,9 +65,10 @@ const addStudentToTable = (student) => {
     <td class="text-center">${student.studentCode}</td>
     <td class="text-center">${student.subject}</td>
     <td class="text-center">${student.studentTeacher['teacherName']}</td>
-    <td class="text-center">${student.paymentType =='perSession' ? 'Per Session':'Per Course' }</td>
+    <td class="text-center">${student.paymentType == 'perSession' ? 'Per Session' : 'Per Course'}</td>
     <td class="text-center">${student.studentAmount}</td>
-    <td class="text-center">${student.amountRemaining ?student.amountRemaining:'N/A' }</td>
+    <td class="text-center">${student.paymentType == 'perSession' ? '--' : (student.amountRemaining ? student.amountRemaining : 'N/A')}</td>
+    <td class="text-center">${student.paymentType == 'perSession' ? '--' : (student.amountRemaining ? student.studentAmount - student.amountRemaining : 'N/A')}</td>
     <td class="align-middle text-center">
       <button class="edit-student-btn mt-2" data-id="${student._id}" 
       data-bs-toggle="modal" data-bs-target="#editStudentModal">Edit</button>
@@ -202,10 +208,12 @@ const saveEditStudent = async () => {
       row.cells[5].textContent = responseData.studentTeacher.teacherName;
       row.cells[6].textContent = responseData.paymentType == 'perSession' ? 'Per Session' : 'Per Course';
       row.cells[7].textContent = responseData.studentAmount;
-      row.cells[8].textContent = responseData.amountRemaining ? responseData.amountRemaining : 'N/A';
+      row.cells[8].textContent = responseData.paymentType == 'perSession' ? '--' : (responseData.amountRemaining ? responseData.amountRemaining : 'N/A');
+      row.cells[9].textContent = responseData.paymentType == 'perSession' ? '--' : (responseData.amountRemaining ? responseData.studentAmount - responseData.amountRemaining : 'N/A');
 
       clodeModalBtn.click();
       successToast.classList.add('show');
+      messageToast.innerHTML = 'تم تعديل الطالب بنجاح';
     } else {
       // Handle error response and fade out the modal
       clodeModalBtn.click();
@@ -247,3 +255,62 @@ searchButton.addEventListener('click', async () => {
         errorMessage.innerHTML = 'An error occurred. Please try again later.';
     }
     });
+
+
+// Send WA
+
+sendWaButton.addEventListener('click', async () => {
+    const teacherValue = waTeacherSelection.value;
+    const message = waMessage.value;
+
+    if (!message) {
+        errorMessage.classList.add('show');
+        errorMessage.innerHTML = 'Please enter a message';
+        return;
+    }
+    if (!teacherValue) {
+        errorMessage.classList.add('show');
+        errorMessage.innerHTML = 'Please select a teacher';
+        return;
+    }
+
+
+    sendWaButton.innerHTML = 'Please wait the message is sending...';
+    sendWaButton.disabled = true;
+    try {
+        const response = await fetch(`/employee/send-wa?teacher=${teacherValue}&message=${message}`
+        );
+        if (!response.ok) {
+        throw new Error('Failed to send message');
+        }
+    
+        const responseData = await response.json();
+        console.log(responseData);
+        if (response.ok) {
+            successToast.classList.add('show');
+            successToast.innerHTML = responseData.message;
+    
+            setTimeout(() => {
+            window.location.reload();
+             sendWaButton.innerHTML = 'Messages Sent and the page will reload in 3 seconds';
+            }, 3000);
+        } else {
+            errorMessage.classList.add('show');
+            errorMessage.innerHTML = responseData.message;
+            setTimeout(() => {
+              window.location.reload();
+             sendWaButton.innerHTML = 'Messages was not sent and the page will reload in 6 seconds';
+
+            }, 6000);
+        }
+    } catch (error) {
+        console.error('Error sending message:', error);
+        errorMessage.classList.add('show');
+        errorMessage.innerHTML = 'An error occurred. Please try again later.';
+         setTimeout(() => {
+           window.location.reload();
+           sendWaButton.innerHTML =
+             'Messages was not sent and the page will reload in 6 seconds';
+         }, 6000);
+    }
+} );

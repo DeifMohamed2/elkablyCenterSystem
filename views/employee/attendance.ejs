@@ -80,6 +80,16 @@ hr {
   
 }
 
+.amountRemaining{
+  direction: ltr;
+  width: 70px;
+  border-radius: 10px;
+  border: 2px solid #ff9847;
+  padding: 5px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
 
 @keyframes spinner-e04l1k {
    100% {
@@ -149,8 +159,28 @@ hr {
        
           </div>
         </div>
+
+             <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+               <div class="card">
+                 <div class="card-header d-flex justify-content-between p-3 pt-2">
+                   <div class="icon icon-md icon-shape bg-gradient-dark shadow-dark text-center border-radius-lg">
+                     <i class="material-symbols-rounded opacity-10">devices</i>
+                   </div>
+                   <div class="text-end pt-1">
+                     <p class="text-md mb-0 text-capitalize">تغيير الجهاز</p>
+                     <select class="form-select" id="deviceSelect" style="border: 1px black solid ; width: 100%;">
+                       <option value="device1"> Device 1</option>
+                       <option value="device2"> Device 2</option>
+                     </select>
+                   </div>
+                 </div>
+                 <hr class="dark horizontal my-0">
+               </div>
+             </div>
     
       </div>
+
+   
 
       <div class="row">
         <div class="col-12">
@@ -196,13 +226,17 @@ hr {
                   <thead>
                     <tr >
                       <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7" >اسم الطالب</th>
+                      <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7" > كود الطالب</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">رقم الهاتف</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">رقم هاتف ولي الامر</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">قيمه المبلغ</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">الماده</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">اسم المدرس</th>
+                      <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">مبلغ متبقي</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7"></th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7"></th>
+                      <!-- <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">____</th> -->
+                      <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-9">اسم الموظف</th>
 
                       
                       <th class="text-secondary opacity-7"></th>
@@ -225,6 +259,14 @@ hr {
          <div class="row" id="teachersSummaryRow">
         
         </div>
+        <h4>
+          الموظفين
+        </h4>
+
+        <div class="row" id="employeesSummaryRow">
+          </div>
+
+
 
 
     </div>
@@ -234,11 +276,11 @@ hr {
 
   
 
-  <script src="https://unpkg.com/qz-tray"></script>
+<script src="https://unpkg.com/qz-tray"></script> 
 
   <!-- <script type="text/javascript" src="js/qz-tray.js"></script> -->
   <!-- Required scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/11.1.0/jsrsasign-all-min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/11.1.0/jsrsasign-all-min.js"></script>
   
   <script>
         // qz.security.setCertificatePromise(function(resolve, reject) {
@@ -306,59 +348,61 @@ const devices = {
       },
     
       device2: {
-      privateKey:"-----BEGIN PRIVATE KEY----- \n" +
-      "MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCXRjfqUvBUYpbo\n" +
-      "2s7wFUb2ZZbBfyF3BVs/9+0HIANsaDXso58BemSYdP0OimUvE9kQY+3zHwDw1HPp\n" +
-      "Y+ymMR8XxbUICfCuhVkiHsvVtTmp0izBD0QCirTHGpW31BYpMSeAEqLG25s+xC2R\n" +
-      "ORXHRwG3A33OsX05I4pVpSQ+HiNYOWRLd24HCuXJTOiESsiLmenJNhnrzmxBKi8W\n" +
-      "GULXQ2y9fbAAEPx5QQ2q4eQmbkAgONgZKVCIXGIB/NJxW9eVmsggMddj4p8AagSw\n" +
-      "bhGAeDUvSLKba/DbVTqDpUTbT42vx4gWj1VtYOTuqD44j6UpmX8BTeAUbLEygZoI\n" +
-      "Py/4iWKpAgMBAAECggEACeDuRFlbs+sHR1gIpQGCs5MBRAwRC6R4J8aBPlKfHpx0\n" +
-      "jwpFVzOer50OLH2pq2gcp/caoiKPbWq2UhKyMM0q5mLFFmwNwVvYbQO9VGykAhzF\n" +
-      "Sus8Cf10Xj80cT+CnfiFh5XP9vP+4JuvjRkA/NU8fa7W76FEF+/j+AFTi1HtBXUK\n" +
-      "Pm3ZdkpZyRa1L2Mt53dZ/8KRXzWwWrM0f/URIMPIkjKzD+y7gkfpncySFYB82T6l\n" +
-      "7fbXK6dcIYRCI8IGyCDq+cl3fWB8ePyVFxG0SkcnbAO03J6VkwWRA7n2b+sTx4gh\n" +
-      "L/G21Utty3I0MKmiVnndfPa1Vf6AvMXPN8yyturorQKBgQDSolxkH9RbvOMPTvnN\n" +
-      "S76SJPJePn5NwhopYpfVExXHpwvM1tEW6Y4QiJiPN6+hZECwdBit3dHr7PM8Q11j\n" +
-      "q5Tt4uxTI6upLykFrkFb5dGoj1YC8977C8kuCj8FqpyTyjv/yXAQ2m9T6IRBKMoc\n" +
-      "HzvRdTeKGRXTe5QVAIx+WE4/NQKBgQC32vUIIVYHNA6r77aArTN/xZu6+PZcSyNk\n" +
-      "ESyiOHeO3e6TC1qE4cmEEUW8HKJ0lF74GU1mp9FAiez4Up8lzKQXTMClvhXNCgBn\n" +
-      "kuIckIAD9rgeQDSsnmoOR/ZdduxEw/p6pMoK5TSlPAkQGzEwr1Ad3PKQBYw1Z3Vs\n" +
-      "aLXofFlAJQKBgBcI2G++p1uM8YvYCCtyUBntXm/+B5P7WR8TgCU2HBikZP72sxD9\n" +
-      "Y6LdPUnUPim5K/XgDF7fNjjFxefeOhVPS08klNGWwgwTczoCz3T8UgxL+I0EHGt5\n" +
-      "43tcdX3qJYtn/12+qrm9GZWkhOoXStr+c205k2RPz/o7tnsBf1vFznDNAoGAb9BA\n" +
-      "7xXfDPhy58wccPtk85MJV9erdIvZ1TTAsVOoGoIMYu8nuOLcPG6Iu5OqlT3a2AYD\n" +
-      "VahAEYEQViFhWoqvTOBH1UTaW112y4a/7uFOiZqVdQhVQJoDI/ZN9Z+qp1OM1OO9\n" +
-      "YIzuzILLfDkdXF9yWQcTmdVV5PCrsCeqYd6mJOUCgYAJcayTcsqnCsCab7xhylfg\n" +
-      "kYZZxb+beQUQRhPSGcKsMVoqHioc7VvnhzuzzzmR1kwdyXR8KXmrE7qvXnictqXE\n" +
-      "sdbn0BhU9FugpMIs+So35Bg46PjFNd0CUYc0EhSqdwtcqRTnc0/qnwiqauNzBuG6\n" +
-      "MA5ZjOEGtZBAqRD6+Ysmew==\n" +
-      "-----END PRIVATE KEY-----\n" ,
+      privateKey:" -----BEGIN PRIVATE KEY----- \n " +
+      " MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCisHjDqDWI5wg6 \n " +
+      " d8YhoUmO1Lp8RrseuhFX0GrEV6zlOhck5GYQe4fd+SfB2L0eHfSKxPnv3OqJT1HF \n " +
+      " W+s2uvf3QLhdS6n8OmRI14qJOoBeZCht5GqHg3+0L4vHPObQRLTlJniCFtFf3xmX \n " +
+      " ze/QulJBwh6OosHvI2qbbIRgp7unEMagC2ckH+RRoYclnrPmU50/jmvjzoGeFPAG \n " +
+      " LGEQ++JeeWeSzuNu7kc25yRe720e298zykDKemdP97XDBK9NAnRsOO77Crt7m1Af \n " +
+      " SSvy8+3CJKOvJj/FysgdRgHc2m2TJTytH3mBQ4O7xV4Ap89tMluaOWAHz4SPRhM5 \n " +
+      " mFIXk7SVAgMBAAECggEAAkvD6kD3keATYjAjd6WtGPiuX35n54/JLPGMkwrbAJ0F \n " +
+      " JvQZODevy9xpn9T3iW6X3RUQEOzY5KSwP49j2fDYn2Ch1ypdzijsqJqm+UCZkdJP \n " +
+      " ZHg0X6vchehtcNJ8UGl89VjJiReZ/Q3Yp3Bm1Q3O9N/VWFnoK2SyhpESK1V2F1K4 \n " +
+      " oSoZcsQqJwGwttMPI2/SDkkxH8Wau8T+D0TEwGQE9uGHR/UY/XVP895IZ0vodsEF \n " +
+      " Zjql9tpDtzoegXdDaGO+2LfP7bFjidCbkxe42YmInL+VNylsAFtgCklXdajVjqQb \n " +
+      " Cott8SsDlRiYnUbRdgHjjiJn/b+JOFs9O2LdwtdTiQKBgQDS9je9dJ/rMDmmK+nc \n " +
+      " +f/3czoffWOk1rvtfrjpN1QXPohfNPyTW0G0QoIFuHvtmkCUC0yS0cItNxiIfPXu \n " +
+      " IyelsShyjCF7ZzmvqkhDhejScsQuNt9MrEcvkYpeh3UYq4Ic2540RBLapeN9MxHL \n " +
+      " 93r48x1mMu/TZhWLQzfl6AcoqQKBgQDFa///Nf90+coY9jXfeZ54vbgsxu8HED0h \n " +
+      " k2kQMDIR3zRgQr/kJz4PpcBf+uTt4dlcTyOj2UfDN/yt7WGPK7DE5SHDvA6pWex1 \n " +
+      " A9LUIPp/XEC1FVOgeGDHU+xsUkyqyRD4Ca5zNVpyEqjj7rDYf0H4VGteoP998fi5 \n " +
+      " S4LuVnQEDQKBgQCBDhbzU5ExM4NQ4LRkdpvcKSV5dh+rC6JTm55LLYnH3n1WoPeS \n " +
+      " vdToDXe1QDKwHBk9d9wURTXgqz/a33cjg2YRutrfmFIzR+bGTAmBJT5U39ib3P2l \n " +
+      " zg6OTx6yzXMY8HLcbI3Ps4VFNQ6B3OgaOv+DpFZr2uVUEbNESo67msImYQKBgAj9 \n " +
+      " KeLM6pzA4trQGxPZzcVhngkr5aZErwPgWmBKUX1O1Gutnl8dCk5cFa5JFjNenS7+ \n " +
+      " y3iiZAoXeoHQ1ShXrOzKIgdvgJtlZMbPLcJK3hz+blPQbMZZtM5em90ywhrknMku \n " +
+      " Z6sHOt8GynnWXGb/JFnSPjFI01lAszp8nbGMbivhAoGBAKXjnLR/jkn3CTlqGPNn \n " +
+      " g3ig62G/nxxZBrdFaz2tKzCnSb0BkX/+zoAtGW+mZxi6C7Uv94pF+2XPcjWrZ0pi \n " +
+      " 84atLVtoatpVbL0/dYpnuehn578LHu5GpmEgz7rfcFs1M/lJw8nLW6AUw9g2pq+t \n " +
+      " F+WNKfwOC9BZO8zh+/ORU4Cx \n " +
+      " -----END PRIVATE KEY----- \n "
+ ,
 
       certificate:" -----BEGIN CERTIFICATE----- \n " +
-      " MIIECzCCAvOgAwIBAgIGAZPaiphWMA0GCSqGSIb3DQEBCwUAMIGiMQswCQYDVQQG \n " +
+      " MIIECzCCAvOgAwIBAgIGAZS+drqyMA0GCSqGSIb3DQEBCwUAMIGiMQswCQYDVQQG \n " +
       " EwJVUzELMAkGA1UECAwCTlkxEjAQBgNVBAcMCUNhbmFzdG90YTEbMBkGA1UECgwS \n " +
       " UVogSW5kdXN0cmllcywgTExDMRswGQYDVQQLDBJRWiBJbmR1c3RyaWVzLCBMTEMx \n " +
       " HDAaBgkqhkiG9w0BCQEWDXN1cHBvcnRAcXouaW8xGjAYBgNVBAMMEVFaIFRyYXkg \n " +
-      " RGVtbyBDZXJ0MB4XDTI0MTIxNzE2MTIxNloXDTQ0MTIxNzE2MTIxNlowgaIxCzAJ \n " +
+      " RGVtbyBDZXJ0MB4XDTI1MDEzMDIyMjM1OVoXDTQ1MDEzMDIyMjM1OVowgaIxCzAJ \n " +
       " BgNVBAYTAlVTMQswCQYDVQQIDAJOWTESMBAGA1UEBwwJQ2FuYXN0b3RhMRswGQYD \n " +
       " VQQKDBJRWiBJbmR1c3RyaWVzLCBMTEMxGzAZBgNVBAsMElFaIEluZHVzdHJpZXMs \n " +
       " IExMQzEcMBoGCSqGSIb3DQEJARYNc3VwcG9ydEBxei5pbzEaMBgGA1UEAwwRUVog \n " +
-      " VHJheSBEZW1vIENlcnQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCX \n " +
-      " RjfqUvBUYpbo2s7wFUb2ZZbBfyF3BVs/9+0HIANsaDXso58BemSYdP0OimUvE9kQ \n " +
-      " Y+3zHwDw1HPpY+ymMR8XxbUICfCuhVkiHsvVtTmp0izBD0QCirTHGpW31BYpMSeA \n " +
-      " EqLG25s+xC2RORXHRwG3A33OsX05I4pVpSQ+HiNYOWRLd24HCuXJTOiESsiLmenJ \n " +
-      " NhnrzmxBKi8WGULXQ2y9fbAAEPx5QQ2q4eQmbkAgONgZKVCIXGIB/NJxW9eVmsgg \n " +
-      " Mddj4p8AagSwbhGAeDUvSLKba/DbVTqDpUTbT42vx4gWj1VtYOTuqD44j6UpmX8B \n " +
-      " TeAUbLEygZoIPy/4iWKpAgMBAAGjRTBDMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD \n " +
-      " VR0PAQH/BAQDAgEGMB0GA1UdDgQWBBSA2M80pkMpV7/GTLwKqkaZkqjy0TANBgkq \n " +
-      " hkiG9w0BAQsFAAOCAQEAHZ7i3A/wIbU1PfoO43O4blHd4boaZ35aqL96bWXCtuiR \n " +
-      " +Iq7bRlmqb1bLsssxsuzbdV1TDXb9qVSpK6yOvP8Da+WRPVcKkta7QVjyIYvwbD7 \n " +
-      " aDBFgjSvfBm6jUDnVbYxsTkyapJ2LUSD4bdrjRshMn/jbXz3aKF/IRQlV+8J8XK/ \n " +
-      " d4f+XmS+9ur30g55dhuWazislae16LuJAUY28bGSXfmkf4Ji7ixlDOkSKiSI7jdh \n " +
-      " Y9WTUzSx1QqtsiMA94WMn9oJYmyRWsjPb/LX7/UGyQDl9xa0pGorVZRxtrUy0SS4 \n " +
-      " wEAjA3x+AClk8SNs3LUXEYiD0tbEQqkHtUGD0REplQ== \n " +
+      " VHJheSBEZW1vIENlcnQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCi \n " +
+      " sHjDqDWI5wg6d8YhoUmO1Lp8RrseuhFX0GrEV6zlOhck5GYQe4fd+SfB2L0eHfSK \n " +
+      " xPnv3OqJT1HFW+s2uvf3QLhdS6n8OmRI14qJOoBeZCht5GqHg3+0L4vHPObQRLTl \n " +
+      " JniCFtFf3xmXze/QulJBwh6OosHvI2qbbIRgp7unEMagC2ckH+RRoYclnrPmU50/ \n " +
+      " jmvjzoGeFPAGLGEQ++JeeWeSzuNu7kc25yRe720e298zykDKemdP97XDBK9NAnRs \n " +
+      " OO77Crt7m1AfSSvy8+3CJKOvJj/FysgdRgHc2m2TJTytH3mBQ4O7xV4Ap89tMlua \n " +
+      " OWAHz4SPRhM5mFIXk7SVAgMBAAGjRTBDMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD \n " +
+      " VR0PAQH/BAQDAgEGMB0GA1UdDgQWBBQ0Nag5cirRvzSetazpr9+vkIuCajANBgkq \n " +
+      " hkiG9w0BAQsFAAOCAQEAKxbB8Coeg241cGiNXnGX41lzQdLpnAEqQOR0E2arCG9w \n " +
+      " zFqs5nJ4yjsHHANKt5pnHNgmZSWBVtykiq7HCPOrhVzI7lnK3tcaNsUSyG99a87A \n " +
+      " xH8/EYV8Ki44tJpollYYITzRDXx0HRwyjRuqb9g1heLjwOOcoCPJZNyb33X6s9EC \n " +
+      " jOgDwV1zlWsJY4Be7k0jRQ5wSQsjnzmlpwU2blVVYtXs/UmxZBSGZ3byzbYWbD92 \n " +
+      " p2MxdCqG0hriMbp7EfjtKEEuLyhPLXXRuTnL245lVLzdkIIB8swjZx69bWf3zev5 \n " +
+      " bMwfH438UxXA/C3/j1WSJfcJI6ClML3RACTQZYEDfA== \n " +
       " -----END CERTIFICATE----- \n "
+
       },
   
     };
@@ -368,23 +412,24 @@ const devices = {
 
 const deviceData = <%- JSON.stringify(device) %>
 console.log(deviceData);
+document.getElementById("deviceSelect").value = deviceData;
 let selectedDevice = devices[deviceData];
 qz.security.setSignatureAlgorithm("SHA512"); // Since 2.1
 qz.security.setSignaturePromise(function(toSign) {
-return function(resolve, reject) {
-try {
-var pk = KEYUTIL.getKey(selectedDevice.privateKey);
-var sig = new KJUR.crypto.Signature({"alg": "SHA512withRSA"}); // Use "SHA1withRSA" for QZ Tray 2.0 and older
-sig.init(pk);
-sig.updateString(toSign);
-var hex = sig.sign();
-console.log("DEBUG: \n\n" + stob64(hextorstr(hex)));
-resolve(stob64(hextorstr(hex)));
-} catch (err) {
-console.error(err);
-reject(err);
-}
-};
+  return function(resolve, reject) {
+    try {
+      var pk = KEYUTIL.getKey(selectedDevice.privateKey);
+      var sig = new KJUR.crypto.Signature({"alg": "SHA512withRSA"}); // Use "SHA1withRSA" for QZ Tray 2.0 and older
+      sig.init(pk);
+      sig.updateString(toSign);
+      var hex = sig.sign();
+      console.log("DEBUG: \n\n" + stob64(hextorstr(hex)));
+      resolve(stob64(hextorstr(hex)));
+    } catch (err) {
+      console.error(err);
+      reject(err);
+    }
+  };
 });
 
 qz.security.setCertificatePromise(function(resolve, reject) {
@@ -393,40 +438,8 @@ resolve(selectedDevice.certificate);
 
 
 
-  </script>
+  </script> 
 
-
-  <!-- <script>
-    qz.security.setCertificatePromise(function(resolve, reject) {
-    //Alternate method 2 - direct
-    resolve("-----BEGIN CERTIFICATE-----\n" +
-    "MIIECzCCAvOgAwIBAgIGAZPWzBTJMA0GCSqGSIb3DQEBCwUAMIGiMQswCQYDVQQG \n" +
-    "EwJVUzELMAkGA1UECAwCTlkxEjAQBgNVBAcMCUNhbmFzdG90YTEbMBkGA1UECgwS \n" +
-    "UVogSW5kdXN0cmllcywgTExDMRswGQYDVQQLDBJRWiBJbmR1c3RyaWVzLCBMTEMx \n" +
-    "HDAaBgkqhkiG9w0BCQEWDXN1cHBvcnRAcXouaW8xGjAYBgNVBAMMEVFaIFRyYXkg \n" +
-    "RGVtbyBDZXJ0MB4XDTI0MTIxNjIyNDUxOVoXDTQ0MTIxNjIyNDUxOVowgaIxCzAJ \n" +
-    "BgNVBAYTAlVTMQswCQYDVQQIDAJOWTESMBAGA1UEBwwJQ2FuYXN0b3RhMRswGQYD \n" +
-    "VQQKDBJRWiBJbmR1c3RyaWVzLCBMTEMxGzAZBgNVBAsMElFaIEluZHVzdHJpZXMs \n" +
-    "IExMQzEcMBoGCSqGSIb3DQEJARYNc3VwcG9ydEBxei5pbzEaMBgGA1UEAwwRUVog \n" +
-    "VHJheSBEZW1vIENlcnQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDh \n" +
-    "cl5K2hTFZVGTSrX6kysAAALnYk4c3Apq3/PEmlNRbl7/A+e63wZNmeaOOwqapem5 \n" +
-    "gOcF3Q0i5afmNXRAh7/tCUnmPLyFVGR7uMfk0eKIuihZPBkMI3t1LZXj7JS+L4ra \n" +
-    "0NpeECoXevVXZJA7HyTk1Q2jLeZuR0L5fINtiigfs25Lmr3SC1xp0eYmZ8MSuwYQ \n" +
-    "nCeaieS6w5c7jS8wRdWG+fBk9Us8P6V3vPQG7d5tj2+5Qw7wD/wqXXlIuBnFExdD \n" +
-    "FRx6JllEOi+OK3BIV0QhtOd4eELcWbVo1JiXyGsVDnNYee3Eq7uTAPVvRbzL+yBl \n" +
-    "Y6ToCwmSDMgQbT4A0JnDAgMBAAGjRTBDMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD \n" +
-    "VR0PAQH/BAQDAgEGMB0GA1UdDgQWBBTX3kKIaxhM+tczaaW6DxtsnaTFlDANBgkq \n" +
-    "hkiG9w0BAQsFAAOCAQEAmxols+AZ/eVrjyOHFiJv1aHQGCjRyrxvdLX+X6LMS1Vt \n" +
-    "FobxoCdnGyb0GKliPF55RsJjenkPIYpssbQG6ZzfqB4CZ/JZfGwvtvcbvqktVCPa \n" +
-    "0dP7V4gQfC+BzBVaG/DaiJvRUobfrFI6Jnp3qRQ4WPkKNBBt0/htg+oo7QGw5PHv \n" +
-    "00Ok2X05JAbJKNAw/hJO8y0AC4WzIlKIrKYv1mG7AipzDvPABC3KZNFHo3qD+U/Y \n" +
-    "UI4yviUFFHD+4c+HAZj6huuv+VwNy9O6azH4ywBz27uhzJJcxQCZXIOzNajEwZIz \n" +
-    "Y3/OoEVfSzhIahEncoWbtSHT5jBW62TzfQyhGDjrZg== \n" +
-    "-----END CERTIFICATE----- \n" 
-  );
-    });
-
-  </script>  -->
 
   
 

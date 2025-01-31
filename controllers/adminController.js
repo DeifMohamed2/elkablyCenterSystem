@@ -656,7 +656,7 @@ const sendDailyBillExcel = async () => {
   }
 };
 
-schedule.scheduleJob('45 21 * * *', sendDailyBillExcel);
+// schedule.scheduleJob('45 21 * * *', sendDailyBillExcel);
 
 
 // ================================= END Billing ================================ //
