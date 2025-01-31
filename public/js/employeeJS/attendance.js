@@ -10,7 +10,10 @@ const totalAmount = document.getElementById('totalAmount');
 const totalFees = document.getElementById('totalFees');
 const totalStudents = document.getElementById('totalStudents');
 const teachersSummaryRow = document.getElementById('teachersSummaryRow');
+const employeesSummaryRow = document.getElementById('employeesSummaryRow');
 const downloadExcelBtn = document.getElementById('downloadExcelBtn');
+
+const deviceSelect = document.getElementById('deviceSelect');
 
 async function attendStudent(event) {
     event.preventDefault();
@@ -196,6 +199,7 @@ const getStudents = async () => {
     }
 
     const responseData = await response.json();
+    console.log(responseData.students);
     // Populate table
     addStudentsToTable(responseData.students);
     spinner.classList.add('d-none');
@@ -206,6 +210,7 @@ const getStudents = async () => {
     totalStudents.textContent = responseData.students.length;
     // pouplate Teachers Summary
     teachersSummary(responseData.teachersSummary);
+    employeesSummary(responseData.employeesSummary);
     setTimeout(() => {
         message.textContent = '';
     },3000)
@@ -236,27 +241,49 @@ reloadButton.addEventListener('click', getStudents);
 
 const addStudentsToTable = (students) => {
     tBody.innerHTML = ''; // Clear existing rows
-    students.forEach((student) => {
+    students.forEach((student,addedBy) => {
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-                        <td class="text-center">${student.studentName}</td>
-                        <td class="text-center">${student.studentPhoneNumber}</td>
-                        <td class="text-center">${student.studentParentPhone}</td>
-                        <td class="text-center">${student.studentAmount}</td>
-                        <td class="text-center">${student['studentTeacher']['subjectName']}</td>
-                        <td class="text-center">${student['studentTeacher']['teacherName']}</td>
+                        <td class="text-center">${student['student'].studentName}</td>
+                        <td class="text-center">${student['student'].studentCode}</td>
+                        <td class="text-center">${student['student'].studentPhoneNumber}</td>
+                        <td class="text-center">${student['student'].studentParentPhone}</td>
+                        <td class="text-center"> ${student.amountPaid} </td>
+                        <td class="text-center">${student['student']['studentTeacher']['subjectName']}</td>
+                        <td class="text-center">${student['student']['studentTeacher']['teacherName']}</td>
+                          <td class="text-center">
+                            <input type="text" class="amountRemaining"  value=${student['student'].amountRemainingSessions} data-student-id="${student['student']._id}">
+                          </td>
+                          <td class="text-center">
+                            <button class="btn btn-primary btn-sm edit-amount">Edit</button>
+                          </td>
                         <td class="text-center">
-                                <button class="btn btn-danger btn-sm">Delete</button>
+                                <button class="btn btn-danger btn-sm delete">Delete</button>
                         </td>
+                        <td class="text-center">${student['addedBy']['employeeName']}</td>
+
                 `;
 
         // Append the row to the tbody
         tBody.appendChild(tr);
 
-        // Attach the event listener to the delete button
-        const deleteButton = tr.querySelector('button');
-        deleteButton.addEventListener('click', () => deleteStudent(student._id));
+        // Attach the event listener for the delete button
+        tr.querySelector('.delete').addEventListener('click', () => {
+            const studentId = student._id;
+            deleteStudent(studentId);
+        });
+
+        // Attach the event listener for the edit button
+
+        tr.querySelector('.edit-amount').addEventListener('click', () => {
+            const amountRemaining = tr.querySelector('.amountRemaining').value;
+            const studentId = tr.querySelector('.amountRemaining').getAttribute('data-student-id');
+            console.log(amountRemaining, studentId);
+            editStudentAmountRemaining(studentId, amountRemaining );
+        });
+      
+
     });
 
     searchStudent.focus();
@@ -326,6 +353,53 @@ const teachersSummary = (teachers) => {
   searchStudent.focus();
 };
 
+const employeesSummary= (employees) => {
+  employeesSummaryRow.innerHTML = ''; // Clear existing rows
+  employees.forEach((employee, index) => {
+    let innerHTMLs= '';
+    // Add teacher cards
+
+    employeesSummaryRow.innerHTML += `
+              <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+                  <div class="card">
+                    <div class="card-header  p-3 pt-2 text-center">
+                      <div class="text-center pt-1">
+                        <h3 class="mb-0 text-capitalize">${employee.employeeName}</h3>
+                      </div>
+                    </div>
+                    <hr class="dark horizontal my-0">
+                    <div class="card-body text-center">
+                       <p class="text-sm mb-0 text-capitalize"> عدد الطلاب الي تم تحضيرهم</p>
+                       <h4 class="mb-0" dir="ltr">${employee.count} </h4>
+                       <p class="text-sm mb-0 text-capitalize"> المبلغ المجمع</p>
+                      <h4 class="mb-0" dir="ltr">${employee.totalAmount} EGP</h4>
+                          
+                       <p class="text-sm mb-0 text-capitalize">النسبه</p>
+                      <h4 class="mb-0" dir="ltr">${employee.percentage} %</h4>
+                          
+
+                        <button type="button" class="btn bg-gradient-dark mt-3 sendExcelBtn" data-employee-id="${employee.employeeId}">
+                        <i class="material-symbols-rounded text-sm">send</i>&nbsp;&nbsp;ارسال نسخة اكسل 
+                      </button>
+
+                    </div>
+                  </div>
+                </div>
+            `;
+            const sendExcelBtns = document.querySelectorAll('.sendExcelBtn');
+            sendExcelBtns.forEach((button) => {
+                button.addEventListener('click', async (event) => {
+                    const employeeId = event.target.getAttribute('data-employee-id');
+                    const originalText = event.target.innerHTML;
+                    event.target.innerHTML = 'جاري التحميل...';
+                    console.log(employeeId , employee.employeeName , employee.employeePhoneNumber);
+                    await downloadAndSendExcelForEmployee(employeeId, employee.employeeName);
+                    event.target.innerHTML = originalText;
+                });
+            });
+
+  });
+};
 
 // Function to delete student
 
@@ -357,6 +431,41 @@ async function deleteStudent(studentId) {
     }
 }
 
+async function editStudentAmountRemaining(studentId,amount){
+    try {
+      console.log(studentId,amount);
+        spinner.classList.remove('d-none');
+        const response = await fetch(`/employee/edit-student-amount-remaining/${studentId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amountRemainingSessions: amount }),
+        });
+        const responseData = await response.json();
+        if (response.ok) {
+        console.log(responseData.students);
+        // addStudentsToTable(responseData.students);
+        window.location.reload();
+        searchStudent.focus();
+        spinner.classList.add('d-none');
+        message.textContent = responseData.message;
+        } else {
+        alert(responseData.message);
+        searchStudent.focus();
+        spinner.classList.add('d-none');
+        message.textContent = responseData.message;
+        }
+    } catch (error) {
+        console.error('Error editing amount:', error);
+        searchStudent.focus();
+        spinner.classList.add('d-none');
+        message.textContent = 'An error occurred. Please try again later.';
+    }
+}
+
+
+
 // download Excel File
 
 downloadExcelBtn.addEventListener('click', async () => {
@@ -387,8 +496,11 @@ async function downloadAndSendExcelForTeacher(teacherId, teacherName) {
         
         const response = await fetch(`/employee/download-send-excel-for-teacher/${teacherId}`);
         if (!response.ok) {
+          const data = await response.json();
+          console.log(data);
             throw new Error('Failed to download excel file');
         }
+   
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -402,3 +514,54 @@ async function downloadAndSendExcelForTeacher(teacherId, teacherName) {
     }
 }
 
+
+
+// Function to download Excel for a specific employee
+
+async function downloadAndSendExcelForEmployee(employeeId, employeeName) {
+    try {
+        
+        const response = await fetch(`/employee/download-send-excel-for-employee/${employeeId}`);
+        if (!response.ok) {
+          const data = await response.json();
+          console.log(data);
+            throw new Error('Failed to download excel file');
+        }
+   
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const date = new Date().toLocaleDateString().replace(/\//g, '-');
+        a.download = `كشف حضور الطلاب __ ${employeeName} __ ${date}.xlsx`;
+        a.click();
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error downloading excel file:', error);
+    }
+}
+
+
+
+// Device Select
+
+deviceSelect.addEventListener('change', async (event) => {
+  const selectedDevice = event.target.value;
+  try {
+    const response = await fetch(`/employee/select-device/${selectedDevice}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const responseData = await response.json();
+    if (!response.ok) {
+      throw new Error('Failed to select device');
+    }
+  
+    window.location.reload();
+
+  } catch (error) {
+    console.error('Error selecting device:', error);
+  }
+});

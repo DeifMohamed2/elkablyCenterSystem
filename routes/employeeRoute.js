@@ -11,7 +11,7 @@ const employeeController = require('../controllers/employeeController.js');
 
 const authMiddleware = async (req, res, next) => {
     const token = req.cookies.token;
-    console.log(token);
+    // console.log(token);
     if (!token) {
       res.status(401).redirect('/');
     }
@@ -64,6 +64,8 @@ router.post('/add-student', authMiddleware, employeeController.addStudent);
 
 router.get('/search-student', authMiddleware, employeeController.searchStudent);
 
+router.get('/send-wa', authMiddleware, employeeController.sendWa);
+
 // Teahcer 
 router.get('/teacher', authMiddleware, employeeController.teacher_Get);
 
@@ -93,6 +95,12 @@ router.get('/download-attendance-excel', authMiddleware, employeeController.down
 
 router.get('/download-send-excel-for-teacher/:id', authMiddleware, employeeController.downloadAndSendExcelForTeacher);
 
+router.get('/download-send-excel-for-employee/:id', authMiddleware, employeeController.downloadAndSendExcelForEmployee);
+
+router.put('/edit-student-amount-remaining/:id', authMiddleware, employeeController.editStudentAmountRemaining);
+
+router.put('/select-device/:deviceId', authMiddleware, employeeController.selectDevice);
+
 
 // handel Attendance
 
@@ -100,9 +108,11 @@ router.get('/handel-attendance', authMiddleware, employeeController.handelAttend
 
 router.get('/attendance-by-date', authMiddleware, employeeController.getAttendanceByDate);
 
-router.get('/download-attendance-excel-by-date' , authMiddleware, employeeController.downloadAttendanceExcelByDate);
+router.get('/download-attendance-excel-by-date-range' , authMiddleware, employeeController.downloadAttendanceExcelByDate);
 
 router.get('/download-sendExcelTeachrByDate/:id', authMiddleware, employeeController.downloadAndSendExcelForTeacherByDate);
+
+router.get('/download-sendExcelEmployeeByDate/:id', authMiddleware, employeeController.downloadAndSendExcelForEmployeeByDate);
 
 // LogOut
 
