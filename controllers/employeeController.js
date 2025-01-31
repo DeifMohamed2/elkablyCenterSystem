@@ -1607,7 +1607,7 @@ const selectDevice = async (req, res) => {
     const employee = await Employee.findByIdAndUpdate(req.employee._id, {
     device :  deviceId
     }, {new: true});
-
+    console.log('Employee:', employee);
     res.status(200).json({ message: 'Device selected successfully', employee });
   }catch (error) {
     console.error('Error selecting device:', error);
