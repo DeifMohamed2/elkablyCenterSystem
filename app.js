@@ -17,7 +17,6 @@ app.use(express.json());
 
 // CONECT to mongodb
 // let io
-å;
 const dbURI = 'mongodb://localhost:27017/ElkablyCenter';
 // const dbURI ='mongodb+srv://3devWay:1qaz2wsx@cluster0.5orkagp.mongodb.net/elkablyCenter?retryWrites=true&w=majority&appName=Cluster0';
 mongoose
