@@ -13,15 +13,44 @@ const waMessage = document.getElementById('waMessage');
 
 async function addNewStudent(event) {
   event.preventDefault();
-
-  // Show spinner and hide messages
   spinner.classList.remove('d-none');
-  successToast.classList.remove('show');
-  errorMessage.classList.remove('show');
 
-  const formData = new FormData(addStudentForm);
+  const studentName = document.getElementById('studentName').value;
+  const studentPhoneNumber = document.getElementById('studentPhoneNumber').value;
+  const studentParentPhone = document.getElementById('studentParentPhone').value;
+  const schoolName = document.getElementById('schoolName').value;
+  const paymentType = document.getElementById('paymentType').value;
 
-  const data = Object.fromEntries(formData);
+  const selectedTeachers = [];
+  document.querySelectorAll('input[name="teachers[]"]:checked').forEach(teacherCheckbox => {
+    const teacherId = teacherCheckbox.value;
+    const selectedCourses = [];
+
+    document.querySelectorAll(`input[name="selectedCourses[${teacherId}][]"]:checked`).forEach(courseCheckbox => {
+      const courseName = courseCheckbox.value;
+      const amountPay = document.getElementById(`price_${courseName}_${teacherId}`).value;
+      const registerPrice = document.getElementById(`registerPrice_${courseName}_${teacherId}`).value;
+
+      if (courseName && amountPay && registerPrice) {
+        selectedCourses.push({ courseName, amountPay, registerPrice });
+      }
+    });
+
+    if (selectedCourses.length > 0) {
+      selectedTeachers.push({ teacherId, courses: selectedCourses });
+    }
+  });
+
+  const data = {
+    studentName,
+    studentPhoneNumber,
+    studentParentPhone,
+    schoolName,
+    paymentType,
+    selectedTeachers,
+  };
+
+  console.log(data);
 
   try {
     const response = await fetch('/employee/add-student', {
@@ -31,11 +60,26 @@ async function addNewStudent(event) {
       },
       body: JSON.stringify(data),
     });
+
     const responseData = await response.json();
     if (response.ok) {
       successToast.classList.add('show');
-      messageToast.innerHTML = 'تم اضافه الطالب بنجاح';
+      messageToast.innerHTML = 'تم إضافة الطالب بنجاح';
       addStudentForm.reset();
+      document.querySelectorAll('input[name="teachers[]"]').forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      document.querySelectorAll('input[name^="selectedCourses"]').forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      document.querySelectorAll('input[id^="price_"], input[id^="registerPrice_"]').forEach(input => {
+        input.value = '';
+        input.disabled = true;
+        input.required = false;
+      });
+      document.querySelectorAll('.courses-container').forEach(container => {
+        container.style.display = 'none';
+      });
       spinner.classList.add('d-none');
     } else {
       errorMessage.classList.add('show');
@@ -44,12 +88,57 @@ async function addNewStudent(event) {
     }
   } catch (error) {
     errorMessage.classList.add('show');
-    errorMessage.innerHTML = 'An error occurred. Please try again later.';
+    errorMessage.innerHTML = 'حدث خطأ. يرجى المحاولة لاحقًا.';
     spinner.classList.add('d-none');
   }
 }
 
+
 addStudentForm.addEventListener('submit', addNewStudent);
+
+// Addcourses to Student
+function toggleCourses(teacherId) {
+  const coursesContainer = document.getElementById(`courses_${teacherId}`);
+  const teacherCheckbox = document.getElementById(`teacher_${teacherId}`);
+
+  if (teacherCheckbox.checked) {
+    coursesContainer.style.display = 'block';
+  } else {
+    coursesContainer.style.display = 'none';
+    // Uncheck all courses if the teacher is deselected
+    coursesContainer
+      .querySelectorAll('input[type="checkbox"]')
+      .forEach((course) => {
+        course.checked = false;
+      });
+  }
+}
+
+function toggleCoursePrice(courseCheckbox, teacherId, courseName) {
+  const priceInput = document.getElementById(
+    `price_${courseName}_${teacherId}`
+  );
+  const registerPriceInput = document.getElementById(
+    `registerPrice_${courseName}_${teacherId}`
+  );
+
+  if (courseCheckbox.checked) {
+    priceInput.disabled = false;
+    priceInput.required = true;
+    registerPriceInput.disabled = false;
+    registerPriceInput.required = true;
+  } else {
+    priceInput.disabled = true;
+    priceInput.required = false;
+    priceInput.value = '';
+    
+    registerPriceInput.disabled = true;
+    registerPriceInput.required = false;
+    registerPriceInput.value = '';
+  }
+}
+
+
 
 // Get ALL Students
 

@@ -80,6 +80,7 @@ function removeTimeSlot(button) {
 function resetAndSpinner() {
   spinner.classList.add('d-none');
   timeSlots.innerHTML = '';
+  
   addTeacherForm.reset();
 }
 
@@ -95,30 +96,31 @@ addTeacherForm.addEventListener('submit', async (e) => {
   spinner.classList.remove('d-none');
 
   const teacherName = document.getElementById('teacherName').value;
-  const teacherPhoneNumber =
-    document.getElementById('teacherPhoneNumber').value;
   const subjectName = document.getElementById('subjectName').value;
+  const teacherPhoneNumber = document.getElementById('teacherPhoneNumber').value;
   const teacherFees = document.getElementById('teacherFees').value;
   const paymentType = document.getElementById('paymentType').value;
 
+  // Get all courses
+  const courses = [];
+  document.querySelectorAll('input[name="courses[]"]').forEach((input) => {
+    if (input.value.trim() !== '') {
+      courses.push(input.value.trim());
+    }
+  });
+
   const schedule = {};
   document.querySelectorAll('#timeSlots > .row').forEach((dayDiv) => {
-    const day = dayDiv.id.replace('time-slot-', ''); // Extract day name
+    const day = dayDiv.id.replace('time-slot-', '');
     schedule[day] = [];
 
     dayDiv.querySelectorAll('.time-slot-group').forEach((slotGroup) => {
-      const startTimeInput = slotGroup.querySelector(
-        'input[name*="StartTime"]'
-      );
-      const endTimeInput = slotGroup.querySelector('input[name*="EndTime"]');
-      const roomIDInput = slotGroup.querySelector('input[name*="roomID"]');
-
-      const startTime = startTimeInput ? startTimeInput.value : null;
-      const endTime = endTimeInput ? endTimeInput.value : null;
-      const roomID = roomIDInput ? roomIDInput.value : null;
+      const startTime = slotGroup.querySelector('input[name*="StartTime"]').value;
+      const endTime = slotGroup.querySelector('input[name*="EndTime"]').value;
+      const roomID = slotGroup.querySelector('input[name*="roomID"]').value;
 
       if (startTime && endTime && roomID) {
-        schedule[day].push({ startTime, endTime, roomID }); // Add roomID to schedule
+        schedule[day].push({ startTime, endTime, roomID });
       }
     });
   });
@@ -127,13 +129,13 @@ addTeacherForm.addEventListener('submit', async (e) => {
     teacherName,
     teacherPhoneNumber,
     subjectName,
+    courses,
     schedule,
     teacherFees,
     paymentType,
   };
 
-  console.log(data); // Log the updated data with roomID
-
+  console.log(data);
   const response = await fetch('/employee/add-teacher', {
     method: 'POST',
     headers: {
@@ -144,21 +146,18 @@ addTeacherForm.addEventListener('submit', async (e) => {
 
   const responseData = await response.json();
   if (response.ok) {
-    console.log(responseData);
-
     successMessage.style.display = 'block';
     successMessage.innerHTML = responseData.message;
     resetAndSpinner();
     closeMessage();
   } else {
-    console.log(responseData.error, responseData.details);
     errorMessage.style.display = 'block';
     errorMessage.innerHTML = responseData.error;
     resetAndSpinner();
     closeMessage();
-    return;
   }
 });
+
 
 
 
@@ -293,6 +292,30 @@ document.getElementById('addEditTimeSlot').addEventListener('click', () => {
 function removeTimeSlot(button) {
   button.closest('.time-slot-group').remove();
 }
+
+
+//add courses 
+function addCourse() {
+  const coursesContainer = document.getElementById('coursesContainer');
+
+  const newCourseDiv = document.createElement('div');
+  newCourseDiv.className = 'row mb-2';
+  newCourseDiv.innerHTML = `
+    <div class="col-md-4">
+      <input type="text" class="form-control" name="courses[]" style="border: 2px solid black; width: 100%; text-align: center;"  placeholder="اسم الكورس" required>
+    </div>
+    <div class="col-md-2">
+      <button type="button" class="btn btn-outline-danger" onclick="removeCourse(this)">- إزالة</button>
+    </div>
+  `;
+
+  coursesContainer.appendChild(newCourseDiv);
+}
+
+function removeCourse(button) {
+  button.closest('.row').remove();
+}
+
 
 
 

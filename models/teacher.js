@@ -47,6 +47,12 @@ const teacherSchema = new mongoose.Schema(
         },
       ],
     },
+    // Courses that the teacher is teaching
+    courses: {
+      type: [String],
+      required: true,
+    }
+
   },
   { timestamps: true }
 );

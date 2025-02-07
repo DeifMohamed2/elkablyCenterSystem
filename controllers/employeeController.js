@@ -100,7 +100,7 @@ const getAllBills = async (req, res) => {
 // ======================================== Add Student ======================================== //
 
 const getAddStudent = async (req, res) => {
-    const allTeachers = await Teacher.find({}, { teacherName: 1 , paymentType: 1 });
+    const allTeachers = await Teacher.find({}, { teacherName: 1 , paymentType: 1 , courses:1 });
     console.log(allTeachers);
     res.render('employee/addStudent', {
       title: 'Add Student',
@@ -111,8 +111,15 @@ const getAddStudent = async (req, res) => {
 
 
 const getAllStudents = async (req, res) => {
-    const allStudents = await Student.find().populate('studentTeacher' , 'teacherName');
-    console.log(allStudents);
+    const allStudents = await Student.find().populate({
+      path: 'selectedTeachers.teacherId',
+
+    });
+    allStudents.forEach((student) => {
+      student.selectedTeachers.forEach((teacher) => {
+        console.log(teacher.teacherId.teacherName);
+      })
+    });
     res.send(allStudents);
 }
 
@@ -233,17 +240,16 @@ async function sendQRCode(chatId, message, studentCode) {
   }
 }
 
-const addStudent = async (req , res) => {
+const addStudent = async (req, res) => {
     const {
-      studentName,
-      studentPhoneNumber,
-      studentParentPhone,
-      studentTeacher,
-      subject,
-      paymentType,
-      studentAmount,
+        studentName,
+        studentPhoneNumber,
+        studentParentPhone,
+        selectedTeachers,
+        schoolName,
+        paymentType,
+        studentAmount,
     } = req.body;
-
 
     if (studentName.length < 3) {
         res.status(400).send({ message: 'اسم الطالب لازم يكون اكتر من 3 احرف' });
@@ -260,12 +266,17 @@ const addStudent = async (req , res) => {
         return;
     }
 
-    if (!studentTeacher) {
-        res.status(400).send({ message: 'يجب اختيار المعلم' });
-        return
+    if (!selectedTeachers || selectedTeachers.length === 0) {
+        res.status(400).send({ message: 'يجب اختيار معلم' });
+        return;
     }
-    
-    if(studentAmount < 0){
+
+    if (!schoolName) {
+        res.status(400).send({ message: 'يجب ادخال اسم المدرسه' });
+        return;
+    }
+
+    if (studentAmount < 0) {
         res.status(400).send({ message: 'لازم Amount يكون اكبر من 0' });
         return;
     }
@@ -276,23 +287,57 @@ const addStudent = async (req , res) => {
     }
 
     const studentCode = Math.floor(Math.random() * (6000 - 1000 + 1)) + 1000;
+
+    // Process each selected teacher and their courses
+    const processedTeachers = selectedTeachers.map(({ teacherId, courses }) => {
+        const processedCourses = courses.map(({ courseName, amountPay, registerPrice }) => {
+            const amountRemaining = 600 - registerPrice;  // Subtract paid amount from full registration fee
+            console.log('Amount Remaining:', amountRemaining);
+            return {
+              courseName,
+              amountPay,
+              registerPrice,
+              amountRemaining: amountRemaining > 0 ? amountRemaining : 0, // Ensure it doesn't go negative
+            };
+        });
+
+        return { teacherId, courses: processedCourses };
+    });
+
     const student = new Student({
-      studentName,
-      studentPhoneNumber,
-      studentParentPhone,
-      studentTeacher,
-      subject,
-      studentAmount,
-      amountRemaining: paymentType === 'perSession' ? 0 : studentAmount,
-      studentCode: studentCode,
-      paymentType,
+        studentName,
+        studentPhoneNumber,
+        studentParentPhone,
+        schoolName,
+        selectedTeachers: processedTeachers,
+        amountRemaining: paymentType === 'perSession' ? 0 : studentAmount,
+        studentCode,
+        paymentType,
     });
 
     student
         .save()
         .then(async (result) => {
-            const populatedStudent = await result.populate('studentTeacher', 'teacherName');
-            const message = `Student Name: ${populatedStudent.studentName}\nTeacher: ${populatedStudent.studentTeacher.teacherName}\nSubject: ${populatedStudent.subject}\nAmount: ${populatedStudent.studentAmount}\nStudent Code: ${populatedStudent.studentCode}`;
+            const populatedStudent = await result.populate('selectedTeachers.teacherId', 'teacherName');
+
+            let message = `📌 *تفاصيل تسجيل الطالب*\n\n`;
+            message += `👤 *اسم الطالب:* ${populatedStudent.studentName}\n`;
+            message += `🏫 *المدرسة:* ${populatedStudent.schoolName}\n`;
+            message += `📞 *رقم الهاتف:* ${populatedStudent.studentPhoneNumber}\n`;
+            message += `📞 *رقم ولي الأمر:* ${populatedStudent.studentParentPhone}\n`;
+            message += `🆔 *كود الطالب:* ${populatedStudent.studentCode}\n\n`;
+
+            message += `📚 *تفاصيل الكورسات المسجلة:*\n`;
+
+            populatedStudent.selectedTeachers.forEach(({ teacherId, courses }) => {
+                message += `\n👨‍🏫 *المعلم:* ${teacherId.teacherName}\n`;
+                courses.forEach(({ courseName}) => {
+                    message += `   ➖ *الكورس:* ${courseName}\n`;
+              
+                });
+            });
+
+            // Send the message via WhatsApp or another service
             sendQRCode(`2${populatedStudent.studentPhoneNumber}@c.us`, `Scan the QR code to check in\n\n${message}`, populatedStudent.studentCode);
 
             res.status(201).send(populatedStudent);
@@ -301,7 +346,8 @@ const addStudent = async (req , res) => {
             console.log(err);
             res.status(400).send({ message: 'هناك مشكله فنيه' });
         });
-}
+};
+
 
 
 const searchStudent = async (req, res) => {
@@ -412,16 +458,23 @@ const addTeacher = async (req, res) => {
       schedule,
       teacherFees,
       paymentType,
+      courses
     } = req.body;
 
     console.log(req.body); // Debugging: Log the incoming request data
-
+    
     // Validation for required fields
+    if(!courses){
+      return res.status(400).json({
+        error: 'يجب اختيار الكورسات التي يدرسها المدرس',
+      });
+    }
     if (
       !teacherName ||
       !teacherFees ||
       !teacherPhoneNumber ||
       !subjectName ||
+   
       typeof schedule !== 'object'
     ) {
       return res.status(400).json({
@@ -463,9 +516,10 @@ const addTeacher = async (req, res) => {
       teacherName: teacherName.trim(),
       teacherPhoneNumber: teacherPhoneNumber.trim(),
       subjectName: subjectName.trim(),
-      teacherFees : teacherFees,
+      teacherFees: teacherFees,
       paymentType,
       schedule,
+      courses,
     });
 
     await newTeacher.save();

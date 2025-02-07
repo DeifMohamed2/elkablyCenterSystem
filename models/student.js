@@ -15,14 +15,16 @@ const studentSchema = new Schema(
       type: String,
       required: true,
     },
-    subject: {
+    studentTeacher: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Teacher',
+        required: true,
+      },
+    ],
+    schoolName: {
       type: String,
-      required: true,
-    },
-    studentTeacher: {
-      type: Schema.Types.ObjectId,
-      ref: 'Teacher',
-      required: true,
+      required: false,
     },
     attendanceNumber: {
       type: Number,
@@ -31,6 +33,7 @@ const studentSchema = new Schema(
     },
     studentAmount: {
       type: Number,
+      default: 0,
       required: true,
     },
     paymentType: {
@@ -38,14 +41,32 @@ const studentSchema = new Schema(
       enum: ['perSession', 'perCourse'],
       required: true,
     },
+
+    selectedTeachers: [
+      {
+        teacherId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Teacher',
+          required: true,
+        },
+        courses: [
+          {
+            courseName: { type: String, required: true },
+            amountPay: { type: Number, required: true },
+            registerPrice: { type: Number, required: true },
+            amountRemaining: { type: Number, required: true },
+          },
+        ],
+      },
+    ],
     amountRemaining: {
       type: Number,
       required: true,
     },
-    amountRemainingSessions: {  
+    amountRemainingSessions: {
       type: Number,
       required: false,
-      default : 0,
+      default: 0,
     },
     paidHistory: [
       {
@@ -73,7 +94,6 @@ const studentSchema = new Schema(
       required: false,
       unique: true,
     },
-
   },
   { timestamps: true }
 );
