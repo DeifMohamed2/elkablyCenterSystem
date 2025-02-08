@@ -55,6 +55,7 @@ const employeeSchema = new Schema(
     },
     device: {
       type: String,
+      default: 'device1',
       required: true,
     },
   },
