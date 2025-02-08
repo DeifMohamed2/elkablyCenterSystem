@@ -201,7 +201,7 @@ const updateStudent = async (req, res) => {
           chatId: `2${student.studentParentPhone}@c.us`,
           message: parentMessage,
         },
-        { id: '34202' }
+        { id: '35457' }
       );
     }
     await student.save();
@@ -231,7 +231,7 @@ async function sendQRCode(chatId, message, studentCode) {
         mediaCaption: message,
         asSticker: false, // Set true if you want to send as a sticker
       },
-      { id: '34202' } // Replace with your actual instance ID
+      { id: '35457' } // Replace with your actual instance ID
     );
 
     console.log('QR code sent successfully:', response.data);
@@ -410,7 +410,7 @@ ${message}
           chatId: waNumber,
           message: messageUpdate,
         },
-        { id: '34202' }
+        { id: '35457' }
       )
       .then((response) => {
         console.log('Message sent:', response.data);
@@ -1451,7 +1451,7 @@ const downloadAndSendExcelForTeacher = async (req, res) => {
           mediaName: fileName,
           mediaCaption: `Attendance Report for ${teacherName} - ${new Date().toDateString()}`,
         },
-        { id: '34241402' }
+        { id: '35457' }
       )
       .then((response) => {
         console.log('WhatsApp response:', response.data);
@@ -1618,7 +1618,7 @@ const downloadAndSendExcelForEmployee = async (req, res) => {
           mediaName: fileName,
           mediaCaption: `Attendance Report for ${employeeName} - ${new Date().toDateString()}`,
         },
-        { id: '34241402' }
+        { id: '35457' }
       )
       .then((response) => {
         console.log('WhatsApp response:', response.data);
@@ -2354,7 +2354,7 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
           mediaName: fileName,
           mediaCaption: `Attendance Report for ${teacherName} (${startDate} to ${endDate})`,
         },
-        { id: '34241402' } // Replace with actual instance ID if required
+        { id: '35457' } // Replace with actual instance ID if required
       )
       .then((response) => {
         console.log('WhatsApp response:', response.data);
@@ -2522,21 +2522,21 @@ const downloadAndSendExcelForEmployeeByDate = async (req, res) => {
     // Send file via WhatsApp API
 
     await waapi
-    .postInstancesIdClientActionSendMedia(
-          {
-            mediaBase64: base64Excel,
-            chatId: `2${employeePhoneNumber}@c.us`,
-            mediaName: fileName,
-            mediaCaption: `Attendance Report for ${employeeName} (${startDate} to ${endDate})`,
-          },
-          { id: '34241402' } // Replace with actual instance ID if required
-        )
-        .then((response) => {
-          console.log('WhatsApp response:', response.data);
-        })
-        .catch((error) => {
-          console.error('Error sending Excel file via WhatsApp:', error);
-        });
+      .postInstancesIdClientActionSendMedia(
+        {
+          mediaBase64: base64Excel,
+          chatId: `2${employeePhoneNumber}@c.us`,
+          mediaName: fileName,
+          mediaCaption: `Attendance Report for ${employeeName} (${startDate} to ${endDate})`,
+        },
+        { id: '35457' } // Replace with actual instance ID if required
+      )
+      .then((response) => {
+        console.log('WhatsApp response:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error sending Excel file via WhatsApp:', error);
+      });
 
     console.log('Excel file sent via WhatsApp');
 
