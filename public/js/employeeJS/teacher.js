@@ -18,14 +18,14 @@ function toggleSchedule(day) {
       <div class="col-md-12">
         <h6>${day}</h6>
         <div class="row mb-2 time-slot-group">
-          <div class="col-md-3 " style="border: 2px solid black;">
-            <input type="time" class="form-control" name="${day}StartTime[]" required>
+          <div class="col-md-3 ">
+            <input type="time"  style="border: 2px solid black;" class="form-control" name="${day}StartTime[]" required placeholder="Start Time">
           </div>
-          <div class="col-md-3" style="border: 2px solid black;">
-            <input type="time" class="form-control" name="${day}EndTime[]" required>
+          <div class="col-md-3" >
+            <input type="time"  style="border: 2px solid black;" class="form-control" name="${day}EndTime[]" required placeholder="End Time">
           </div>
-          <div class="col-md-3" style="border: 2px solid black;">
-            <input type="text" class="form-control input-group border border-2 rounded w-50 text-center" placeholder="Room ID" name="${day}roomID"  required>
+          <div class="col-md-3" >
+            <input type="text"  style="border: 2px solid black;" class="form-control input-group border border-2 rounded w-50 text-center" placeholder="Room ID" name="${day}roomID"  required>
           </div>
           <div class="col-md-2 text-end">
             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addTimeSlot('${day}')">+ إضافة وقت آخر</button>
@@ -52,13 +52,13 @@ function addTimeSlot(day) {
   newSlot.className = 'row mb-2 time-slot-group';
   newSlot.innerHTML = `
     <div class="col-md-3">
-      <input type="time" class="form-control" name="${day}StartTime[]" required>
+      <input type="time" style="border: 2px solid black;"  class="form-control" name="${day}StartTime[]" required placeholder="Start Time">
     </div>
     <div class="col-md-3">
-      <input type="time" class="form-control" name="${day}EndTime[]" required>
+      <input type="time" style="border: 2px solid black;"  class="form-control" name="${day}EndTime[]" required placeholder="End Time">
     </div>
     <div class="col-md-3">
-      <input type="text" class="form-control input-group border border-2 rounded w-50 text-center" placeholder="Room ID" name="${day}roomID"  required>
+      <input type="text" style="border: 2px solid black;" class="form-control input-group border border-2 rounded w-50 text-center" placeholder="Room ID" name="${day}roomID"  required>
     </div>
     
     <div class="col-md-2">
