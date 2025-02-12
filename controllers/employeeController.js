@@ -124,91 +124,10 @@ const getAllStudents = async (req, res) => {
 }
 
 const getStudent = async (req, res) => {
-    const student = await Student.findById(req.params.id).populate('studentTeacher' , 'teacherName');
+    const student = await Student.findById(req.params.id).populate('selectedTeachers.teacherId');
     console.log(student);
     res.send(student);
 }
-
-const updateStudent = async (req, res) => {
-  const {
-    studentName,
-    studentPhoneNumber,
-    studentParentPhone,
-    studentTeacher,
-    subject,
-    studentAmount,
-    amountRemaining,
-    installmentAmount,
-  } = req.body;
-
-  if (studentName.length < 3) {
-      res.status(400).send({ message: 'اسم الطالب لازم يكون اكتر من 3 احرف' });
-      return;
-  }
-
-  if (studentPhoneNumber.length !== 11) {
-      res.status(400).send({ message: 'رقم الهاتف يجب ان يكون مكون من 11 رقم' });
-      return;
-  }
-
-  if (studentParentPhone.length !== 11) {
-      res.status(400).send({ message: 'رقم هاتف ولى الامر يجب ان يكون مكون من 11 رقم' });
-      return;
-  }
-
-  if (!studentTeacher) {
-      res.status(400).send({ message: 'يجب اختيار المعلم' });
-      return
-  }
-  
-
-  const student = await Student.findByIdAndUpdate(req.params.id, {
-    studentName,
-    studentPhoneNumber,
-    studentParentPhone,
-    studentTeacher,
-    subject,
-    studentAmount,
-    amountRemaining,
-
-  }).populate('studentTeacher' , 'teacherName');
-  
-  if (student.paymentType === 'perCourse') {
-    if ((student.amountRemaining - installmentAmount) <= 0) {
-      return res.status(200).send(student);
-    }
-    student.amountRemaining -= installmentAmount;
-    student.paidHistory.push({
-      amount: installmentAmount,
-      date: new Date(),
-      employee: req.employee._id,
-    });
-
-    if (installmentAmount>0) {
-      const parentMessage = `
-عزيزي ولي أمر الطالب ${student.studentName},
------------------------------
-نود إعلامكم بأنه تم دفع مبلغ ${installmentAmount} جنيه من إجمالي المبلغ المستحق.
-المبلغ المتبقي هو ${student.amountRemaining} جنيه.
-الكورس: ${student.subject}
-المعلم: ${student.studentTeacher.teacherName}
-التاريخ: ${new Date().toLocaleDateString()}
-شكرًا لتعاونكم.
-    `;
-
-      await waapi.postInstancesIdClientActionSendMessage(
-        {
-          chatId: `2${student.studentParentPhone}@c.us`,
-          message: parentMessage,
-        },
-        { id: '35457' }
-      );
-    }
-    await student.save();
-  }
- return res.send(student);
-}
-
 
 async function sendQRCode(chatId, message, studentCode) {
   try {
@@ -348,31 +267,122 @@ const addStudent = async (req, res) => {
         });
 };
 
+const updateStudent = async (req, res) => {
+  const {
+    studentName,
+    studentPhoneNumber,
+    studentParentPhone,
+    // studentTeacher,
+    subject,
+    studentAmount,
+    amountRemaining,
+    installmentAmount,
+    selectedTeachers,
+  } = req.body;
 
+  if (studentName.length < 3) {
+      res.status(400).send({ message: 'اسم الطالب لازم يكون اكتر من 3 احرف' });
+      return;
+  }
+
+  if (studentPhoneNumber.length !== 11) {
+      res.status(400).send({ message: 'رقم الهاتف يجب ان يكون مكون من 11 رقم' });
+      return;
+  }
+
+  if (studentParentPhone.length !== 11) {
+      res.status(400).send({ message: 'رقم هاتف ولى الامر يجب ان يكون مكون من 11 رقم' });
+      return;
+  }
+
+  // if (!studentTeacher) {
+  //     res.status(400).send({ message: 'يجب اختيار المعلم' });
+  //     return
+  // }
+  
+
+  const student = await Student.findByIdAndUpdate(req.params.id, {
+    studentName,
+    studentPhoneNumber,
+    studentParentPhone,
+    // studentTeacher,
+    subject,
+    studentAmount,
+    amountRemaining,
+    selectedTeachers,
+  }).populate('studentTeacher', 'teacherName');
+  
+  if (student.paymentType === 'perCourse') {
+    if ((student.amountRemaining - installmentAmount) <= 0) {
+      return res.status(200).send(student);
+    }
+    student.amountRemaining -= installmentAmount;
+    student.paidHistory.push({
+      amount: installmentAmount,
+      date: new Date(),
+      employee: req.employee._id,
+    });
+
+    if (installmentAmount>0) {
+      const parentMessage = `
+عزيزي ولي أمر الطالب ${student.studentName},
+-----------------------------
+نود إعلامكم بأنه تم دفع مبلغ ${installmentAmount} جنيه من إجمالي المبلغ المستحق.
+المبلغ المتبقي هو ${student.amountRemaining} جنيه.
+الكورس: ${student.subject}
+المعلم: ${student.studentTeacher.teacherName}
+التاريخ: ${new Date().toLocaleDateString()}
+شكرًا لتعاونكم.
+    `;
+
+      await waapi.postInstancesIdClientActionSendMessage(
+        {
+          chatId: `2${student.studentParentPhone}@c.us`,
+          message: parentMessage,
+        },
+        { id: '35457' }
+      );
+    }
+    await student.save();
+  }
+ return res.send(student);
+}
 
 const searchStudent = async (req, res) => {
   try {
-    const { search, teacher } = req.query; // Extract query parameters
-    console.log('Search:', search, 'Teacher:', teacher);
+
+    const { search, teacher, course } = req.query; // Extract query parameters
+    console.log('Search:', search, 'Teacher:', teacher, 'Course:', course);
 
     // Build the query dynamically
     const query = {};
+
     if (search) {
-      query.studentCode = search; // Filter by phone number if provided
+      if(search.length > 4){
+        query.studentPhoneNumber = search; // Search by phone number
+      } else {
+      query.studentCode = search; // Search by student code
+      }
     }
     if (teacher) {
-      query.studentTeacher = teacher; // Filter by teacher if provided
+      query['selectedTeachers.teacherId'] = teacher; // Filter by teacher
+    }
+    if (course) {
+      query['selectedTeachers.courses.courseName'] = course; // Filter by course
     }
 
-    // Fetch the student record(s)
-    const students = await Student.find(query).populate(
-      'studentTeacher',
-      'teacherName'
-    );
+    // Fetch the student records & populate teachers and their courses
+    const students = await Student.find(query).populate({
+      path: 'selectedTeachers.teacherId',
+      select: 'teacherName', // Get teacher name only
+    });
+
     console.log('Students:', students);
 
-    // Send the response
-    res.send(students.length ? students : { message: 'No students found' });
+    // Send response
+    res
+      .status(200)
+      .send(students.length ? students : { message: 'No students found' });
   } catch (error) {
     console.error('Error fetching students:', error);
     res
@@ -558,6 +568,7 @@ const updateTeacher = async (req, res) => {
     subjectName,
     teacherFees,
     schedule,
+    courses,
   } = req.body;
 
   try {
@@ -569,7 +580,7 @@ const updateTeacher = async (req, res) => {
     teacher.teacherPhoneNumber = teacherPhoneNumber;
     teacher.subjectName = subjectName;
     teacher.teacherFees = teacherFees;
-
+    teacher.courses = courses;
     // Update schedule
     if (schedule && Array.isArray(schedule)) {
       const formattedSchedule = schedule.reduce((acc, slot) => {
@@ -596,12 +607,14 @@ const updateTeacher = async (req, res) => {
 
 // ======================================== Attendance ======================================== //
 
-const getAttendance = (req, res) => {
+const getAttendance = async(req, res) => {
   const employee = req.employee;
   console.log(employee.device);
+  const allTeachers = await Teacher.find({});
     res.render('employee/attendance', {
         title: 'Attendance',
         path: '/employee/attendance',
+        allTeachers :allTeachers,
         device : employee.device
     });
 }
@@ -619,27 +632,62 @@ function getDateTime() {
 }
 
 const attendStudent = async (req, res) => {
-  console.time('attendStudentExecutionTime'); // Start timer
+  console.time('attendStudentExecutionTime');
 
-  const { searchStudent } = req.body;
-  const employeeId = req.employeeId; // Assuming employee ID is available in the request
+  const { searchStudent, teacherId, courseName } = req.body;
+  const employeeId = req.employeeId;
+
+  if (!teacherId || !courseName) {
+    return res.status(400).json({ message: 'يجب اختيار الكورس ' });
+  }
 
   try {
-    // Find the student based on barcode or student code
+    // Find the student
     const student = await Student.findOne({
       $or: [{ barCode: searchStudent }, { studentCode: searchStudent }],
-    }).populate('studentTeacher', 'teacherName subjectName teacherFees');
+    }).populate('selectedTeachers.teacherId', 'teacherName subjectName teacherFees');
 
     if (!student) {
       return res.status(404).json({ message: 'هذا الطالب غير موجود' });
     }
 
-    // Find or create today's attendance record
-    const todayDate = getDateTime(); // Cache date for consistency
-    let attendance = await Attendance.findOne({ date: todayDate });
+    // Check if the student is enrolled with the specified teacher and course
+    const selectedTeacherEntry = student.selectedTeachers.find(
+      (t) => t.teacherId._id.toString() === teacherId
+    );
+
+    if (!selectedTeacherEntry) {
+      return res.status(404).json({ message: 'الطالب غير مسجل مع هذا المدرس' });
+    }
+
+    const course = selectedTeacherEntry.courses.find((c) => c.courseName === courseName);
+
+    if (!course) {
+      return res.status(404).json({ message: 'الطالب غير مسجل في هذه المادة مع المدرس المحدد' });
+    }
+
+    // Fetch the teacher's details
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) {
+      return res.status(404).json({ message: 'المدرس غير موجود' });
+    }
+
+    // Find or create today's attendance record for this teacher and course
+    const todayDate = getDateTime();
+    let attendance = await Attendance.findOne({
+      date: todayDate,
+      teacher: teacherId,
+      course: courseName,
+    });
 
     if (!attendance) {
-      attendance = new Attendance({ date: todayDate, studentsPresent: [] });
+      attendance = new Attendance({
+        date: todayDate,
+        teacher: teacherId,
+        course: courseName,
+        studentsPresent: [],
+        netProfitToTeacher: { amount: 0, feesAmount: 0 }, // Initialize net profit
+      });
     }
 
     // Check if the student is already marked present
@@ -648,13 +696,13 @@ const attendStudent = async (req, res) => {
     );
 
     if (isStudentPresent) {
-      return res.status(400).json({ message: 'تم تسجيل حضور الطالب بالفعل' });
+      return res.status(400).json({ message: 'تم تسجيل حضور الطالب بالفعل لهذه المادة' });
     }
 
-    // Calculate payment details for "perSession" students
+    // Calculate payment details
     const isPerSession = student.paymentType === 'perSession';
-    const amountPaid = isPerSession ? student.studentAmount : 0;
-    const feesApplied = isPerSession ? student.studentTeacher.teacherFees : 0;
+    const amountPaid = isPerSession ? course.amountPay : 0;
+    const feesApplied = isPerSession ? teacher.teacherFees : 0;
     const teacherProfit = isPerSession ? amountPaid - feesApplied : 0;
 
     // Add the student to the attendance record
@@ -665,27 +713,14 @@ const attendStudent = async (req, res) => {
       feesApplied,
     });
 
-    // Update totals for "perSession" students
+    // Update totals
     if (isPerSession) {
       attendance.totalAmount += amountPaid;
       attendance.totalFees += feesApplied;
 
-      // Add or update the teacher's profit
-      const teacherId = student.studentTeacher._id.toString();
-      const existingProfitEntry = attendance.netProfitToTeachers.find(
-        (entry) => entry.teacher.toString() === teacherId
-      );
-
-      if (existingProfitEntry) {
-        existingProfitEntry.amount += teacherProfit;
-        existingProfitEntry.feesAmount += feesApplied;
-      } else {
-        attendance.netProfitToTeachers.push({
-          teacher: teacherId,
-          amount: teacherProfit,
-          feesAmount: feesApplied,
-        });
-      }
+      // Update teacher's profit
+      attendance.netProfitToTeacher.amount += teacherProfit;
+      attendance.netProfitToTeacher.feesAmount += feesApplied;
     }
 
     // Save the attendance record
@@ -695,20 +730,26 @@ const attendStudent = async (req, res) => {
     const updatedAttendance = await Attendance.findById(attendance._id)
       .populate({
         path: 'studentsPresent.student',
-        populate: {
-          path: 'studentTeacher',
-          select: 'teacherName subjectName',
-        },
+        populate: { path: 'selectedTeachers.teacherId', select: 'teacherName subjectName' },
       })
-      .populate('studentsPresent.addedBy', 'employeeName'); // Populate employee details if needed
+      .populate('studentsPresent.addedBy', 'employeeName');
 
-    console.timeEnd('attendStudentExecutionTime'); // End timer
-    // Respond with updated data
+    console.timeEnd('attendStudentExecutionTime');
+
     res.status(201).json({
       message: 'تم تسجيل الحضور',
-      studentData: student,
+      studentData: {
+        studentName: student.studentName,
+        studentTeacher: {
+          teacherName: teacher.teacherName,
+          subjectName: courseName,
+        },
+        amountPaid,
+        feesApplied,
+      },
       students: updatedAttendance.studentsPresent,
     });
+
   } catch (error) {
     console.error('Error attending student:', error);
     res.status(500).json({ message: 'يبدو ان هناك مشكله ما حاول مره اخري' });
@@ -718,107 +759,68 @@ const attendStudent = async (req, res) => {
 
 const getAttendedStudents = async (req, res) => {
   try {
-    // Fetch today's attendance record
+    const { teacherId, courseName } = req.query;
+    if (!teacherId || !courseName) {
+      return res.status(400).json({ message: 'Teacher ID and course name are required' });
+    }
+
+    // Fetch attendance record for today
     const attendance = await Attendance.findOne({
       date: getDateTime(),
+      teacher: teacherId,
+      course: courseName,
     })
       .populate({
         path: 'studentsPresent.student',
-        populate: {
-          path: 'studentTeacher',
-          select: 'teacherName subjectName teacherFees paymentType',
-        },
       })
-      .populate('studentsPresent.addedBy', 'employeeName');
+      .populate('studentsPresent.addedBy', 'employeeName')
+      .populate('invoices.addedBy', 'employeeName') // Populate invoice details
+      .populate('teacher', 'teacherName teacherFees');
 
     if (!attendance) {
-      return res.status(404).json({ message: 'لا يوجد حضور ' });
+      return res.status(404).json({ message: 'لا يوجد حضور اليوم' });
     }
 
-    let totalAmountFromAllStudents = 0;
-    let totalFeesFromAllTeachers = 0;
+    // Filter out null students (to prevent errors in calculations)
+    const filteredStudents = attendance.studentsPresent.filter(sp => sp.student);
 
-    // Helper maps for teachers and employees
-    const teacherData = {};
-    const employeeData = {};
-
-    // Iterate over attendance records
-    for (const {
-      student,
-      addedBy,
-      amountPaid,
-      feesApplied,
-    } of attendance.studentsPresent) {
-      if (!student || !student.studentTeacher) continue;
-
-      const teacher = student.studentTeacher;
-      const teacherId = teacher._id.toString();
-      const employeeId = addedBy._id.toString();
-
-      // Update teacher data
-      if (!teacherData[teacherId]) {
-        teacherData[teacherId] = {
-          teacherId: teacher._id,
-          teacherName: teacher.teacherName,
-          subjectName: teacher.subjectName,
-          paymentType: teacher.paymentType,
-          totalAmount: 0,
-          totalFees: 0,
-          netProfit: 0,
-          totalStudents: 0,
-        };
-      }
-
-      teacherData[teacherId].totalAmount += amountPaid;
-      teacherData[teacherId].totalFees += feesApplied;
-      teacherData[teacherId].totalStudents += 1;
-      console.log(amountPaid, feesApplied);
-      totalAmountFromAllStudents += amountPaid;
-      totalFeesFromAllTeachers += feesApplied;
-
-      // Update employee data
-      if (!employeeData[employeeId]) {
-        employeeData[employeeId] = {
-          employeeId: employeeId,
-          employeeName: addedBy.employeeName,
-          count: 0,
-          totalAmount: 0,
-          percentage: 0,
-        };
-      }
-
-      employeeData[employeeId].count += 1;
-      employeeData[employeeId].totalAmount += amountPaid;
+    if (filteredStudents.length === 0) {
+      return res.status(404).json({ message: 'لا يوجد حضور لهذا المدرس والمادة' });
     }
 
-    // Calculate net profits for teachers
-    for (const teacherId in teacherData) {
-      const teacher = teacherData[teacherId];
-      teacher.netProfit = teacher.totalAmount - teacher.totalFees;
-    }
+    // **Recalculate all values dynamically**
+    let totalAmount = 0;
+    let totalFees = 0;
+    let netProfitToTeacher = { amount: 0, feesAmount: 0 };
 
-    // Calculate percentages for employees
-    for (const employeeId in employeeData) {
-      employeeData[employeeId].percentage = (
-        (employeeData[employeeId].totalAmount / totalAmountFromAllStudents) *
-        100
-      ).toFixed(2);
-    }
-    // console.log(totalAmountFromAllStudents);
-    // console.log('Employee student count:', Object.values(employeeData));
+    filteredStudents.forEach(({ amountPaid, feesApplied }) => {
+      totalAmount += amountPaid;
+      totalFees += feesApplied;
+      netProfitToTeacher.amount += (amountPaid - feesApplied);
+      netProfitToTeacher.feesAmount += feesApplied;
+    });
 
-    attendance.totalAmount = totalAmountFromAllStudents;
-    attendance.totalFees = totalFeesFromAllTeachers;
+    // **Subtract invoice amounts from the teacher's net profit**
+    const totalInvoiceAmount = attendance.invoices.reduce((sum, inv) => sum + inv.invoiceAmount, 0);
+    netProfitToTeacher.amount -= totalInvoiceAmount;
+
+    // **Update attendance record dynamically**
+    attendance.totalAmount = totalAmount;
+    attendance.totalFees = totalFees;
+    attendance.netProfitToTeacher = netProfitToTeacher;
+
     await attendance.save();
 
     res.status(200).json({
-      students: attendance.studentsPresent,
-      message: 'حضور اليوم',
-      totalAmount: totalAmountFromAllStudents,
-      totalFees: totalFeesFromAllTeachers,
-      teachersSummary: Object.values(teacherData),
-      employeesSummary: Object.values(employeeData),
+      students: filteredStudents,
+      invoices: attendance.invoices, // Include invoices in response
+      message: 'حضور المدرس والمادة المحددة',
+      totalAmount,
+      totalFees,
+      netProfitToTeacher,
+      totalInvoiceAmount,
     });
+
   } catch (error) {
     console.error('Error fetching attendance:', error);
     res.status(500).json({ message: 'يبدو ان هناك مشكله ما حاول مره اخري' });
@@ -826,49 +828,115 @@ const getAttendedStudents = async (req, res) => {
 };
 
 
-const deleteAttendStudent = async (req, res) => {
+const editStudentAmountRemaining = async (req, res) => {
   const { id } = req.params;
+  const { amountRemaining, teacherId, courseName } = req.body;
 
   try {
-    console.log('Deleting student:', id);
+    const student = await Student.findById(id);
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    // Find the specific course for the student
+    const teacherEntry = student.selectedTeachers.find(
+      (t) => t.teacherId.toString() === teacherId
+    );
+    if (!teacherEntry) {
+      return res
+        .status(404)
+        .json({ message: 'Teacher not found for this student' });
+    }
+
+    const course = teacherEntry.courses.find(
+      (c) => c.courseName === courseName
+    );
+    if (!course) {
+      return res
+        .status(404)
+        .json({ message: 'Course not found for this student' });
+    }
+
+    // Calculate the difference
+    const difference = course.amountRemaining - amountRemaining;
+    course.amountRemaining = amountRemaining;
+
+    // Update attendance record
+    const attendance = await Attendance.findOne({
+      date: getDateTime(),
+      teacher: teacherId,
+      course: courseName,
+      'studentsPresent.student': id,
+    });
+
+    if (attendance) {
+      const studentAttendance = attendance.studentsPresent.find(
+        (entry) => entry.student.toString() === id
+      );
+
+      if (studentAttendance) {
+        studentAttendance.amountPaid += difference;
+        studentAttendance.feesApplied = await Teacher.findById(teacherId).then(
+          (t) => t.teacherFees
+        );
+
+        // Recalculate totals dynamically
+        attendance.totalAmount = attendance.studentsPresent.reduce(
+          (sum, s) => sum + s.amountPaid,
+          0
+        );
+        attendance.totalFees = attendance.studentsPresent.reduce(
+          (sum, s) => sum + s.feesApplied,
+          0
+        );
+        attendance.netProfitToTeacher.amount =
+          attendance.totalAmount - attendance.totalFees;
+        attendance.netProfitToTeacher.feesAmount = attendance.totalFees;
+
+        await attendance.save();
+      }
+    }
+
+    await student.save();
+    res.status(200).json({ message: 'Amount updated successfully', student });
+  } catch (error) {
+    console.error('Error updating amount:', error);
+    res.status(500).json({ message: 'Error updating amount' });
+  }
+};
+
+const deleteAttendStudent = async (req, res) => {
+  const { id } = req.params;
+  const { teacherId, courseName } = req.query;
+  try {
+    console.log('Deleting student:', id , 'Teacher:', teacherId, 'Course:', courseName);
 
     // Find the attendance record for today and the student being removed
     const attendance = await Attendance.findOne(
-      { date: getDateTime(), 'studentsPresent._id': id },
+      { 
+        date: getDateTime(),
+        teacher: teacherId,
+        course: courseName,
+        'studentsPresent.student': id 
+      },
       { 'studentsPresent.$': 1 } // Fetch only the matching student
     );
-
+    console.log('Attendance:', attendance);
     if (!attendance || !attendance.studentsPresent.length) {
       return res
         .status(404)
         .json({ message: 'Student not found in attendance' });
     }
 
-    const studentEntry = attendance.studentsPresent[0];
-    const { amountPaid, feesApplied, student: studentId } = studentEntry;
 
-    // Fetch the student to get the teacher details
-    const student = await Student.findById(studentId).populate(
-      'studentTeacher',
-      'teacherFees'
-    );
-
-    if (!student) {
-      return res.status(404).json({ message: 'Student details not found' });
-    }
-
-    const teacherId = student.studentTeacher._id;
-    const teacherFees = student.studentTeacher.teacherFees;
-
-    // Update the attendance record
+    // Remove student from attendance
     const updateResult = await Attendance.updateOne(
-      { date: getDateTime() },
+      { date: getDateTime(),
+        teacher: teacherId,
+        course: courseName
+      },
       {
-        $pull: { studentsPresent: { _id: id } },
-        $inc: {
-          totalAmount: -amountPaid,
-          totalFees: -feesApplied,
-        },
+        $pull: { studentsPresent: { student: id } },
       }
     );
 
@@ -876,34 +944,9 @@ const deleteAttendStudent = async (req, res) => {
       return res.status(404).json({ message: 'Failed to remove student' });
     }
 
-    // Update the teacher's profit in netProfitToTeachers
-    const profitReduction = amountPaid - teacherFees;
-    await Attendance.updateOne(
-      {
-        date: getDateTime(),
-        'netProfitToTeachers.teacher': teacherId,
-      },
-      {
-        $inc: { 'netProfitToTeachers.$.amount': -profitReduction , 'netProfitToTeachers.$.feesAmount': -feesApplied },
-      }
-    );
-
-    // Fetch updated attendance to return the remaining students
-    const updatedAttendance = await Attendance.findOne({
-      date: getDateTime(),
-    })
-      .populate({
-        path: 'studentsPresent.student',
-        populate: {
-          path: 'studentTeacher',
-          select: 'teacherName subjectName',
-        },
-      })
-      .populate('studentsPresent.addedBy', 'employeeName');
 
     res.status(200).json({
       message: 'Student removed from attendance',
-      students: updatedAttendance.studentsPresent,
     });
   } catch (error) {
     console.error('Error deleting student from attendance:', error);
@@ -913,88 +956,36 @@ const deleteAttendStudent = async (req, res) => {
   }
 };
 
-const editStudentAmountRemaining = async (req, res) => {
-  const { id } = req.params;
-  const { amountRemainingSessions } = req.body;
-
-  try {
-    console.log(
-      'Updating student amount remaining:',
-      id,
-      amountRemainingSessions
-    );
-    const student = await Student.findById(id).populate('studentTeacher', 'teacherFees');
-    console.log('Student:', student);
-    if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
-    }
-
-    // Update the amount paid in the attendance record
-    const todayDate = getDateTime();
-    const attendance = await Attendance.findOne({
-      date: todayDate,
-      'studentsPresent.student': id,
-    })
-
-    if (attendance) {
-      const studentAttendance = attendance.studentsPresent.find(
-        (entry) => entry.student.toString() === id
-      );
-      console.log('Student attendance:', studentAttendance);
-      if (studentAttendance) {
-      
-       studentAttendance.amountPaid += (student.amountRemainingSessions - amountRemainingSessions);
-       if (studentAttendance.amountPaid<=0){
-        studentAttendance.amountPaid = 0;
-        studentAttendance.feesApplied=0;
-       }
-       console.log( student.studentTeacher.teacherFees);
-      if (studentAttendance.amountPaid > 0) {
-         studentAttendance.feesApplied = student.studentTeacher.teacherFees||0;
-      }
-       await attendance.save();
-      }
-    }
-    // Update the student's amount remaining
-    student.amountRemainingSessions = amountRemainingSessions;
-
-    await student.save();
-
-    res
-      .status(200)
-      .json({ message: 'Student amount remaining updated', student });
-  } catch (error) {
-    console.error('Error updating student amount remaining:', error);
-    res.status(500).json({
-      message: 'An error occurred while updating student amount remaining',
-    });
-
-  }
-};
-
 const downloadAttendanceExcel = async (req, res) => {
   try {
-    // Fetch today's attendance record
+    const { teacherId, courseName } = req.query;
+    if (!teacherId || !courseName) {
+      return res
+        .status(400)
+        .json({ message: 'Teacher ID and course name are required' });
+    }
+
+    // Fetch today's attendance for the specific teacher and course
     const attendance = await Attendance.findOne({
       date: getDateTime(),
+      teacher: teacherId,
+      course: courseName,
     })
-      .populate({
-        path: 'studentsPresent.student',
-        populate: {
-          path: 'studentTeacher',
-          select: 'teacherName subjectName teacherFees paymentType',
-        },
-      })
-      .populate('studentsPresent.addedBy', 'employeeName');
+      .populate('studentsPresent.student')
+      .populate('studentsPresent.addedBy', 'employeeName')
+      .populate('invoices.addedBy', 'employeeName') // Include invoice details
+      .populate('teacher', 'teacherName subjectName teacherPhoneNumber');
 
     if (!attendance) {
-      return res.status(404).json({ message: 'No attendance record found' });
+      return res
+        .status(404)
+        .json({ message: 'No attendance record found for this teacher' });
     }
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Attendance Report');
 
-    // Styles for the sheet
+    // Define styles
     const styles = {
       header: {
         font: { bold: true, color: { argb: 'FFFFFF' }, size: 16 },
@@ -1032,200 +1023,190 @@ const downloadAttendanceExcel = async (req, res) => {
           fgColor: { argb: 'FF5733' },
         },
       },
+      invoiceHeader: {
+        font: { bold: true, color: { argb: 'FFFFFF' }, size: 12 },
+        alignment: { horizontal: 'center', vertical: 'middle' },
+        fill: {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: '7030A0' },
+        }, // Purple
+      },
     };
 
-    // Sheet title
+    // Add report title
     worksheet.mergeCells('A1:F1');
     worksheet.getCell(
       'A1'
-    ).value = `Attendance Report - ${new Date().toDateString()}`;
+    ).value = `Attendance Report - ${attendance.teacher.teacherName} - ${attendance.course}`;
     worksheet.getCell('A1').style = styles.header;
 
     let rowIndex = 2;
-
-    const teacherData = {};
-    const employeeData = {};
     let totalAmount = 0;
     let totalFees = 0;
+    let netProfit = 0;
+    const studentsData = [];
 
-    // Aggregate attendance data
-    for (const {
-      student,
-      addedBy,
-      amountPaid,
-      feesApplied,
-    } of attendance.studentsPresent) {
-      if (!student || !student.studentTeacher) continue;
+    attendance.studentsPresent.forEach(
+      ({ student, addedBy, amountPaid, feesApplied }) => {
+        if (!student) return;
 
-      const teacher = student.studentTeacher;
-      const teacherId = teacher._id.toString();
-      const employeeId = addedBy._id.toString();
+        totalAmount += amountPaid;
+        totalFees += feesApplied;
+        netProfit += amountPaid - feesApplied;
 
-      // Aggregate teacher data
-      if (!teacherData[teacherId]) {
-        teacherData[teacherId] = {
-          teacherName: teacher.teacherName,
-          subjectName: teacher.subjectName,
-          totalAmount: 0,
-          totalFees: 0,
-          netProfit: 0,
-          students: [],
-        };
+        studentsData.push([
+          student.studentName,
+          student.studentPhoneNumber,
+          amountPaid,
+          feesApplied,
+          amountPaid - feesApplied,
+          addedBy.employeeName,
+        ]);
       }
+    );
 
-      teacherData[teacherId].totalAmount += amountPaid;
-      teacherData[teacherId].totalFees += feesApplied;
-      teacherData[teacherId].students.push({
-        studentName: student.studentName,
-        phoneNumber: student.studentPhoneNumber,
-        amountPaid,
-        feesApplied,
-        netProfit: amountPaid - feesApplied,
-        addedBy: addedBy.employeeName,
-      });
-
-      totalAmount += amountPaid;
-      totalFees += feesApplied;
-
-      // Aggregate employee data
-      if (!employeeData[employeeId]) {
-        employeeData[employeeId] = {
-          employeeName: addedBy.employeeName,
-          totalAmount: 0,
-          count: 0,
-        };
-      }
-
-      employeeData[employeeId].totalAmount += amountPaid;
-      employeeData[employeeId].count++;
-    }
-
-    // Add Employee Summary Section
-    worksheet.getRow(rowIndex).values = ['Employee Summary'];
-    worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = styles.header));
+    // Add student section header
+    worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
+    worksheet.getCell(`A${rowIndex}`).value = 'Student Attendance Details';
+    worksheet.getCell(`A${rowIndex}`).style = styles.header;
     rowIndex++;
 
+    // Add column headers for students
     worksheet.getRow(rowIndex).values = [
-      'Employee Name',
-      'Students Added',
-      'Total Amount (EGP)',
-      'Contribution (%)',
+      'Student Name',
+      'Phone Number',
+      'Amount Paid (EGP)',
+      'Center Fees (EGP)',
+      'Net Profit (EGP)',
+      'Added By',
     ];
     worksheet
       .getRow(rowIndex)
       .eachCell((cell) => (cell.style = styles.columnHeader));
     rowIndex++;
 
-    for (const employeeId in employeeData) {
-      const employee = employeeData[employeeId];
-      const contributionPercentage = (
-        (employee.totalAmount / totalAmount) *
-        100
-      ).toFixed(2);
-
-      worksheet.getRow(rowIndex).values = [
-        employee.employeeName,
-        employee.count,
-        employee.totalAmount,
-        `${contributionPercentage}%`,
-      ];
+    // Add student data
+    studentsData.forEach((row) => {
+      worksheet.getRow(rowIndex).values = row;
       worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = styles.cell));
       rowIndex++;
-    }
+    });
 
-    rowIndex++; // Add space before teacher data
+    rowIndex++; // Space before invoices
 
-    // Populate Teacher Data
-    for (const teacherId in teacherData) {
-      const teacher = teacherData[teacherId];
+    // Add invoice section header
+    worksheet.mergeCells(`A${rowIndex}:D${rowIndex}`);
+    worksheet.getCell(`A${rowIndex}`).value = 'Invoice Details';
+    worksheet.getCell(`A${rowIndex}`).style = styles.header;
+    rowIndex++;
 
-      // Add teacher header
-      worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
-      worksheet.getCell(`A${rowIndex}`).value = teacher.teacherName;
-      worksheet.getCell(`A${rowIndex}`).style = styles.header;
-      rowIndex++;
+    // Add invoice headers
+    worksheet.getRow(rowIndex).values = [
+      'Invoice Details',
+      'Invoice Amount (EGP)',
+      'Time',
+      'Added By',
+    ];
+    worksheet
+      .getRow(rowIndex)
+      .eachCell((cell) => (cell.style = styles.invoiceHeader));
+    rowIndex++;
 
-      // Column headers for student data
-      worksheet.getRow(rowIndex).values = [
-        'Student Name',
-        'Phone Number',
-        'Amount (EGP)',
-        'Net Profit (EGP)',
-        'Fees Applied (EGP)',
-        'Added By',
-      ];
-      worksheet
-        .getRow(rowIndex)
-        .eachCell((cell) => (cell.style = styles.columnHeader));
-      rowIndex++;
+    let totalInvoiceAmount = 0;
+    attendance.invoices.forEach(
+      ({ invoiceDetails, invoiceAmount, time, addedBy }) => {
+        totalInvoiceAmount += invoiceAmount;
 
-      // Add student rows
-      teacher.students.forEach((student) => {
         worksheet.getRow(rowIndex).values = [
-          student.studentName,
-          student.phoneNumber,
-          student.amountPaid,
-          student.netProfit,
-          student.feesApplied,
-          student.addedBy,
+          invoiceDetails,
+          invoiceAmount,
+          time,
+          addedBy.employeeName,
         ];
         worksheet
           .getRow(rowIndex)
           .eachCell((cell) => (cell.style = styles.cell));
         rowIndex++;
-      });
+      }
+    );
 
-      // Add teacher totals and percentage
-      const teacherNetProfit = teacher.totalAmount - teacher.totalFees;
-      const teacherProfitPercentage = (
-        (teacherNetProfit / (totalAmount - totalFees)) *
-        100
-      ).toFixed(2);
+    rowIndex++; // Space before totals
 
-      worksheet.getRow(rowIndex).values = [
-        `Total for ${teacher.teacherName}`,
-        '',
-        teacher.totalAmount,
-        teacherNetProfit,
-        teacher.totalFees,
-        `${teacherProfitPercentage}%`,
-      ];
-      worksheet
-        .getRow(rowIndex)
-        .eachCell((cell) => (cell.style = styles.totalRow));
-      rowIndex++;
-    }
+    // Add total invoices row
+    worksheet.mergeCells(`A${rowIndex}:B${rowIndex}`);
+    worksheet.getCell(`A${rowIndex}`).value = 'Total Invoices';
+    worksheet.getCell(`A${rowIndex}`).style = styles.totalRow;
+    worksheet.getCell(`C${rowIndex}`).value = totalInvoiceAmount;
+    worksheet.getCell(`C${rowIndex}`).style = styles.totalRow;
+    rowIndex++;
 
-    // Add overall totals
-    worksheet.mergeCells(`A${rowIndex+1}:B${rowIndex+1}`);
-    worksheet.getCell(`A${rowIndex+1}`).value = 'Overall Total';
-    worksheet.getCell(`A${rowIndex+1}`).style = styles.totalRow;
-    worksheet.getCell(`C${rowIndex+1}`).value = totalAmount;
-    worksheet.getCell(`C${rowIndex+1}`).style = styles.totalRow;
-    worksheet.getCell(`D${rowIndex+1}`).value = totalAmount - totalFees;
-    worksheet.getCell(`D${rowIndex+1}`).style = styles.totalRow;
-    worksheet.getCell(`E${rowIndex+1}`).value = totalFees;
-    worksheet.getCell(`E${rowIndex+1}`).style = styles.totalRow;
+    rowIndex++; // Space before final summary
+
+    // Add final summary header
+    worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
+    worksheet.getCell(`A${rowIndex}`).value = 'Final Summary';
+    worksheet.getCell(`A${rowIndex}`).style = styles.header;
+    rowIndex++;
+
+    // Add total row with new headers
+    worksheet.getRow(rowIndex).values = [
+      'Total Amount Paid (EGP)',
+      'Center Fees (EGP)',
+      'Total Invoices (EGP)',
+      'Net Profit Before Invoice (EGP)',
+      'Final Net Profit (EGP)',
+    ];
+    worksheet
+      .getRow(rowIndex)
+      .eachCell((cell) => (cell.style = styles.columnHeader));
+    rowIndex++;
+
+    worksheet.getRow(rowIndex).values = [
+      totalAmount,
+      totalFees,
+      totalInvoiceAmount,
+      netProfit,
+      netProfit - totalInvoiceAmount,
+    ];
+    worksheet
+      .getRow(rowIndex)
+      .eachCell((cell) => (cell.style = styles.totalRow));
+    rowIndex++;
 
     // Set column widths
     worksheet.columns = [
       { width: 30 }, // Student Name
       { width: 20 }, // Phone Number
-      { width: 20 }, // Amount
-      { width: 20 }, // Teacher Fees
+      { width: 20 }, // Amount Paid
+      { width: 20 }, // Fees Applied
       { width: 20 }, // Net Profit
       { width: 20 }, // Added By
     ];
 
-    // Export Excel file
-    res.setHeader(
-      'Content-Type',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    );
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename="Attendance_Report_${new Date().toDateString()}.xlsx"`
-    );
+    // Send file via WhatsApp API
+    const buffer = await workbook.xlsx.writeBuffer();
+    const base64Excel = buffer.toString('base64');
+    const fileName = `Attendance_Report_${attendance.teacher.teacherName}_${
+      attendance.course
+    }_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+    await waapi.postInstancesIdClientActionSendMedia(
+      {
+        mediaBase64: base64Excel,
+        chatId: `2${attendance.teacher.teacherPhoneNumber}@c.us`,
+        mediaName: fileName,
+        mediaCaption: `Attendance Report for ${
+          attendance.teacher.teacherName
+        } - ${attendance.course} - ${new Date().toDateString()}`,
+      },
+      { id: '3544257' }
+    ).then((response) => {
+      console.log('Excel sent:', response.data);
+    }).catch((error) => {
+      console.error('Error sending Excel:', error);
+    });
+
     await workbook.xlsx.write(res);
     res.end();
   } catch (error) {
@@ -1234,424 +1215,6 @@ const downloadAttendanceExcel = async (req, res) => {
   }
 };
 
-const downloadAndSendExcelForTeacher = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const attendance = await Attendance.findOne({ date: getDateTime() })
-      .populate({
-        path: 'studentsPresent.student',
-        populate: {
-          path: 'studentTeacher',
-          select:
-            'teacherName subjectName teacherPhoneNumber teacherFees paymentType',
-        },
-      })
-      .populate('studentsPresent.addedBy', 'employeeName'); // Populate employee (addedBy)
-
-    if (!attendance) {
-      return res.status(404).json({ message: 'No attendance record found' });
-    }
-
-    // Filter students associated with the given teacher
-    const teacherRelatedStudents = attendance.studentsPresent.filter(
-      (entry) =>
-        entry.student.studentTeacher &&
-        entry.student.studentTeacher._id.toString() === id
-    );
-
-    if (teacherRelatedStudents.length === 0) {
-      return res
-        .status(404)
-        .json({ message: 'No students found for the given teacher' });
-    }
-
-    const teacher = teacherRelatedStudents[0].student.studentTeacher;
-    const teacherName = teacher.teacherName.replace(/\s+/g, '_'); // Replace spaces with underscores
-    const teacherPhoneNumber = teacher.teacherPhoneNumber;
-    const isPerSession = teacher.paymentType === 'perSession';
-
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Attendance Report');
-
-    // Define reusable styles
-    const styles = {
-      header: {
-        font: { bold: true, size: 16, color: { argb: 'FFFFFF' } },
-        alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: '4472C4' },
-        },
-      },
-      columnHeader: {
-        font: { bold: true, size: 12, color: { argb: 'FFFFFF' } },
-        alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: '2E75B6' },
-        },
-        border: {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' },
-        },
-      },
-      cell: {
-        alignment: { horizontal: 'center', vertical: 'middle' },
-        border: {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' },
-        },
-      },
-      totalRow: {
-        font: { bold: true, size: 12, color: { argb: 'FFFFFF' } },
-        alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FF5733' },
-        },
-        border: {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' },
-        },
-      },
-      studentCountRow: {
-        font: { bold: true, size: 14, color: { argb: 'FFFFFF' } },
-        alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: '4CAF50' },
-        }, // Green color for visibility
-        border: {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' },
-        },
-      },
-    };
-
-    // Add report title
-    worksheet.mergeCells('A1:F1');
-    worksheet.getCell(
-      'A1'
-    ).value = `Attendance Report for ${teacher.teacherName}`;
-    worksheet.getCell('A1').style = styles.header;
-
-    // Add column headers
-    worksheet.getRow(2).values = [
-      'Student Name',
-      'Phone Number',
-      'Amount Paid (EGP)',
-      isPerSession ? 'Center Fees (EGP)' : 'Amount Remaining (EGP)',
-      isPerSession ? 'Total Amount (EGP)' : '',
-      'Added By',
-    ];
-    worksheet.getRow(2).eachCell((cell) => (cell.style = styles.columnHeader));
-
-    let totalAmountPaid = 0;
-    let totalRemaining = 0;
-    let totalFees = 0;
-    let totalProfit = 0;
-    let rowIndex = 3;
-
-    // Keep track of who added students
-    const addedByMap = {};
-
-    // Add student data rows for related students
-    teacherRelatedStudents.forEach(
-      ({ student, amountPaid, feesApplied, addedBy }) => {
-        const studentName = student.studentName;
-        const studentPhoneNumber = student.studentPhoneNumber;
-        const teacherFees = student.studentTeacher.teacherFees;
-        const addedByName = addedBy ? addedBy.employeeName : 'Unknown'; // Fallback to 'Unknown' if no addedBy info
-
-        // Track who added this student
-        if (!addedByMap[addedByName]) {
-          addedByMap[addedByName] = { totalAdded: 0, studentCount: 0 };
-        }
-        addedByMap[addedByName].totalAdded += amountPaid;
-        addedByMap[addedByName].studentCount++;
-
-        worksheet.getRow(rowIndex).values = [
-          studentName,
-          studentPhoneNumber,
-          amountPaid,
-          isPerSession ? feesApplied : amountPaid - feesApplied, // Center Fees or Remaining Amount
-          isPerSession ? amountPaid - feesApplied : '', // Teacher Fees (for perSession)
-          addedByName, // Added By
-        ];
-        worksheet
-          .getRow(rowIndex)
-          .eachCell((cell) => (cell.style = styles.cell));
-
-        totalAmountPaid += amountPaid;
-        totalRemaining += amountPaid - feesApplied || 0;
-        totalFees += feesApplied || 0;
-        totalProfit += amountPaid - feesApplied || 0;
-        rowIndex++;
-      }
-    );
-
-    // Add totals row
-    worksheet.getRow(rowIndex).values = [
-      'Total',
-      '',
-      totalAmountPaid,
-      isPerSession ? totalFees : totalRemaining,
-      isPerSession ? totalProfit : '',
-    ];
-    worksheet
-      .getRow(rowIndex)
-      .eachCell((cell) => (cell.style = styles.totalRow));
-
-    // Add total student count for the teacher-related students
-    rowIndex++; // Move to the next row after the totals
-    worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`); // Merge all cells for the student count row
-    worksheet.getCell(
-      `A${rowIndex}`
-    ).value = `Total Students for ${teacher.teacherName}: ${teacherRelatedStudents.length}`;
-    worksheet.getCell(`A${rowIndex}`).style = styles.studentCountRow;
-
-    // Adjust column widths
-    worksheet.columns = [
-      { width: 30 }, // Student Name
-      { width: 20 }, // Phone Number
-      { width: 20 }, // Amount Paid
-      { width: 20 }, // Center Fees / Amount Remaining
-      { width: 20 }, // Teacher Fees / Net Profit
-      { width: 20 }, // Added By
-    ];
-
-    // Export the Excel file to buffer
-    const buffer = await workbook.xlsx.writeBuffer();
-    const base64Excel = buffer.toString('base64');
-
-    // File name for download and WhatsApp
-    const fileName = `Attendance_Report_${teacherName}_${
-      new Date().toISOString().split('T')[0]
-    }.xlsx`;
-
-    // Send file via WhatsApp API
-    await waapi
-      .postInstancesIdClientActionSendMedia(
-        {
-          mediaBase64: base64Excel,
-          chatId: `2${teacherPhoneNumber}@c.us`,
-          mediaName: fileName,
-          mediaCaption: `Attendance Report for ${teacherName} - ${new Date().toDateString()}`,
-        },
-        { id: '35457' }
-      )
-      .then((response) => {
-        console.log('WhatsApp response:', response.data);
-      })
-      .catch((error) => {
-        console.error('Error sending Excel file via WhatsApp:', error);
-      });
-
-    console.log('Excel file sent via WhatsApp');
-
-    // Send the file as an attachment
-    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
-    res.setHeader(
-      'Content-Type',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    );
-    await workbook.xlsx.write(res);
-    res.end();
-  } catch (error) {
-    console.error('Error generating and sending attendance report:', error);
-    if (!res.headersSent) {
-      res.status(500).json({ message: 'Error processing the request' });
-    }
-  }
-};
-
-const downloadAndSendExcelForEmployee = async (req, res) => {
-  const { id } = req.params;
-  
-  try {
-    const attendance = await Attendance.findOne({ date: getDateTime() })
-      .populate({ path: 'studentsPresent.student', populate: { path: 'studentTeacher', select: 'teacherName subjectName teacherPhoneNumber teacherFees paymentType ' } })
-      .populate('studentsPresent.addedBy', 'employeeName employeePhoneNumber');
-
-    if (!attendance) {
-      return res.status(404).json({ message: 'No attendance record found' });
-    }
-
-    // Filter students added by the given employee
-
-    const employeeRelatedStudents = attendance.studentsPresent.filter(
-      (entry) => entry.addedBy._id.toString() === id
-    );
-
-    if (employeeRelatedStudents.length === 0) {
-      return res.status(404).json({ message: 'No students found for the given employee' });
-    }
-
-    const employee = employeeRelatedStudents[0].addedBy;
-    const employeeName = employee.employeeName.replace(/\s+/g, '_'); // Replace spaces with underscores
-    const employeePhoneNumber = employee.employeePhoneNumber;
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Attendance Report');
-
-    // Define reusable styles
-    const styles = {
-      header: {
-        font: { bold: true, size: 16, color: { argb: 'FFFFFF' } },
-        alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '4472C4' } },
-      },
-
-      columnHeader: {
-        font: { bold: true, size: 12, color: { argb: 'FFFFFF' } },
-        alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '2E75B6' } },
-      },
-
-      cell: {
-        alignment: { horizontal: 'center', vertical: 'middle' },
-        border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } },
-      },
-
-      totalRow: {
-        font: { bold: true, size: 12, color: { argb: 'FFFFFF' } },
-        alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF5733' } },
-      },
-
-      studentCountRow: {
-        font: { bold: true, size: 14, color: { argb: 'FFFFFF' } },
-        alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '4CAF50' } }, // Green color for visibility
-      },
-    };
-
-
-    // Add report title
-    worksheet.mergeCells('A1:F1');
-    worksheet.getCell('A1').value = `Attendance Report for ${employee.employeeName}`;
-    worksheet.getCell('A1').style = styles.header;
-
-    // Add column headers
-
-    worksheet.getRow(2).values = ['Student Name', 'Phone Number', 'Amount Paid (EGP)', 'Fees Applied (EGP)', 'Added By'];
-
-    worksheet.getRow(2).eachCell((cell) => (cell.style = styles.columnHeader));
-
-    let totalAmountPaid = 0;
-    let totalFees = 0;
-    let rowIndex = 3;
-
-    // Add student data rows for related students
-
-    employeeRelatedStudents.forEach(({ student, amountPaid, feesApplied }) => {
-      const studentName = student.studentName;
-      const studentPhoneNumber = student.studentPhoneNumber;
-      
-      worksheet.getRow(rowIndex).values = [studentName, studentPhoneNumber, amountPaid, feesApplied, employee.employeeName];
-
-      worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = styles.cell));
-
-      totalAmountPaid += amountPaid;
-
-      totalFees += feesApplied;
-
-      rowIndex++;
-
-    });
-
-    // Add totals row
-
-    worksheet.getRow(rowIndex).values = ['Total', '', totalAmountPaid, totalFees, ''];
-
-    worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = styles.totalRow));
-
-    // Add total student count for the employee-related students
-
-    rowIndex++; // Move to the next row after the totals
-
-    worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`); // Merge all cells for the student count row
-
-    worksheet.getCell(`A${rowIndex}`).value = `Total Students for ${employee.employeeName}: ${employeeRelatedStudents.length}`;
-
-    worksheet.getCell(`A${rowIndex}`).style = styles.studentCountRow;
-
-    // Adjust column widths
-
-    worksheet.columns = [  
-      { width: 30 }, // Student Name
-      { width: 20 }, // Phone Number
-      { width: 20 }, // Amount Paid
-      { width: 20 }, // Fees Applied
-      { width: 20 }, // Added By
-    ];
-
-    // Export the Excel file to buffer
-
-    const buffer = await workbook.xlsx.writeBuffer();
-
-    const base64Excel = buffer.toString('base64');
-
-    // File name for download and WhatsApp
-
-    const fileName = `Attendance_Report_${employeeName}_${new Date().toISOString().split('T')[0]}.xlsx`;
-
-    // Send file via WhatsApp API
-
-    await waapi
-      .postInstancesIdClientActionSendMedia(
-        {
-          mediaBase64: base64Excel,
-          chatId: `2${employeePhoneNumber}@c.us`,
-          mediaName: fileName,
-          mediaCaption: `Attendance Report for ${employeeName} - ${new Date().toDateString()}`,
-        },
-        { id: '35457' }
-      )
-      .then((response) => {
-        console.log('WhatsApp response:', response.data);
-      })
-
-      .catch((error) => {
-        console.error('Error sending Excel file via WhatsApp:', error);
-      });
-
-    console.log('Excel file sent via WhatsApp');
-
-    // Send the file as an attachment
-
-    res.setHeader('Content-Disposition', `attachment; filename="${fileName}`);
-
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
-    await workbook.xlsx.write(res);
-
-    res.end();
-
-  } catch (error) {
-    console.error('Error generating and sending attendance report:', error);
-
-    if (!res.headersSent) {
-
-      res.status(500).json({ message: 'Error processing the request' });
-
-    }
-
-  }
-
-};
 
 const selectDevice = async (req, res) => {
   const {deviceId} = req.params;
@@ -1670,6 +1233,64 @@ const selectDevice = async (req, res) => {
       
 }
 
+
+const addTeacherInvoice = async (req, res) => {
+  const { teacherId, courseName, invoiceDetails,invoiceAmount } = req.body;
+  const employeeId = req.employeeId;
+  if( !teacherId || !courseName){
+    return res.status(400).json({ message: 'يجب اختيار الكورس ' });
+  }
+
+  try {
+    // Find the teacher
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) {
+      return res.status(404).json({ message: 'المدرس غير موجود' });
+    }
+
+    // Find or create today's attendance record for this teacher and course
+    const todayDate = getDateTime();
+    let attendance = await Attendance.findOne({
+      date: todayDate,
+      teacher: teacherId,
+      course: courseName,
+    });
+
+    if (!attendance) {
+      attendance = new Attendance({
+        date: todayDate,
+        teacher: teacherId,
+        course: courseName,
+        studentsPresent: [],
+        netProfitToTeacher: { amount: 0, feesAmount: 0 }, // Initialize net profit
+        invoices: [],
+      });
+    }
+
+    // Add the invoice to the attendance record
+    attendance.invoices.push({
+      invoiceDetails,
+      invoiceAmount,
+      time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+      addedBy: employeeId,
+    });
+
+    // Save the attendance record
+    await attendance.save();
+
+    res.status(201).json({ message: 'تم اضافه الفاتوره بنجاح',});
+
+  } catch (error) {
+    console.error('Error adding teacher invoice:', error);
+    res.status(500).json({ message: 'يبدو ان هناك مشكله ما حاول مره اخري' });
+  }
+
+};
+
+
+
+
+
 // ======================================== End Attendance ======================================== //
 
 
@@ -1677,151 +1298,130 @@ const selectDevice = async (req, res) => {
 // ======================================== handel Attendace ======================================== //
 
 const handelAttendance = async (req, res) => {
+  const allTeachers = await Teacher.find({});
   res.render('employee/handelAttendance', {
     title: 'Handel Attendance',
     path: '/employee/handel-attendance',
+    allTeachers: allTeachers,
   });
 }
 
 const getAttendanceByDate = async (req, res) => {
-  const { startDate, endDate } = req.query; // Accept date range from query params
-  console.log('Date range:', startDate, endDate);
   try {
-    // Validate date range
+    const { startDate, endDate } = req.query;
+
     if (!startDate || !endDate) {
-      return res.status(400).json({ message: 'يرجى تقديم تاريخ بداية ونهاية صالحين.' });
+      return res
+        .status(400)
+        .json({ message: 'يرجى تقديم تاريخ بداية ونهاية صالحين.' });
     }
 
-    // Fetch attendance records within the date range
     const attendances = await Attendance.find({
-      date: {
-        $gte: startDate,
-        $lte: endDate,
-      },
+      date: { $gte: startDate, $lte: endDate },
     })
-      .populate({
-        path: 'studentsPresent.student',
-        populate: {
-          path: 'studentTeacher',
-          select: 'teacherName subjectName teacherFees paymentType',
-        },
-      })
-      .populate('studentsPresent.addedBy', 'employeeName');
-
-      // console.log(attendances);
+      .populate('studentsPresent.student')
+      .populate('studentsPresent.addedBy', 'employeeName')
+      .populate('invoices.addedBy', 'employeeName')
+      .populate('teacher', 'teacherName subjectName paymentType');
 
     if (!attendances.length) {
-      return res.status(404).json({ message: 'لا يوجد حضور في النطاق الزمني المحدد.' });
+      return res
+        .status(404)
+        .json({ message: 'لا يوجد حضور في النطاق الزمني المحدد.' });
     }
 
-    let totalAmountFromAllStudents = 0;
-    let totalFeesFromAllTeachers = 0;
+    let totalAmount = 0,
+      totalFees = 0,
+      totalInvoiceAmount = 0;
+    const teacherData = {},
+      employeeData = {},
+      invoicesByTeacher = {};
 
-    const teacherData = {};
-    const employeeData = {};
+    attendances.forEach((attendance) => {
+      const teacherId = attendance.teacher._id.toString();
 
-    // Process each attendance record
-    for (const attendance of attendances) {
-      for (const {
-        student,
-        addedBy,
-        amountPaid,
-        feesApplied,
-      } of attendance.studentsPresent) {
-        if (!student || !student.studentTeacher) continue;
-
-        const teacher = student.studentTeacher;
-        const teacherId = teacher._id.toString();
-        const employeeId = addedBy._id.toString();
-
-        // Update teacher data
-        if (!teacherData[teacherId]) {
-          teacherData[teacherId] = {
-            teacherId: teacher._id,
-            teacherName: teacher.teacherName,
-            subjectName: teacher.subjectName,
-            paymentType: teacher.paymentType,
-            totalAmount: 0,
-            totalFees: 0,
-            netProfit: 0,
-            percentage: 0,
-            totalStudents: 0,
-          };
-        }
-
-        teacherData[teacherId].totalAmount += amountPaid;
-        teacherData[teacherId].totalFees += feesApplied;
-        teacherData[teacherId].totalStudents += 1;
-
-        totalAmountFromAllStudents += amountPaid;
-        totalFeesFromAllTeachers += feesApplied;
-
-        // Update employee data
-        if (!employeeData[employeeId]) {
-          employeeData[employeeId] = {
-            employeeId: employeeId,
-            employeeName: addedBy.employeeName,
-            count: 0,
-            totalAmount: 0,
-            percentage: 0,
-          };
-        }
-
-        employeeData[employeeId].count += 1;
-        employeeData[employeeId].totalAmount += amountPaid;
+      if (!teacherData[teacherId]) {
+        teacherData[teacherId] = {
+          teacherId: teacherId,
+          teacherName: attendance.teacher.teacherName,
+          subjectName: attendance.teacher.subjectName,
+          paymentType: attendance.teacher.paymentType,
+          totalAmount: 0,
+          totalFees: 0,
+          netProfit: 0,
+          totalStudents: 0,
+        };
       }
-    }
 
-    // Calculate net profits for teachers
-    for (const teacherId in teacherData) {
-      const teacher = teacherData[teacherId];
+      attendance.studentsPresent.forEach(
+        ({ student, addedBy, amountPaid, feesApplied }) => {
+          if (!student) return;
+
+          teacherData[teacherId].totalAmount += amountPaid;
+          teacherData[teacherId].totalFees += feesApplied;
+          teacherData[teacherId].totalStudents++;
+
+          totalAmount += amountPaid;
+          totalFees += feesApplied;
+
+          const employeeId = addedBy._id.toString();
+          if (!employeeData[employeeId]) {
+            employeeData[employeeId] = {
+              employeeId: employeeId,
+              employeeName: addedBy.employeeName,
+              count: 0,
+              totalAmount: 0,
+            };
+          }
+          employeeData[employeeId].count++;
+          employeeData[employeeId].totalAmount += amountPaid;
+        }
+      );
+
+      attendance.invoices.forEach(({ invoiceAmount }) => {
+        totalInvoiceAmount += invoiceAmount;
+        if (!invoicesByTeacher[teacherId]) {
+          invoicesByTeacher[teacherId] = 0;
+        }
+        invoicesByTeacher[teacherId] += invoiceAmount;
+      });
+    });
+
+    Object.values(teacherData).forEach((teacher) => {
       teacher.netProfit = teacher.totalAmount - teacher.totalFees;
-      teacher.percentage = ( (teacher.totalAmount / totalAmountFromAllStudents) * 100 ).toFixed(2);
-    }
+    });
 
-    // Calculate percentages for employees
-    for (const employeeId in employeeData) {
-      employeeData[employeeId].percentage = (
-        (employeeData[employeeId].totalAmount / totalAmountFromAllStudents) *
-        100
-      ).toFixed(2);
-    }
-    console.log('Teacher data:', teacherData);
-    console.log('Employee data:', employeeData);
-    console.log('Total amount:', totalAmountFromAllStudents);
-    console.log('Total fees:', totalFeesFromAllTeachers);
-    console.log('Attendance records:', attendances);
     res.status(200).json({
       message: 'بيانات الحضور للنطاق الزمني',
-      totalAmount: totalAmountFromAllStudents,
-      totalFees: totalFeesFromAllTeachers,
+      totalAmount,
+      totalFees,
+      totalInvoiceAmount,
+      finalNetProfit: totalAmount - totalFees - totalInvoiceAmount,
       teachersSummary: Object.values(teacherData),
       employeesSummary: Object.values(employeeData),
-      attendanceRecords: attendances, // Return the raw records if needed
+      invoicesByTeacher,
+      attendanceRecords: attendances,
     });
   } catch (error) {
-    console.error('Error fetching attendance by date range:', error);
+    console.error('Error fetching attendance:', error);
     res.status(500).json({ message: 'يبدو ان هناك مشكله ما حاول مره اخري' });
   }
 };
 
+
 const downloadAttendanceExcelByDate = async (req, res) => {
-  const { startDate, endDate } = req.query; // Get start and end date from query parameters
+  const { startDate, endDate } = req.query;
   try {
     // Fetch attendance records within the date range
     const attendances = await Attendance.find({
       date: { $gte: startDate, $lte: endDate },
     })
-      .populate({
-        path: 'studentsPresent.student',
-        populate: {
-          path: 'studentTeacher',
-          select: 'teacherName subjectName teacherFees paymentType',
-        },
-      })
-      .populate('studentsPresent.addedBy', 'employeeName');
+      .populate('studentsPresent.student')
+      .populate('studentsPresent.addedBy', 'employeeName')
+      .populate('teacher', 'teacherName subjectName teacherPhoneNumber')
+      .populate('invoices.addedBy', 'employeeName');
 
-    if (!attendances || attendances.length === 0) {
+    if (!attendances.length) {
       return res.status(404).json({
         message: 'No attendance records found for the given date range',
       });
@@ -1830,7 +1430,7 @@ const downloadAttendanceExcelByDate = async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Attendance Report');
 
-    // Styles for the sheet
+    // Styles
     const styles = {
       header: {
         font: { bold: true, color: { argb: 'FFFFFF' }, size: 16 },
@@ -1870,82 +1470,88 @@ const downloadAttendanceExcelByDate = async (req, res) => {
       },
     };
 
-    // Sheet title
-    worksheet.mergeCells('A1:G1');
+    // Title
+    worksheet.mergeCells('A1:H1');
     worksheet.getCell(
       'A1'
     ).value = `Attendance Report - ${startDate} to ${endDate}`;
     worksheet.getCell('A1').style = styles.header;
 
-    let rowIndex = 0;
-
-    // Data structures for employee and teacher summaries
-    const employeeData = {};
+    let rowIndex = 2;
     const teacherData = {};
-    let totalAmount = 0;
-    let totalFees = 0;
+    const employeeData = {};
+    const invoiceData = {};
+    let totalAmount = 0,
+      totalFees = 0,
+      totalInvoices = 0;
 
-    // Iterate over each attendance record and organize by date
-    for (const attendance of attendances) {
+    // Group Data
+    attendances.forEach((attendance) => {
+      const teacherId = attendance.teacher._id.toString();
+      const teacherName = attendance.teacher.teacherName;
+      const subjectName = attendance.teacher.subjectName;
 
-      rowIndex++;
-
-      // Aggregate attendance data for this specific date
-      for (const {
-        student,
-        addedBy,
-        amountPaid,
-        feesApplied,
-      } of attendance.studentsPresent) {
-        if (!student || !student.studentTeacher) continue;
-
-        const teacher = student.studentTeacher;
-        const teacherId = teacher._id.toString();
-        const employeeId = addedBy._id.toString();
-
-        // Aggregate teacher data
-        if (!teacherData[teacherId]) {
-          teacherData[teacherId] = {
-            teacherName: teacher.teacherName,
-            subjectName: teacher.subjectName,
-            totalAmount: 0,
-            totalFees: 0,
-            netProfit: 0,
-            students: [],
-          };
-        }
-
-        teacherData[teacherId].totalAmount += amountPaid;
-        teacherData[teacherId].totalFees += feesApplied;
-        teacherData[teacherId].students.push({
-          studentName: student.studentName,
-          phoneNumber: student.studentPhoneNumber,
-          amountPaid,
-          feesApplied,
-          netProfit: amountPaid - feesApplied,
-          addedBy: addedBy.employeeName,
-        });
-
-        totalAmount += amountPaid;
-        totalFees += feesApplied;
-
-        // Aggregate employee data
-        if (!employeeData[employeeId]) {
-          employeeData[employeeId] = {
-            employeeName: addedBy.employeeName,
-            totalAmount: 0,
-            count: 0,
-          };
-        }
-
-        employeeData[employeeId].totalAmount += amountPaid;
-        employeeData[employeeId].count++;
+      if (!teacherData[teacherId]) {
+        teacherData[teacherId] = {
+          teacherName,
+          subjectName,
+          totalAmount: 0,
+          totalFees: 0,
+          students: [],
+          invoices: [],
+        };
       }
 
-      rowIndex++; // Add space before next date
-    }
+      attendance.studentsPresent.forEach(
+        ({ student, addedBy, amountPaid, feesApplied }) => {
+          if (!student) return;
 
-    // Employee Summary Section
+          teacherData[teacherId].totalAmount += amountPaid;
+          teacherData[teacherId].totalFees += feesApplied;
+          totalAmount += amountPaid;
+          totalFees += feesApplied;
+
+          const employeeId = addedBy._id.toString();
+          if (!employeeData[employeeId]) {
+            employeeData[employeeId] = {
+              employeeName: addedBy.employeeName,
+              totalAmount: 0,
+              count: 0,
+            };
+          }
+          employeeData[employeeId].totalAmount += amountPaid;
+          employeeData[employeeId].count++;
+
+          teacherData[teacherId].students.push({
+            studentName: student.studentName,
+            phoneNumber: student.studentPhoneNumber,
+            amountPaid,
+            feesApplied,
+            netProfit: amountPaid - feesApplied,
+            addedBy: addedBy.employeeName,
+          });
+        }
+      );
+
+      attendance.invoices.forEach(
+        ({ invoiceDetails, invoiceAmount, time, addedBy }) => {
+          totalInvoices += invoiceAmount;
+          teacherData[teacherId].invoices.push({
+            invoiceDetails,
+            invoiceAmount,
+            time,
+            addedBy: addedBy.employeeName,
+          });
+
+          if (!invoiceData[teacherId]) {
+            invoiceData[teacherId] = 0;
+          }
+          invoiceData[teacherId] += invoiceAmount;
+        }
+      );
+    });
+
+    // **Employee Summary**
     worksheet.getRow(rowIndex).values = ['Employee Summary'];
     worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = styles.header));
     rowIndex++;
@@ -1961,7 +1567,6 @@ const downloadAttendanceExcelByDate = async (req, res) => {
       .eachCell((cell) => (cell.style = styles.columnHeader));
     rowIndex++;
 
-    // Employee data rows
     for (const employeeId in employeeData) {
       const employee = employeeData[employeeId];
       const contributionPercentage = (
@@ -1979,43 +1584,47 @@ const downloadAttendanceExcelByDate = async (req, res) => {
       rowIndex++;
     }
 
-    rowIndex++; // Add space before teacher data
+    rowIndex++; // Space before teacher data
 
-    // Teacher Data Section
+    // **Teacher Data**
     for (const teacherId in teacherData) {
       const teacher = teacherData[teacherId];
-
-      // Add teacher header
-      worksheet.mergeCells(`A${rowIndex}:G${rowIndex}`);
-      worksheet.getCell(`A${rowIndex}`).value = teacher.teacherName;
+      const teacherNetProfit =
+        teacher.totalAmount - teacher.totalFees - (invoiceData[teacherId] || 0);
+      const teacherProfitContribution = (
+        (teacherNetProfit / (totalAmount - totalFees - totalInvoices)) *
+        100
+      ).toFixed(2);
+      rowIndex++;
+      worksheet.mergeCells(`A${rowIndex}:H${rowIndex}`);
+      worksheet.getCell(
+        `A${rowIndex}`
+      ).value = `Teacher: ${teacher.teacherName} - Subject: ${teacher.subjectName}`;
       worksheet.getCell(`A${rowIndex}`).style = styles.header;
       rowIndex++;
 
-      // Column headers for student data
+      // **Student Data**
       worksheet.getRow(rowIndex).values = [
         'Student Name',
         'Phone Number',
-        'Amount (EGP)',
-        'Net Profit (EGP)',
-        'Fees Applied (EGP)',
+        'Amount Paid',
+        'Fees Applied',
+        'Net Profit',
         'Added By',
-        'Contribution (%)',
       ];
       worksheet
         .getRow(rowIndex)
         .eachCell((cell) => (cell.style = styles.columnHeader));
       rowIndex++;
 
-      // Add student rows
       teacher.students.forEach((student) => {
         worksheet.getRow(rowIndex).values = [
           student.studentName,
           student.phoneNumber,
           student.amountPaid,
-          student.netProfit,
           student.feesApplied,
+          student.netProfit,
           student.addedBy,
-          '', // Contribution will be calculated for the teacher's total row
         ];
         worksheet
           .getRow(rowIndex)
@@ -2023,56 +1632,142 @@ const downloadAttendanceExcelByDate = async (req, res) => {
         rowIndex++;
       });
 
-      // Add teacher totals and percentages
-      const teacherNetProfit = teacher.totalAmount - teacher.totalFees;
+      // **Invoices Section**
+      let invoiceTeacherTotal = 0;
+      if (teacher.invoices.length > 0) {
+        rowIndex++;
+        worksheet.getRow(rowIndex).values = ['Invoices'];
+        worksheet
+          .getRow(rowIndex)
+          .eachCell((cell) => (cell.style = styles.header));
+        rowIndex++;
 
-      // Contribution based on total amount (net profit)
-      const teacherProfitContribution = (
-        (teacherNetProfit / (totalAmount - totalFees)) *
-        100
-      ).toFixed(2);
+        worksheet.getRow(rowIndex).values = [
+          'Invoice Details',
+          'Amount (EGP)',
+          'Time',
+          'Added By',
+        ];
+        worksheet
+          .getRow(rowIndex)
+          .eachCell((cell) => (cell.style = styles.columnHeader));
+        rowIndex++;
 
-      // Contribution based on total fees
-      const teacherFeesContribution = (
-        (teacher.totalFees / totalFees) *
-        100
-      ).toFixed(2);
+        teacher.invoices.forEach((invoice) => {
+          invoiceTeacherTotal += invoice.invoiceAmount;
+          worksheet.getRow(rowIndex).values = [
+            invoice.invoiceDetails,
+            invoice.invoiceAmount,
+            invoice.time,
+            invoice.addedBy,
+          ];
+          worksheet
+            .getRow(rowIndex)
+            .eachCell((cell) => (cell.style = styles.cell));
+          rowIndex++;
+        });
+      }
+      rowIndex++;
+      // Add headers explaining each total
+      worksheet.getRow(rowIndex ).values = [
+        '',
+        '',
+        'Amount Paid (EGP)',
+        'Center Fees (EGP)',
+        'Invoices (EGP)',
+        'Net Profit (EGP)',
+      ];
+      worksheet
+        .getRow(rowIndex )
+        .eachCell((cell) => (cell.style = styles.columnHeader));
 
-      worksheet.getRow(rowIndex).values = [
+      // **Teacher Totals**
+      worksheet.getRow(rowIndex+1).values = [
         `Total for ${teacher.teacherName}`,
         '',
         teacher.totalAmount,
-        teacherNetProfit,
         teacher.totalFees,
-        '',
-        `${teacherProfitContribution}% (Profit), ${teacherFeesContribution}% (Fees)`, // Display both contributions
+        invoiceTeacherTotal,
+        teacherNetProfit,
+        `${teacherProfitContribution}%`,
       ];
+
       worksheet
-        .getRow(rowIndex)
-        .eachCell((cell) => (cell.style = styles.totalRow));
+        .getRow(rowIndex+1)
+        .eachCell((cell, colNumber) => {
+          if (colNumber === 6 || colNumber === 7) {
+        cell.style = {
+          ...styles.totalRow,
+          fill: {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: '4CAF50' }, // Green color
+          },
+        };
+          } else {
+        cell.style = styles.totalRow;
+          }
+        });
       rowIndex++;
     }
 
-    // Add overall totals for the entire report
-    worksheet.mergeCells(`A${rowIndex + 1}:B${rowIndex + 1}`);
-    worksheet.getCell(`A${rowIndex + 1}`).value = 'Overall Total';
-    worksheet.getCell(`A${rowIndex + 1}`).style = styles.totalRow;
-    worksheet.getCell(`C${rowIndex + 1}`).value = totalAmount;
-    worksheet.getCell(`C${rowIndex + 1}`).style = styles.totalRow;
-    worksheet.getCell(`D${rowIndex + 1}`).value = totalAmount - totalFees;
-    worksheet.getCell(`D${rowIndex + 1}`).style = styles.totalRow;
-    worksheet.getCell(`E${rowIndex + 1}`).value = totalFees;
-    worksheet.getCell(`E${rowIndex + 1}`).style = styles.totalRow;
+    rowIndex++; // Space before overall summary
+    rowIndex++; // Space before overall summary
 
-    // Set column widths
+    // **Overall Summary Header**
+    worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
+    worksheet.getCell(`A${rowIndex}`).value = 'Overall Summary';
+    worksheet.getCell(`A${rowIndex}`).style = styles.header;
+    rowIndex++;
+
+    // Add headers explaining each total
+    worksheet.getRow(rowIndex + 1).values = [
+      '',
+      '',
+      'Total Amount Paid (EGP)',
+      'Total Center Fees (EGP)',
+      'Total Invoices (EGP)',
+      'Net Profit (EGP)',
+    ];
+    worksheet
+      .getRow(rowIndex + 1)
+      .eachCell((cell) => (cell.style = styles.columnHeader));
+    // **Overall Summary**
+    worksheet.getRow(rowIndex + 2).values = [
+      'Overall Totals',
+      '',
+      totalAmount,
+      totalFees,
+      totalInvoices,
+      totalAmount - totalFees - totalInvoices,
+    ];
+    worksheet
+      .getRow(rowIndex + 2)
+      .eachCell((cell, colNumber) => {
+      if (colNumber === 6) {
+        cell.style = {
+        ...styles.totalRow,
+        fill: {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: '4CAF50' }, // Green color
+        },
+        };
+      } else {
+        cell.style = styles.totalRow;
+      }
+      });
+
     worksheet.columns = [
-      { width: 30 }, // Student Name
-      { width: 20 }, // Phone Number
-      { width: 20 }, // Amount
-      { width: 20 }, // Net Profit
-      { width: 20 }, // Fees Applied
-      { width: 20 }, // Added By
-      { width: 30 }, // Contribution (%)
+      { width: 35 },
+      { width: 25 },
+      { width: 20 },
+      { width: 20 },
+      { width: 20 },
+      { width: 25 },
+      { width: 30 },
+      { width: 30 },
+      { width: 30 },
     ];
 
     // Export Excel file
@@ -2091,6 +1786,9 @@ const downloadAttendanceExcelByDate = async (req, res) => {
     res.status(500).json({ message: 'Error generating attendance Excel' });
   }
 };
+
+
+
 
 const downloadAndSendExcelForTeacherByDate = async (req, res) => {
   const { id } = req.params;
@@ -2614,9 +2312,8 @@ module.exports = {
     deleteAttendStudent,
     editStudentAmountRemaining,
     downloadAttendanceExcel,
-    downloadAndSendExcelForTeacher,
-    downloadAndSendExcelForEmployee,
     selectDevice,
+    addTeacherInvoice,
 
     // handel Attendance
     handelAttendance,

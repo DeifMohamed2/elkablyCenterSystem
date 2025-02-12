@@ -93,14 +93,11 @@ router.delete('/delete-attend-student/:id', authMiddleware, employeeController.d
 
 router.get('/download-attendance-excel', authMiddleware, employeeController.downloadAttendanceExcel);
 
-router.get('/download-send-excel-for-teacher/:id', authMiddleware, employeeController.downloadAndSendExcelForTeacher);
-
-router.get('/download-send-excel-for-employee/:id', authMiddleware, employeeController.downloadAndSendExcelForEmployee);
-
 router.put('/edit-student-amount-remaining/:id', authMiddleware, employeeController.editStudentAmountRemaining);
 
 router.put('/select-device/:deviceId', authMiddleware, employeeController.selectDevice);
 
+router.post('/add-teacher-invoice', authMiddleware, employeeController.addTeacherInvoice);
 
 // handel Attendance
 

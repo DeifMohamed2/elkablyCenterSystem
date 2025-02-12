@@ -242,6 +242,17 @@ const openEditModal = async (id) => {
         addEditTimeSlot(day, slot.startTime, slot.endTime, slot.roomID);
       });
     });
+
+    // Populate courses
+    const editCoursesContainer = document.getElementById(
+      'editCoursesContainer'
+    );
+    editCoursesContainer.innerHTML = ''; // Clear previous courses
+
+    teacher.courses.forEach((course) => {
+      addEditCourseView(course); // Load each course dynamically
+    });
+
   } catch (error) {
     console.error('Error fetching teacher details:', error);
     alert('Failed to open edit modal. Please try again.');
@@ -284,13 +295,56 @@ function addEditTimeSlot(day = '', startTime = '', endTime = '', roomID = '') {
   editScheduleContainer.appendChild(timeSlotDiv);
 }
 
+function addEditCourseView(courseName = '') {
+  const editCoursesContainer = document.getElementById('editCoursesContainer');
+
+  const newCourseDiv = document.createElement('div');
+  newCourseDiv.className = 'row mb-2';
+  newCourseDiv.innerHTML = `
+    <div class="col-md-4">
+      <input type="text" class="form-control" name="editCourses[]" style="border: 2px solid black; width: 100%; text-align: center;" value="${courseName}" placeholder="اسم الكورس" required readonly>
+    </div>
+
+  `;
+
+  editCoursesContainer.appendChild(newCourseDiv);
+}
+
+function addEditCourse() {
+  const editCoursesContainer = document.getElementById('editCoursesContainer');
+
+  const newCourseDiv = document.createElement('div');
+  newCourseDiv.className = 'row mb-2';
+  newCourseDiv.innerHTML = `
+    <div class="col-md-4"> 
+      <input type="text" class="form-control" name="editCourses[]" style="border: 2px solid black; width: 100%; text-align: center;" placeholder="اسم الكورس" required>
+    </div>
+    <div class="col-md-2">
+      <button type="button" class="btn btn-outline-danger" onclick="removeEditCourse(this)">- إزالة</button>
+    </div>
+  `;
+  editCoursesContainer.appendChild(newCourseDiv);
+}
+
+
 // Event to add a new time slot in the edit modal
 document.getElementById('addEditTimeSlot').addEventListener('click', () => {
   addEditTimeSlot(); // Empty fields
 });
 
+document.getElementById('addEditCourse').addEventListener('click', () => {
+  addEditCourse(); // Add an empty course field
+});
+
+
 function removeTimeSlot(button) {
   button.closest('.time-slot-group').remove();
+}
+
+
+// Function to remove course
+function removeEditCourse(button) {
+  button.closest('.row').remove();
 }
 
 
@@ -318,11 +372,8 @@ function removeCourse(button) {
 
 
 
-
-
 const editTeacherModal = document.getElementById('editTeacherModal');
 const saveTeacherBtn = document.getElementById('saveTeacherBtn');
-
 
 saveTeacherBtn.addEventListener('click', async () => {
   const teacherId = document.getElementById('editTeacherId').value;
@@ -331,6 +382,15 @@ saveTeacherBtn.addEventListener('click', async () => {
   const subjectName = document.getElementById('editTeacherSubject').value;
   const teacherFees = document.getElementById('editTeacherFees').value;
 
+  // Collect updated courses
+  const courses = [];
+  document.querySelectorAll('input[name="editCourses[]"]').forEach((input) => {
+    if (input.value.trim() !== '') {
+      courses.push(input.value.trim());
+    }
+  });
+
+  // Collect updated schedule
   const schedule = [];
   document
     .querySelectorAll('#editScheduleContainer .time-slot-group')
@@ -350,6 +410,7 @@ saveTeacherBtn.addEventListener('click', async () => {
     teacherPhoneNumber,
     subjectName,
     teacherFees,
+    courses,
     schedule,
   };
 
@@ -369,6 +430,7 @@ saveTeacherBtn.addEventListener('click', async () => {
     alert('Failed to update teacher.');
   }
 });
+
 
 
 

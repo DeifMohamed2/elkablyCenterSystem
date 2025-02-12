@@ -146,6 +146,37 @@ hr {
           <div class="card">
             <div class="card-header d-flex justify-content-between p-3 pt-2">
               <div class="icon icon-md icon-shape bg-gradient-dark shadow-dark text-center border-radius-lg">
+                <i class="material-symbols-rounded opacity-10">leaderboard</i>
+              </div>
+              <div class="text-start pt-1">
+                <p class="text-sm mb-0 text-capitalize"> مجموع الفواتير</p>
+                <h4 class="mb-0" dir="ltr" id="totalInvoices"></h4>
+              </div>
+            </div>
+            <hr class="dark horizontal my-0">
+          
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between p-3 pt-2">
+              <div class="icon icon-md icon-shape bg-gradient-dark shadow-dark text-center border-radius-lg">
+                <i class="material-symbols-rounded opacity-10">leaderboard</i>
+              </div>
+              <div class="text-start pt-1">
+                <p class="text-sm mb-0 text-capitalize">  صافي الربح للمعلم</p>
+                <h4 class="mb-0" dir="ltr" id="netProfit"></h4>
+              </div>
+            </div>
+            <hr class="dark horizontal my-0">
+          
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between p-3 pt-2">
+              <div class="icon icon-md icon-shape bg-gradient-dark shadow-dark text-center border-radius-lg">
                 <i class="material-symbols-rounded opacity-10">store</i>
               </div>
               <div class="text-start pt-1">
@@ -160,7 +191,7 @@ hr {
           </div>
         </div>
 
-             <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+        <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
                <div class="card">
                  <div class="card-header d-flex justify-content-between p-3 pt-2">
                    <div class="icon icon-md icon-shape bg-gradient-dark shadow-dark text-center border-radius-lg">
@@ -176,12 +207,22 @@ hr {
                  </div>
                  <hr class="dark horizontal my-0">
                </div>
-             </div>
+        </div>
     
       </div>
-
-   
-
+      <div class="row">
+        <div class="col-md-3 d-flex align-items-center">
+        <select class="form-select border border-2 rounded text-center" id="courseSelction" name="courseSelction" onchange="disableCourseSelection()">
+          <option selected value="">اختر اسم الكورس</option>
+            <% allTeachers.forEach(teacher => { %>
+              <% teacher.courses.forEach(course => { %>
+                <option value="<%= teacher._id %>_<%= course %>"><%= teacher.teacherName %> - <%= course %> </option>
+              <% }) %>
+            <% }) %>
+        </select>
+          <button id="changeCourseButton" class="btn btn-secondary ms-2 d-none" onclick="enableCourseSelection()">تغيير الكورس</button>
+        </div>
+      </div>
       <div class="row">
         <div class="col-12">
           <div class="card my-4">
@@ -208,7 +249,7 @@ hr {
                           <i class="material-symbols-rounded text-sm">refresh</i>&nbsp;&nbsp;تحديث
                         </button>
                         <button type="button" class="btn bg-gradient-success mb-0" id="downloadExcelBtn" >
-                          <i class="material-symbols-rounded text-sm">download</i>&nbsp;&nbsp;Download Excel
+                          <i class="material-symbols-rounded text-sm">download</i>&nbsp;&nbsp;Download Excel And Send Copy
                         </button>
 
                       </div>
@@ -230,8 +271,8 @@ hr {
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">رقم الهاتف</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">رقم هاتف ولي الامر</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">قيمه المبلغ</th>
-                      <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">الماده</th>
-                      <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">اسم المدرس</th>
+                      <!-- <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">الماده</th>
+                      <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">اسم المدرس</th> -->
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">مبلغ متبقي</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7"></th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7"></th>
@@ -252,29 +293,81 @@ hr {
         </div>
       </div>
 
-
-        <h4>
-          المعلمون
-        </h4>
-         <div class="row" id="teachersSummaryRow">
-        
-        </div>
-        <h4>
-          الموظفين
-        </h4>
-
-        <div class="row" id="employeesSummaryRow">
+      <hr>
+      <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-header pb-0 p-3">
+              <h5 class="mb-0"> اضافه فاتوره</h5>
+            </div>
+            <hr>
+            <div class="card-body px-0 pb-2">
+              <form id="invoiceForm">
+                <div class="row">
+                  <div class="col-3">
+                    <textarea class="form-control border border-2 p-2" id="invoiceDetails" name="invoiceDetails" placeholder="تفاصيل الفاتورة" required></textarea>
+                  </div>
+                  <div class="col-3">
+                    <input type="number" class="form-control border border-2 p-2" id="invoiceAmount" name="invoiceAmount" placeholder="المبلغ" required>
+                  </div>
+                  <div class="col-3 text-end">
+                    <button type="submit" class="btn bg-gradient-dark mb-0">
+                      <i class="material-symbols-rounded text-sm">add</i>&nbsp;&nbsp;إضافة الفاتورة
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
+        </div>
+      </div>
 
-
-
+      <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-header pb-0 p-3">
+              <h5 class="mb-0">الفواتير</h5>
+            </div>
+            <hr>
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0" id="invoiceTable">
+                  <thead>
+                    <tr>
+                      <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7">تفاصيل الفاتورة</th>
+                      <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7">المبلغ</th>
+                      <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7">تاريخ الفاتورة</th>
+                      <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7">اسم الموظف</th>
+                    </tr>
+                  </thead>
+                  <tbody id="invoiceTBody">
+                    <!-- Invoice rows will be dynamically added here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
   </main>
 
-  <!--   Core JS Files   -->
 
-  
+  <script>
+          function disableCourseSelection() {
+            document.getElementById('courseSelction').disabled = true;
+            document.getElementById('changeCourseButton').classList.remove('d-none');
+          }
+
+          function enableCourseSelection() {
+            document.getElementById('courseSelction').disabled = false;
+            document.getElementById('changeCourseButton').classList.add('d-none');
+          }
+  </script>
+
+
+<!--   Core JS Files   -->
 
 <script src="https://unpkg.com/qz-tray"></script> 
 

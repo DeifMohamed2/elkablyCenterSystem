@@ -4,7 +4,7 @@ const successToast = document.getElementById('successToast');
 const messageToast = document.getElementById('messageToast');
 const errorMessage = document.getElementById('errorMessage');
 const searchStudent = document.getElementById('searchStudent');
-const filterTeacherSelection = document.getElementById('filterTeacherSelection');
+const filterTeacherSelection = document.getElementById('filterCourseSelection');
 const searchButton = document.getElementById('searchButton');
 const studentTableBody = document.querySelector('#studentTable tbody'); // Target tbody
 const sendWaButton = document.getElementById('sendWaButton');
@@ -152,12 +152,9 @@ const addStudentToTable = (student) => {
     <td class="text-center">${student.studentPhoneNumber}</td>
     <td class="text-center">${student.studentParentPhone}</td>
     <td class="text-center">${student.studentCode}</td>
-    <td class="text-center">${student.subject}</td>
-    <td class="text-center">${student.studentTeacher['teacherName']}</td>
+
     <td class="text-center">${student.paymentType == 'perSession' ? 'Per Session' : 'Per Course'}</td>
-    <td class="text-center">${student.studentAmount}</td>
-    <td class="text-center">${student.paymentType == 'perSession' ? '--' : (student.amountRemaining ? student.amountRemaining : 'N/A')}</td>
-    <td class="text-center">${student.paymentType == 'perSession' ? '--' : (student.amountRemaining ? student.studentAmount - student.amountRemaining : 'N/A')}</td>
+
     <td class="align-middle text-center">
       <button class="edit-student-btn mt-2" data-id="${student._id}" 
       data-bs-toggle="modal" data-bs-target="#editStudentModal">Edit</button>
@@ -201,47 +198,91 @@ document.addEventListener('DOMContentLoaded', getStudents);
 const openEditModal = async (id) => {
   try {
     const response = await fetch(`/employee/get-student/${id}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch student details');
-    }
+    if (!response.ok) throw new Error('Failed to fetch student details');
 
     const student = await response.json();
     console.log(student);
 
-    // Populate the modal fields
+    // Populate basic student info
     document.getElementById('editStudentName').value = student.studentName;
-    document.getElementById('editStudentPhone').value =
-      student.studentPhoneNumber;
-    document.getElementById('editStudentParentPhone').value =
-      student.studentParentPhone;
-    document.getElementById('editStudentAmount').value =
-      student.studentAmount;
-
-    document.getElementById('editSubject').value = student.subject;
-
-    document.getElementById('modalPaymentType').innerHTML = student.paymentType =='perSession' ? 'Per Session':'Per Course';
-
-    document.getElementById('installmentAmountDiv').style.display = student.paymentType =='perSession' ? 'none':'block';
-
-    document.getElementById('amountRemainingDiv').style.display = student.paymentType =='perSession' ? 'none':'block';
-
-    document.getElementById('editAmountRemaining').value = student.amountRemaining ?student.amountRemaining:'N/A';
-    
-    document.getElementById('installmentAmount').value = '';
-    // Set the teacher in the select dropdown
-    const teacherSelect = document.getElementById('editTeacherName');
-    const teacherId = student.studentTeacher._id; // Ensure this is the ID of the teacher
-    console.log(teacherId);
-    teacherSelect.value = teacherId;
-
+    document.getElementById('editStudentPhone').value = student.studentPhoneNumber;
+    document.getElementById('editStudentParentPhone').value = student.studentParentPhone;
     document.getElementById('editStudentId').value = student._id;
-    
+
+    // Reset all checkboxes and fields
+    document.querySelectorAll('input[name="editTeachers[]"]').forEach(input => {
+      input.checked = false;
+    });
+    document.querySelectorAll('input[name^="editSelectedCourses"]').forEach(input => {
+      input.checked = false;
+    });
+
+    // Mark selected teachers and courses
+    student.selectedTeachers.forEach(({ teacherId, courses }) => {
+      const teacherCheckbox = document.getElementById(`edit_teacher_${teacherId._id}`);
+      if (teacherCheckbox) {
+        teacherCheckbox.checked = true;
+        toggleEditCourses(teacherId._id); // Show the teacher's courses
+
+        courses.forEach(({ courseName, amountPay, registerPrice, amountRemaining }) => {
+          const courseCheckbox = document.getElementById(`edit_course_${courseName}_${teacherId._id}`);
+          const priceInput = document.getElementById(`edit_price_${courseName}_${teacherId._id}`);
+          const registerPriceInput = document.getElementById(`edit_registerPrice_${courseName}_${teacherId._id}`);
+          const amountRemainingInput = document.getElementById(`edit_amountRemaining_${courseName}_${teacherId._id}`);
+
+          if (courseCheckbox) {
+            courseCheckbox.checked = true;
+            toggleEditCoursePrice(courseCheckbox, teacherId._id, courseName); // Enable inputs
+            priceInput.value = amountPay;
+            registerPriceInput.value = registerPrice;
+            amountRemainingInput.value = amountRemaining;
+          }
+        });
+      }
+    });
+
   } catch (error) {
     console.error('Error fetching student details:', error);
-    errorMessage.classList.add('show');
-    errorMessage.innerHTML = 'هناك مشكله ما يرجي اعاده تحميل الصفحه';
+    alert('حدثت مشكلة أثناء تحميل بيانات الطالب.');
   }
 };
+
+
+function toggleEditCourses(teacherId) {
+  const coursesContainer = document.getElementById(`edit_courses_${teacherId}`);
+  const teacherCheckbox = document.getElementById(`edit_teacher_${teacherId}`);
+
+  coursesContainer.style.display = teacherCheckbox.checked ? 'block' : 'none';
+
+  // Uncheck all courses if teacher is deselected
+  if (!teacherCheckbox.checked) {
+    coursesContainer
+      .querySelectorAll('input[type="checkbox"]')
+      .forEach((course) => {
+        course.checked = false;
+      });
+  }
+}
+
+function toggleEditCoursePrice(courseCheckbox, teacherId, courseName) {
+  const priceInput = document.getElementById(`edit_price_${courseName}_${teacherId}`);
+  const registerPriceInput = document.getElementById(`edit_registerPrice_${courseName}_${teacherId}`);
+  const amountRemainingInput = document.getElementById(`edit_amountRemaining_${courseName}_${teacherId}`);
+
+  if (courseCheckbox.checked) {
+    priceInput.disabled = false;
+    registerPriceInput.disabled = false;
+    amountRemainingInput.disabled = false;
+  } else {
+    priceInput.disabled = true;
+    registerPriceInput.disabled = true;
+    amountRemainingInput.disabled = true;
+    priceInput.value = '';
+    registerPriceInput.value = '';
+    amountRemainingInput.value = '';
+  }
+}
+
 
 // Save updated Data
 const editStudentModal = document.getElementById('editStudentModal');
@@ -249,75 +290,76 @@ const clodeModalBtn = document.getElementById('clodeModalBtn');
 const saveEditStudentBtn = document.getElementById('saveEditStudentBtn');
 
 const saveEditStudent = async () => {
-  const editStudentName = document.getElementById('editStudentName').value;
-  const editStudentPhone = document.getElementById('editStudentPhone').value;
-  const editStudentParentPhone = document.getElementById(
-    'editStudentParentPhone'
-  ).value;
-  const editStudentAmount = document.getElementById('editStudentAmount').value;
-  const editSubject = document.getElementById('editSubject').value;
-  const editTeacherName = document.getElementById('editTeacherName').value;
-  const editAmountRemaining = document.getElementById('editAmountRemaining').value;
-  const installmentAmount = document.getElementById('installmentAmount').value;
+  const studentId = document.getElementById('editStudentId').value;
+  const studentName = document.getElementById('editStudentName').value;
+  const studentPhone = document.getElementById('editStudentPhone').value;
+  const studentParentPhone = document.getElementById('editStudentParentPhone').value;
 
+  // Collect updated teachers and courses
+  const selectedTeachers = [];
+  document.querySelectorAll('input[name="editTeachers[]"]:checked').forEach(teacherCheckbox => {
+    const teacherId = teacherCheckbox.value;
+    const selectedCourses = [];
 
-  const Id = document.getElementById('editStudentId').value;
+    document.querySelectorAll(`input[name="editSelectedCourses[${teacherId}][]"]:checked`).forEach(courseCheckbox => {
+      const courseName = courseCheckbox.value;
+      const amountPay = document.getElementById(`edit_price_${courseName}_${teacherId}`).value;
+      const registerPrice = document.getElementById(`edit_registerPrice_${courseName}_${teacherId}`).value;
+      const amountRemaining = document.getElementById(`edit_amountRemaining_${courseName}_${teacherId}`).value;
+
+      selectedCourses.push({
+        courseName,
+        amountPay: parseFloat(amountPay) || 0,
+        registerPrice: parseFloat(registerPrice) || 0,
+        amountRemaining: parseFloat(amountRemaining) || 0
+      });
+    });
+
+    if (selectedCourses.length > 0) {
+      selectedTeachers.push({ teacherId, courses: selectedCourses });
+    }
+  });
 
   const data = {
-    studentName: editStudentName,
-    studentPhoneNumber: editStudentPhone,
-    studentParentPhone: editStudentParentPhone,
-    studentAmount: editStudentAmount,
-    subject: editSubject,
-    studentTeacher: editTeacherName,
-    amountRemaining: editAmountRemaining,
-    installmentAmount: installmentAmount,
+    studentName,
+    studentPhoneNumber: studentPhone,
+    studentParentPhone,
+    selectedTeachers
   };
 
   try {
-    const response = await fetch(`/employee/update-student/${Id}`, {
+    const response = await fetch(`/employee/update-student/${studentId}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    const responseData = await response.json();
-    console.log(responseData);
-    if (response.ok) {
-      // Update the row in the table
-      const row = document
-        .querySelector(`button[data-id="${Id}"]`)
-        .closest('tr');
-      row.cells[0].textContent = responseData.studentName;
-      row.cells[1].textContent = responseData.studentPhoneNumber;
-      row.cells[2].textContent = responseData.studentParentPhone;
-      row.cells[3].textContent = responseData.studentCode;
-      row.cells[4].textContent = responseData.subject;
-      row.cells[5].textContent = responseData.studentTeacher.teacherName;
-      row.cells[6].textContent = responseData.paymentType == 'perSession' ? 'Per Session' : 'Per Course';
-      row.cells[7].textContent = responseData.studentAmount;
-      row.cells[8].textContent = responseData.paymentType == 'perSession' ? '--' : (responseData.amountRemaining ? responseData.amountRemaining : 'N/A');
-      row.cells[9].textContent = responseData.paymentType == 'perSession' ? '--' : (responseData.amountRemaining ? responseData.studentAmount - responseData.amountRemaining : 'N/A');
 
-      clodeModalBtn.click();
-      successToast.classList.add('show');
-      messageToast.innerHTML = 'تم تعديل الطالب بنجاح';
-    } else {
-      // Handle error response and fade out the modal
-      clodeModalBtn.click();
-        errorMessage.classList.add('show');
-      errorMessage.innerHTML = responseData.message;
-    }
+    const responseData = await response.json();
+    if (!response.ok) throw new Error(responseData.message || 'Failed to update student');
+
+    // Update the row in the table dynamically
+    const row = document.querySelector(`button[data-id="${studentId}"]`).closest('tr');
+    row.cells[0].textContent = responseData.studentName;
+    row.cells[1].textContent = responseData.studentPhoneNumber;
+    row.cells[2].textContent = responseData.studentParentPhone;
+    row.cells[3].textContent = responseData.studentCode;
+
+    // Close modal & show success message
+    document.getElementById('clodeModalBtn').click();
+    successToast.classList.add('show');
+    messageToast.innerHTML = 'تم تعديل الطالب بنجاح';
+
   } catch (error) {
-      clodeModalBtn.click();
+    console.error('Error updating student:', error);
     errorMessage.classList.add('show');
-    errorMessage.innerHTML = 'An error occurred. Please try again later.';
+    errorMessage.innerHTML = 'حدث خطأ أثناء تحديث الطالب.';
   }
 };
 
+// Attach event to save button
+document.getElementById('saveEditStudentBtn').addEventListener('click', saveEditStudent);
 
-saveEditStudentBtn.addEventListener('click', saveEditStudent);
+
 
 
 
@@ -326,9 +368,10 @@ saveEditStudentBtn.addEventListener('click', saveEditStudent);
 searchButton.addEventListener('click', async () => {
     const searchValue = searchStudent.value;
     const teacherValue = filterTeacherSelection.value;
-    
+    const [teacher, course] = teacherValue.split('_');
+    console.log(teacher,course);
     try {
-        const response = await fetch(`/employee/search-student?search=${searchValue}&teacher=${teacherValue}`
+        const response = await fetch(`/employee/search-student?search=${searchValue}&teacher=${teacher}&course=${course}`
         );
         if (!response.ok) {
         throw new Error('Failed to search for student');
@@ -341,7 +384,7 @@ searchButton.addEventListener('click', async () => {
     } catch (error) {
         console.error('Error searching for student:', error);
         errorMessage.classList.add('show');
-        errorMessage.innerHTML = 'An error occurred. Please try again later.';
+        errorMessage.innerHTML = 'No Students Found. Please try again later.';
     }
     });
 
