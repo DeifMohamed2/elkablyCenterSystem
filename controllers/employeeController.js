@@ -9,6 +9,7 @@ const ExcelJS = require('exceljs');
 
 const waapi = require('@api/waapi');
 const waapiAPI = process.env.WAAPIAPI;
+const instanceId = process.env.instanceId;
 waapi.auth(waapiAPI);
 
 
@@ -150,7 +151,7 @@ async function sendQRCode(chatId, message, studentCode) {
         mediaCaption: message,
         asSticker: false, // Set true if you want to send as a sticker
       },
-      { id: '35457' } // Replace with your actual instance ID
+      { id: instanceId } // Replace with your actual instance ID
     );
 
     console.log('QR code sent successfully:', response.data);
@@ -340,7 +341,7 @@ const updateStudent = async (req, res) => {
           chatId: `2${student.studentParentPhone}@c.us`,
           message: parentMessage,
         },
-        { id: '35457' }
+        { id: instanceId }
       );
     }
     await student.save();
@@ -367,10 +368,10 @@ const searchStudent = async (req, res) => {
     if (teacher) {
       query['selectedTeachers.teacherId'] = teacher; // Filter by teacher
     }
-    if (course) {
+    if (course && course !== 'undefined') {
       query['selectedTeachers.courses.courseName'] = course; // Filter by course
     }
-
+    console.log('Query:', query);
     // Fetch the student records & populate teachers and their courses
     const students = await Student.find(query).populate({
       path: 'selectedTeachers.teacherId',
@@ -420,7 +421,7 @@ ${message}
           chatId: waNumber,
           message: messageUpdate,
         },
-        { id: '35457' }
+        { id: instanceId }
       )
       .then((response) => {
         console.log('Message sent:', response.data);
@@ -440,6 +441,21 @@ ${message}
 }
 
 };
+
+const deleteStudent = async (req, res) => {
+  try {
+    const student = await Student.findByIdAndDelete(req.params.id);
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+    res.status(200).json({ message: 'Student deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting student:', error);
+    res.status(500).json({ message: 'An error occurred while deleting student' });
+  }
+};
+
+
 // ======================================== End Add Student ======================================== //
 
 
@@ -726,6 +742,33 @@ const attendStudent = async (req, res) => {
     // Save the attendance record
     await attendance.save();
 
+
+    // Send message to parent in Arabic
+    const parentMessage = `
+عزيزي ولي أمر الطالب ${student.studentName},
+-----------------------------
+نود إعلامكم بأن الطالب قد تم تسجيل حضوره اليوم .
+الكورس: ${course.courseName}
+المعلم: ${teacher.teacherName}
+التاريخ: ${new Date().toLocaleDateString()}
+شكرًا لتعاونكم.
+`;
+
+    await waapi
+      .postInstancesIdClientActionSendMessage(
+        {
+          chatId: `2${student.studentParentPhone}@c.us`,
+          message: parentMessage,
+        },
+        { id: instanceId }
+      )
+      .then((response) => {
+        console.log('Message sent:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error sending message:', error);
+      });
+
     // Populate updated attendance data
     const updatedAttendance = await Attendance.findById(attendance._id)
       .populate({
@@ -783,10 +826,6 @@ const getAttendedStudents = async (req, res) => {
 
     // Filter out null students (to prevent errors in calculations)
     const filteredStudents = attendance.studentsPresent.filter(sp => sp.student);
-
-    if (filteredStudents.length === 0) {
-      return res.status(404).json({ message: 'لا يوجد حضور لهذا المدرس والمادة' });
-    }
 
     // **Recalculate all values dynamically**
     let totalAmount = 0;
@@ -1191,21 +1230,24 @@ const downloadAttendanceExcel = async (req, res) => {
       attendance.course
     }_${new Date().toISOString().split('T')[0]}.xlsx`;
 
-    await waapi.postInstancesIdClientActionSendMedia(
-      {
-        mediaBase64: base64Excel,
-        chatId: `2${attendance.teacher.teacherPhoneNumber}@c.us`,
-        mediaName: fileName,
-        mediaCaption: `Attendance Report for ${
-          attendance.teacher.teacherName
-        } - ${attendance.course} - ${new Date().toDateString()}`,
-      },
-      { id: '3544257' }
-    ).then((response) => {
-      console.log('Excel sent:', response.data);
-    }).catch((error) => {
-      console.error('Error sending Excel:', error);
-    });
+    await waapi
+      .postInstancesIdClientActionSendMedia(
+        {
+          mediaBase64: base64Excel,
+          chatId: `2${attendance.teacher.teacherPhoneNumber}@c.us`,
+          mediaName: fileName,
+          mediaCaption: `Attendance Report for ${
+            attendance.teacher.teacherName
+          } - ${attendance.course} - ${new Date().toDateString()}`,
+        },
+        { id: instanceId }
+      )
+      .then((response) => {
+        console.log('Excel sent:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error sending Excel:', error);
+      });
 
     await workbook.xlsx.write(res);
     res.end();
@@ -2052,7 +2094,7 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
           mediaName: fileName,
           mediaCaption: `Attendance Report for ${teacherName} (${startDate} to ${endDate})`,
         },
-        { id: '35457' } // Replace with actual instance ID if required
+        { id: instanceId } // Replace with actual instance ID if required
       )
       .then((response) => {
         console.log('WhatsApp response:', response.data);
@@ -2227,7 +2269,7 @@ const downloadAndSendExcelForEmployeeByDate = async (req, res) => {
           mediaName: fileName,
           mediaCaption: `Attendance Report for ${employeeName} (${startDate} to ${endDate})`,
         },
-        { id: '35457' } // Replace with actual instance ID if required
+        { id: instanceId } // Replace with actual instance ID if required
       )
       .then((response) => {
         console.log('WhatsApp response:', response.data);
@@ -2294,6 +2336,7 @@ module.exports = {
     getDeviceData,
     searchStudent,
     sendWa,
+    deleteStudent,
 
     // Teacher
     

@@ -94,12 +94,12 @@ function printReceipt(data = {}) {
   const englishLabels = {
     title: 'GTA CENTER',
     phone: '+201234567890', // Example phone number
-    date: '🗓 Date',
-    teacherName: '👨‍🏫 Teacher Name',
-    courseName: '📚 Course Name',
-    studentName: '👨‍🎓 Student Name',
-    amountPaid: '💰 Amount Paid',
-    thankYou: '🙏 Thank you for choosing our center!',
+    date: 'Date',
+    teacherName: 'Teacher Name',
+    courseName: 'Course Name',
+    studentName: 'Student Name',
+    amountPaid: 'Amount Paid',
+    thankYou: ' Thank you for choosing our center!',
   };
 
   // ESC/POS Printer Commands
@@ -201,12 +201,15 @@ const getStudents = async () => {
     teacherId = courseSelection[0];
     courseName = courseSelection[1];
     const response = await fetch(`/employee/get-attended-students?teacherId=${teacherId}&courseName=${courseName}`);
+        const responseData = await response.json();
+        console.log(responseData.message);
     if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    const responseData = await response.json();
+    // const responseData = await response.json();
     console.log(responseData.students);
+    console.log(responseData.message);
     // Populate table
     addStudentsToTable(responseData.students , teacherId , courseName);
     addInvoicesToTable(responseData.invoices);

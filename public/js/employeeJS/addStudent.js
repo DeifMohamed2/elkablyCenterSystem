@@ -159,6 +159,12 @@ const addStudentToTable = (student) => {
       <button class="edit-student-btn mt-2" data-id="${student._id}" 
       data-bs-toggle="modal" data-bs-target="#editStudentModal">Edit</button>
     </td>
+
+  <td class="align-middle text-center"></td>
+    <button class="delete-student-btn mt-2" data-id="${student._id}">Delete</button>
+  </td>
+
+
   `;
   studentTableBody.appendChild(tr);
 
@@ -166,6 +172,12 @@ const addStudentToTable = (student) => {
   tr.querySelector('.edit-student-btn').addEventListener('click', () => {
     openEditModal(student._id);
   });
+
+
+  tr.querySelector('.delete-student-btn').addEventListener('click',()=>{
+    deleteStudent(student._id)
+ });
+
 };
 
 
@@ -216,10 +228,18 @@ const openEditModal = async (id) => {
     document.querySelectorAll('input[name^="editSelectedCourses"]').forEach(input => {
       input.checked = false;
     });
+    document.querySelectorAll('input[id^="edit_price_"], input[id^="edit_registerPrice_"], input[id^="edit_amountRemaining_"]').forEach(input => {
+      input.value = '';
+      input.disabled = true;
+    });
+    document.querySelectorAll('.edit-courses-container').forEach(container => {
+      container.style.display = 'none';
+    });
 
     // Mark selected teachers and courses
     student.selectedTeachers.forEach(({ teacherId, courses }) => {
       const teacherCheckbox = document.getElementById(`edit_teacher_${teacherId._id}`);
+      
       if (teacherCheckbox) {
         teacherCheckbox.checked = true;
         toggleEditCourses(teacherId._id); // Show the teacher's courses
@@ -348,7 +368,6 @@ const saveEditStudent = async () => {
     document.getElementById('clodeModalBtn').click();
     successToast.classList.add('show');
     messageToast.innerHTML = 'تم تعديل الطالب بنجاح';
-
   } catch (error) {
     console.error('Error updating student:', error);
     errorMessage.classList.add('show');
@@ -359,8 +378,25 @@ const saveEditStudent = async () => {
 // Attach event to save button
 document.getElementById('saveEditStudentBtn').addEventListener('click', saveEditStudent);
 
+// Delete Student
 
+const deleteStudent = async (id) => {
+  if (!confirm('هل أنت متأكد أنك تريد حذف هذا الطالب؟')) return;
 
+  try {
+    const response = await fetch(`/employee/delete-student/${id}`, { method: 'DELETE' });
+    if (!response.ok) throw new Error('Failed to delete student');
+
+    // Remove the row from the table
+    document.querySelector(`button[data-id="${id}"]`).closest('tr').remove();
+    successToast.classList.add('show');
+    messageToast.innerHTML = 'تم حذف الطالب بنجاح';
+  } catch (error) {
+    console.error('Error deleting student:', error);
+    errorMessage.classList.add('show');
+    errorMessage.innerHTML = 'حدث خطأ أثناء حذف الطالب.';
+  }
+};
 
 
 // Search Student

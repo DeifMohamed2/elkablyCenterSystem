@@ -66,6 +66,8 @@ router.get('/search-student', authMiddleware, employeeController.searchStudent);
 
 router.get('/send-wa', authMiddleware, employeeController.sendWa);
 
+router.delete('/delete-student/:id', authMiddleware, employeeController.deleteStudent);
+
 // Teahcer 
 router.get('/teacher', authMiddleware, employeeController.teacher_Get);
 

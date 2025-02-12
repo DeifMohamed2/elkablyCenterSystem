@@ -65,6 +65,26 @@ hr {
  
 }
 
+.delete-student-btn{
+  background-color: #ff3d71 !important; 
+  color: white !important;
+  border: 1px solid transparent !important;
+  padding: 5px 10px !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+  transition: all ease 0.3s !important;
+}
+
+.delete-student-btn:hover{
+  scale: 1.07;
+  color: #ff3d71 !important;
+  background-color: white !important;
+
+  padding: 5px 10px !important;
+  border: 1px solid #ff3d71 !important;
+
+ 
+}
 
 .table-responsive  {
   max-height: 400px;
@@ -145,13 +165,13 @@ input[type='number'] {
              <% allTeachers.forEach(teacher => { %>
              <div class="teacher-block">
                <input type="checkbox" class="form-check-input" id="edit_teacher_<%= teacher.id %>" name="editTeachers[]" value="<%= teacher.id %>" onchange="toggleEditCourses('<%= teacher.id %>')">
-               <label for="edit_teacher_<%= teacher.id %>"><%= teacher.teacherName %></label>
+               <label style="font-weight: bolder; " for="edit_teacher_<%= teacher.id %>"><%= teacher.teacherName %></label>
 
                <div id="edit_courses_<%= teacher.id %>" class="courses-container" style="display: none; padding-left: 20px;">
                  <% teacher.courses.forEach(course => { %>
                  <div class="row align-items-center mb-2">
                    <div class="col-md-4">
-                     <input type="checkbox" class="form-check-input" id="edit_course_<%= course %>_<%= teacher.id %>" name="editSelectedCourses[<%= teacher.id %>][]" value="<%= course %>" onchange="toggleEditCoursePrice(this, '<%= teacher.id %>', '<%= course %>')">
+                     <input style="accent-color: #ff9847 !important;" type="checkbox" class="form-check-input" id="edit_course_<%= course %>_<%= teacher.id %>" name="editSelectedCourses[<%= teacher.id %>][]" value="<%= course %>" onchange="toggleEditCoursePrice(this, '<%= teacher.id %>', '<%= course %>')">
                      <label for="edit_course_<%= course %>_<%= teacher.id %>"><%= course %></label>
                    </div>
                    <div class="col-md-3">
@@ -330,7 +350,7 @@ input[type='number'] {
                               <i class="fas fa-times text-md me-3 cursor-pointer" data-bs-dismiss="toast" aria-label="Close"></i>
                           </div>
                           <hr class="horizontal dark m-0">
-                          <div class="toast-body">تم اضافه الطالب بنجاح </div>
+                          <!-- <div class="toast-body">تم اضافه الطالب بنجاح </div> -->
                       </div>
 
                       <!-- Error Message -->
