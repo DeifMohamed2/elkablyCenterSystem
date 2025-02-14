@@ -93,13 +93,13 @@ function printReceipt(data = {}) {
   // English labels for the receipt
   const englishLabels = {
     title: 'GTA CENTER',
-    phone: '+201234567890', // Example phone number
+    phone: '01092257120', // Example phone number
     date: 'Date',
     teacherName: 'Teacher Name',
     courseName: 'Course Name',
     studentName: 'Student Name',
     amountPaid: 'Amount Paid',
-    thankYou: ' Thank you for choosing our center!',
+    thankYou: ' Thank you for choosing our GTA Center!',
   };
 
   // ESC/POS Printer Commands
