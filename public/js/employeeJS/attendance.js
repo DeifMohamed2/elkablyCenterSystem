@@ -18,7 +18,7 @@ const downloadExcelBtn = document.getElementById('downloadExcelBtn');
 
 
 const deviceSelect = document.getElementById('deviceSelect');
-
+let temp3Student = 0;
 async function attendStudent(event) {
     event.preventDefault();
     
@@ -47,9 +47,21 @@ async function attendStudent(event) {
         attendStudentForm.reset();
       
         message.textContent = responseData.message;
-        console.log(responseData.studentData);
         printReceipt(responseData.studentData);
           searchStudent.focus();
+          if (responseData.studentData.amountRemaining > 0) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'مبلغ متبقي  ',
+              html: `يوجد مبلغ متبقي علي الطالب <b>${responseData.studentData.studentName}</b> بقيمة <b>${responseData.studentData.amountRemaining}</b> جنيه`,
+            });
+          }
+           temp3Student++;
+          if(temp3Student == 5){
+            getStudents();
+            temp3Student = 0;
+          }
+    
         } else {
         spinner.classList.add('d-none');
       attendStudentForm.reset();
@@ -201,15 +213,13 @@ const getStudents = async () => {
     teacherId = courseSelection[0];
     courseName = courseSelection[1];
     const response = await fetch(`/employee/get-attended-students?teacherId=${teacherId}&courseName=${courseName}`);
-        const responseData = await response.json();
-        console.log(responseData.message);
+    const responseData = await response.json();
     if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
     // const responseData = await response.json();
-    console.log(responseData.students);
-    console.log(responseData.message);
+
     // Populate table
     addStudentsToTable(responseData.students , teacherId , courseName);
     addInvoicesToTable(responseData.invoices);

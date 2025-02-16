@@ -773,22 +773,24 @@ const attendStudent = async (req, res) => {
     const updatedAttendance = await Attendance.findById(attendance._id)
       .populate({
         path: 'studentsPresent.student',
-        populate: { path: 'selectedTeachers.teacherId', select: 'teacherName subjectName' },
       })
-      .populate('studentsPresent.addedBy', 'employeeName');
+      .populate('studentsPresent.addedBy', 'employeeName')
+      .populate('invoices.addedBy', 'employeeName') // Populate invoice details
 
     console.timeEnd('attendStudentExecutionTime');
 
+console.log(student);
     res.status(201).json({
       message: 'تم تسجيل الحضور',
       studentData: {
-        studentName: student.studentName,
-        studentTeacher: {
-          teacherName: teacher.teacherName,
-          subjectName: courseName,
-        },
-        amountPaid,
-        feesApplied,
+      studentName: student.studentName,
+      amountRemaining: course.amountRemaining,
+      studentTeacher: {
+        teacherName: teacher.teacherName,
+        subjectName: courseName,
+      },
+      amountPaid,
+      feesApplied,
       },
       students: updatedAttendance.studentsPresent,
     });
@@ -1013,7 +1015,6 @@ const downloadAttendanceExcel = async (req, res) => {
       .populate('studentsPresent.student')
       .populate('studentsPresent.addedBy', 'employeeName')
       .populate('invoices.addedBy', 'employeeName') // Include invoice details
-      .populate('teacher', 'teacherName subjectName teacherPhoneNumber');
 
     if (!attendance) {
       return res
