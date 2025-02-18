@@ -263,8 +263,12 @@ const addStudent = async (req, res) => {
             res.status(201).send(populatedStudent);
         })
         .catch((err) => {
-            console.log(err);
+          if (err.code === 11000) {
+            res.status(400).send({ message: ' خطأ: إدخال مكرر تم ادخال الطالب من قبل' });
+          }else{
+
             res.status(400).send({ message: 'هناك مشكله فنيه' });
+          }
         });
 };
 
@@ -1015,6 +1019,7 @@ const downloadAttendanceExcel = async (req, res) => {
       .populate('studentsPresent.student')
       .populate('studentsPresent.addedBy', 'employeeName')
       .populate('invoices.addedBy', 'employeeName') // Include invoice details
+      .populate('teacher');
 
     if (!attendance) {
       return res
@@ -1230,7 +1235,6 @@ const downloadAttendanceExcel = async (req, res) => {
     const fileName = `Attendance_Report_${attendance.teacher.teacherName}_${
       attendance.course
     }_${new Date().toISOString().split('T')[0]}.xlsx`;
-
     await waapi
       .postInstancesIdClientActionSendMedia(
         {
@@ -1365,7 +1369,7 @@ const getAttendanceByDate = async (req, res) => {
       .populate('studentsPresent.student')
       .populate('studentsPresent.addedBy', 'employeeName')
       .populate('invoices.addedBy', 'employeeName')
-      .populate('teacher', 'teacherName subjectName paymentType');
+      .populate('teacher');
 
     if (!attendances.length) {
       return res
@@ -1463,6 +1467,7 @@ const downloadAttendanceExcelByDate = async (req, res) => {
       .populate('studentsPresent.addedBy', 'employeeName')
       .populate('teacher', 'teacherName subjectName teacherPhoneNumber')
       .populate('invoices.addedBy', 'employeeName');
+      
 
     if (!attendances.length) {
       return res.status(404).json({
@@ -1850,7 +1855,8 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
             'teacherName subjectName teacherPhoneNumber teacherFees paymentType',
         },
       })
-      .populate('studentsPresent.addedBy', 'employeeName');
+      .populate('studentsPresent.addedBy', 'employeeName')
+      .populate('teacher');
 
     if (!attendances || attendances.length === 0) {
       return res.status(404).json({

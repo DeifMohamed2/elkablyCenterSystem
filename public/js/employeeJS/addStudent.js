@@ -10,9 +10,11 @@ const studentTableBody = document.querySelector('#studentTable tbody'); // Targe
 const sendWaButton = document.getElementById('sendWaButton');
 const waTeacherSelection = document.getElementById('waTeacherSelection');
 const waMessage = document.getElementById('waMessage');
+const addNewStudentBtn = document.getElementById('addNewStudentBtn');
 
 async function addNewStudent(event) {
   event.preventDefault();
+  addNewStudentBtn.disabled = true;
   spinner.classList.remove('d-none');
 
   const studentName = document.getElementById('studentName').value;
@@ -81,15 +83,19 @@ async function addNewStudent(event) {
         container.style.display = 'none';
       });
       spinner.classList.add('d-none');
+      addNewStudentBtn.disabled = false;
+
     } else {
       errorMessage.classList.add('show');
       errorMessage.innerHTML = responseData.message;
       spinner.classList.add('d-none');
+      addNewStudentBtn.disabled = false;
     }
   } catch (error) {
     errorMessage.classList.add('show');
     errorMessage.innerHTML = 'حدث خطأ. يرجى المحاولة لاحقًا.';
     spinner.classList.add('d-none');
+    addNewStudentBtn.disabled = false;
   }
 }
 

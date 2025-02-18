@@ -10,6 +10,7 @@ const studentSchema = new Schema(
     studentPhoneNumber: {
       type: String,
       required: true,
+      unique: true,
     },
     studentParentPhone: {
       type: String,
