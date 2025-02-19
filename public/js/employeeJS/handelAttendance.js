@@ -59,12 +59,12 @@ const addStudentsToTable = (attendanceRecords) => {
       attendance.studentsPresent.forEach((student) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td class="text-center">${student.student.studentName}</td>
-          <td class="text-center">${student.student.studentCode}</td>
-          <td class="text-center">${student.student.studentPhoneNumber}</td>
-          <td class="text-center">${student.student.studentParentPhone}</td>
-          <td class="text-center">${student.amountPaid}</td>
-          <td class="text-center">${student.addedBy.employeeName}</td>
+          <td class="text-center">${student.student?.studentName || 'Unknown'}</td>
+          <td class="text-center">${student.student?.studentCode || 'Unknown'}</td>
+          <td class="text-center">${student.student?.studentPhoneNumber || 'Unknown'}</td>
+          <td class="text-center">${student.student?.studentParentPhone || 'Unknown'}</td>
+          <td class="text-center">${student.amountPaid || '0'}</td>
+          <td class="text-center">${student.addedBy?.employeeName || 'Unknown'}</td>
         `;
         tBody.appendChild(tr);
       });

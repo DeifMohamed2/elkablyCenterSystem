@@ -1369,7 +1369,8 @@ const getAttendanceByDate = async (req, res) => {
       .populate('studentsPresent.student')
       .populate('studentsPresent.addedBy', 'employeeName')
       .populate('invoices.addedBy', 'employeeName')
-      .populate('teacher');
+      .populate('teacher', 'teacherName subjectName paymentType');
+
 
     if (!attendances.length) {
       return res
