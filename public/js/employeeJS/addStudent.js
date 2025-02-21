@@ -12,6 +12,8 @@ const waTeacherSelection = document.getElementById('waTeacherSelection');
 const waMessage = document.getElementById('waMessage');
 const addNewStudentBtn = document.getElementById('addNewStudentBtn');
 
+let sequenceOfStudets = 0;
+
 async function addNewStudent(event) {
   event.preventDefault();
   addNewStudentBtn.disabled = true;
@@ -154,6 +156,7 @@ const studentTable = document.getElementById('studentTable');
 const addStudentToTable = (student) => {
   const tr = document.createElement('tr');
   tr.innerHTML = `
+    <td class="text-center">${++sequenceOfStudets}</td>
     <td class="text-center">${student.studentName}</td>
     <td class="text-center">${student.studentPhoneNumber}</td>
     <td class="text-center">${student.studentParentPhone}</td>
@@ -204,6 +207,7 @@ const getStudents = async () => {
     console.log(students);
     console.log(students);
     clearStudentTable(); // Clear the table before populating
+    sequenceOfStudets=0;
     students.forEach(addStudentToTable); // Add each student to the table
   } catch (error) {
     console.error(error);
@@ -422,6 +426,7 @@ searchButton.addEventListener('click', async () => {
         const students = await response.json();
         console.log(students);
         clearStudentTable(); // Clear the table before populating
+        sequenceOfStudets=0;
         students.forEach(addStudentToTable); // Add each student to the table
     } catch (error) {
         console.error('Error searching for student:', error);
