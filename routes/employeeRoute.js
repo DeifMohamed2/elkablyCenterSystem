@@ -109,7 +109,7 @@ router.get('/attendance-by-date', authMiddleware, employeeController.getAttendan
 
 router.get('/download-attendance-excel-by-date-range' , authMiddleware, employeeController.downloadAttendanceExcelByDate);
 
-router.get('/download-sendExcelTeachrByDate/:id', authMiddleware, employeeController.downloadAndSendExcelForTeacherByDate);
+router.get('/download-sendExcelTeachrByDate/:teacherId', authMiddleware, employeeController.downloadAndSendExcelForTeacherByDate);
 
 router.get('/download-sendExcelEmployeeByDate/:id', authMiddleware, employeeController.downloadAndSendExcelForEmployeeByDate);
 

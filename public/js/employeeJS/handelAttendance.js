@@ -58,7 +58,11 @@ const addStudentsToTable = (attendanceRecords) => {
       // Add students for this teacher & course
       attendance.studentsPresent.forEach((student) => {
         const tr = document.createElement('tr');
+        if (!student.student?.studentName) {
+          console.log('Unknown student:', student);
+        }
         tr.innerHTML = `
+          <td class="text-center">${attendance.studentsPresent.indexOf(student) + 1}</td>
           <td class="text-center">${student.student?.studentName || 'Unknown'}</td>
           <td class="text-center">${student.student?.studentCode || 'Unknown'}</td>
           <td class="text-center">${student.student?.studentPhoneNumber || 'Unknown'}</td>
@@ -123,7 +127,7 @@ const teachersSummary = (teachers, totalInvoiceAmount, invoicesByTeacher) => {
             <p class="text-sm mb-0 text-capitalize">عدد الطلاب</p>
             <h4 class="mb-0" dir="ltr">${teacher.totalStudents}</h4>
             ${innerHTMLs}
-            <button type="button" class="btn bg-gradient-dark mt-3 sendExcelBtn" data-teacher-id="${teacher.teacherId}">
+            <button type="button" class="btn bg-gradient-dark mt-3 sendExcelBtn" data-teacher-id="${teacher.teacherId}" data-teacher-name="${teacher.teacherName}">
               <i class="material-symbols-rounded text-sm">send</i>&nbsp;&nbsp;ارسال نسخة اكسل
             </button>
           </div>
@@ -334,6 +338,32 @@ async function downloadAndSendExcelForTeacher(teacherId, teacherName) {
     console.error('Error downloading excel file:', error);
   }
 }
+
+// Event delegation for sendExcelBtn
+document.body.addEventListener('click', async (event) => {
+  if (event.target.classList.contains('sendExcelBtn')) {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = 'جاري التحميل...';
+
+    const teacherId = button.dataset.teacherId;
+    const employeeId = button.dataset.employeeId;
+    const teacherName = button.dataset.teacherName;
+    const employeeName = button.dataset.employeeName;
+
+    try {
+      if (teacherId) {
+        await downloadAndSendExcelForTeacher(teacherId, teacherName);
+      } else if (employeeId) {
+        await downloadAndSendExcelForEmployee(employeeId, employeeName);
+      }
+    } catch (error) {
+      console.error('Error downloading excel file:', error);
+    } finally {
+      button.innerHTML = originalText;
+    }
+  }
+});
 
 // Function to download Excel for a specific employee 
 

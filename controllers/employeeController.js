@@ -1838,41 +1838,36 @@ const downloadAttendanceExcelByDate = async (req, res) => {
 
 
 
-
 const downloadAndSendExcelForTeacherByDate = async (req, res) => {
-  const { id } = req.params;
+  const { teacherId } = req.params;
   const { startDate, endDate } = req.query;
 
   try {
-    // Fetch attendance records within the date range
-    const attendances = await Attendance.find({
+    // Fetch attendance records within the given date range
+    const attendance = await Attendance.findOne({
       date: { $gte: startDate, $lte: endDate },
+      teacher: teacherId,
     })
       .populate({
         path: 'studentsPresent.student',
         populate: {
-          path: 'studentTeacher',
+          path: 'selectedTeachers.teacherId',
           select:
             'teacherName subjectName teacherPhoneNumber teacherFees paymentType',
         },
       })
       .populate('studentsPresent.addedBy', 'employeeName')
-      .populate('teacher');
+      .populate('teacher', 'teacherName teacherPhoneNumber subjectName paymentType')
+      .populate('invoices.addedBy', 'employeeName');
 
-    if (!attendances || attendances.length === 0) {
+    if (!attendance || attendance.length === 0) {
       return res.status(404).json({
         message: 'No attendance records found for the given date range',
       });
     }
 
-    // Filter students associated with the given teacher across all dates
-    const teacherRelatedStudents = attendances.flatMap((attendance) =>
-      attendance.studentsPresent.filter(
-        (entry) =>
-          entry.student.studentTeacher &&
-          entry.student.studentTeacher._id.toString() === id
-      )
-    );
+    // Filter teacher-related student entries safely using optional chaining
+    const teacherRelatedStudents = attendance.studentsPresent;
 
     if (teacherRelatedStudents.length === 0) {
       return res
@@ -1880,11 +1875,15 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
         .json({ message: 'No students found for the given teacher' });
     }
 
-    const teacher = teacherRelatedStudents[0].student.studentTeacher;
+    // Get teacher info (assuming all entries are for the same teacher)
+    const teacher = attendance.teacher;
+    
+    console.log('Teacher:', teacher);
     const teacherName = teacher.teacherName.replace(/\s+/g, '_'); // Replace spaces with underscores
     const teacherPhoneNumber = teacher.teacherPhoneNumber;
     const isPerSession = teacher.paymentType === 'perSession';
-
+    console.log( teacherName , teacherPhoneNumber , isPerSession);
+    // Create workbook and worksheet using ExcelJS
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Attendance Report');
 
@@ -1897,21 +1896,6 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
           type: 'pattern',
           pattern: 'solid',
           fgColor: { argb: '4472C4' },
-        },
-      },
-      dateHeader: {
-        font: { bold: true, size: 14, color: { argb: '000000' } }, // Black text for date header
-        alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'D3D3D3' }, // Light gray background for date header
-        },
-        border: {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' },
         },
       },
       columnHeader: {
@@ -1960,7 +1944,7 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
           type: 'pattern',
           pattern: 'solid',
           fgColor: { argb: '4CAF50' },
-        }, // Green color for visibility
+        },
         border: {
           top: { style: 'thin' },
           left: { style: 'thin' },
@@ -1971,79 +1955,72 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
     };
 
     // Add report title
-    worksheet.mergeCells('A1:F1');
+    worksheet.mergeCells('A1:H1');
     worksheet.getCell(
       'A1'
-    ).value = `Attendance Report for ${teacher.teacherName} (${startDate} to ${endDate})`;
+    ).value = `Attendance Report for ${teacherName} (${startDate} to ${endDate})`;
     worksheet.getCell('A1').style = styles.header;
 
-    let rowIndex = 2;
-
-    // Keep track of the last date to avoid duplicate date headers
-    let lastDate = null;
-
-    // Iterate over each attendance record and organize by date
-    for (const attendance of attendances) {
-      const currentDate = attendance.date;
-
-      // Add a date header row if the date changes
-      if (currentDate !== lastDate) {
-        worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
-        worksheet.getCell(`A${rowIndex}`).value = `Date: ${currentDate}`;
-        worksheet.getCell(`A${rowIndex}`).style = styles.dateHeader;
-        rowIndex++;
-
-        // Add column headers for the new date
-        worksheet.getRow(rowIndex).values = [
+    // Set column headers (including the attendance date)
+    const headerRowValues = isPerSession
+      ? [
           'Student Name',
           'Phone Number',
           'Amount Paid (EGP)',
-          isPerSession ? 'Center Fees (EGP)' : 'Amount Remaining (EGP)',
-          isPerSession ? 'Total Amount (EGP)' : '',
+          'Center Fees (EGP)',
+          'Net Profit (EGP)',
           'Added By',
+          'Student Code',
+        ]
+      : [
+          'Student Name',
+          'Phone Number',
+          'Amount Paid (EGP)',
+          'Amount Remaining (EGP)',
+          'Added By',
+          'Student Code',
         ];
-        worksheet
-          .getRow(rowIndex)
-          .eachCell((cell) => (cell.style = styles.columnHeader));
-        rowIndex++;
 
-        lastDate = currentDate;
-      }
+    worksheet.getRow(2).values = headerRowValues;
+    worksheet.getRow(2).eachCell((cell) => (cell.style = styles.columnHeader));
 
-      // Add student data rows for related students
-      const studentsForDate = attendance.studentsPresent.filter(
-        (entry) =>
-          entry.student.studentTeacher &&
-          entry.student.studentTeacher._id.toString() === id
-      );
+    // Populate student data rows
+    let rowIndex = 3;
+    teacherRelatedStudents.forEach((entry) => {
+      const studentName = entry.student.studentName;
+      const phoneNumber = entry.student.studentPhoneNumber;
+      const amountPaid = entry.amountPaid;
+      const feesApplied = entry.feesApplied || 0;
+      const addedBy = entry.addedBy ? entry.addedBy.employeeName : 'Unknown';
+      const studentCode = entry.student.studentCode;
 
-      for (const {
-        student,
-        amountPaid,
-        feesApplied,
-        addedBy,
-      } of studentsForDate) {
-        const studentName = student.studentName;
-        const studentPhoneNumber = student.studentPhoneNumber;
-        const teacherFees = student.studentTeacher.teacherFees;
-        const addedByName = addedBy ? addedBy.employeeName : 'Unknown'; // Fallback to 'Unknown' if no addedBy info
-
+      if (isPerSession) {
+        const netProfit = amountPaid - feesApplied;
         worksheet.getRow(rowIndex).values = [
           studentName,
-          studentPhoneNumber,
+          phoneNumber,
           amountPaid,
-          isPerSession ? feesApplied : amountPaid - feesApplied, // Center Fees or Remaining Amount
-          isPerSession ? amountPaid - feesApplied : '', // Teacher Fees (for perSession)
-          addedByName, // Added By
+          feesApplied,
+          netProfit,
+          addedBy,
+          studentCode,
         ];
-        worksheet
-          .getRow(rowIndex)
-          .eachCell((cell) => (cell.style = styles.cell));
-        rowIndex++;
+      } else {
+        const amountRemaining = amountPaid - feesApplied;
+        worksheet.getRow(rowIndex).values = [
+          studentName,
+          phoneNumber,
+          amountPaid,
+          amountRemaining,
+          addedBy,
+          studentCode,
+        ];
       }
-    }
+      worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = styles.cell));
+      rowIndex++;
+    });
 
-    // Add totals row
+    // Calculate totals
     const totalAmountPaid = teacherRelatedStudents.reduce(
       (sum, entry) => sum + entry.amountPaid,
       0
@@ -2052,29 +2029,124 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
       (sum, entry) => sum + (entry.feesApplied || 0),
       0
     );
-    const totalProfit = teacherRelatedStudents.reduce(
+    const totalNetProfit = teacherRelatedStudents.reduce(
       (sum, entry) => sum + (entry.amountPaid - (entry.feesApplied || 0)),
       0
     );
 
+    // Add totals row
+    if (isPerSession) {
+      worksheet.getRow(rowIndex).values = [
+        'Total',
+        '',
+        totalAmountPaid,
+        totalFees,
+        totalNetProfit,
+        '',
+        '',
+      ];
+    } else {
+      worksheet.getRow(rowIndex).values = [
+        'Total',
+        '',
+        totalAmountPaid,
+        totalAmountPaid - totalFees,
+        '',
+        '',
+      ];
+    }
+    worksheet
+      .getRow(rowIndex)
+      .eachCell((cell) => (cell.style = styles.totalRow));
+    rowIndex++;
+
+    // Add a summary row for total student count
+    worksheet.mergeCells(`A${rowIndex}:H${rowIndex}`);
+    worksheet.getCell(
+      `A${rowIndex}`
+    ).value = `Total Students for ${teacherName}: ${teacherRelatedStudents.length}`;
+    worksheet.getCell(`A${rowIndex}`).style = styles.studentCountRow;
+
+    rowIndex++; // Space before invoices
+
+    // Add invoice section header
+    worksheet.mergeCells(`A${rowIndex}:D${rowIndex}`);
+    worksheet.getCell(`A${rowIndex}`).value = 'Invoice Details';
+    worksheet.getCell(`A${rowIndex}`).style = styles.header;
+    rowIndex++;
+
+    // Add invoice headers
     worksheet.getRow(rowIndex).values = [
-      'Total',
-      '',
+      'Invoice Details',
+      'Invoice Amount (EGP)',
+      'Time',
+      'Added By',
+    ];
+    worksheet
+      .getRow(rowIndex)
+      .eachCell((cell) => (cell.style = styles.columnHeader));
+    rowIndex++;
+
+    let totalInvoiceAmount = 0;
+    attendance.invoices.forEach(
+      ({ invoiceDetails, invoiceAmount, time, addedBy }) => {
+        totalInvoiceAmount += invoiceAmount;
+
+        worksheet.getRow(rowIndex).values = [
+          invoiceDetails,
+          invoiceAmount,
+          time,
+          addedBy.employeeName,
+        ];
+        worksheet
+          .getRow(rowIndex)
+          .eachCell((cell) => (cell.style = styles.cell));
+        rowIndex++;
+      }
+    );
+
+    rowIndex++; // Space before totals
+
+    // Add total invoices row
+    worksheet.mergeCells(`A${rowIndex}:B${rowIndex}`);
+    worksheet.getCell(`A${rowIndex}`).value = 'Total Invoices';
+    worksheet.getCell(`A${rowIndex}`).style = styles.totalRow;
+    worksheet.getCell(`C${rowIndex}`).value = totalInvoiceAmount;
+    worksheet.getCell(`C${rowIndex}`).style = styles.totalRow;
+    rowIndex++;
+
+    rowIndex++; // Space before final summary
+
+    // Add final summary header
+    worksheet.mergeCells(`A${rowIndex}:H${rowIndex}`);
+    worksheet.getCell(`A${rowIndex}`).value = 'Final Summary';
+    worksheet.getCell(`A${rowIndex}`).style = styles.header;
+    rowIndex++;
+
+    // Add total row with new headers
+    worksheet.getRow(rowIndex).values = [
+      'Total Amount Paid (EGP)',
+      'Center Fees (EGP)',
+      'Total Invoices (EGP)',
+      'Net Profit Before Invoice (EGP)',
+      'Final Net Profit (EGP)',
+    ];
+    worksheet
+      .getRow(rowIndex)
+      .eachCell((cell) => (cell.style = styles.columnHeader));
+    rowIndex++;
+
+    worksheet.getRow(rowIndex).values = [
       totalAmountPaid,
-      isPerSession ? totalFees : totalAmountPaid - totalFees,
-      isPerSession ? totalProfit : '',
+      totalFees,
+      totalInvoiceAmount,
+      totalNetProfit,
+      totalNetProfit - totalInvoiceAmount,
     ];
     worksheet
       .getRow(rowIndex)
       .eachCell((cell) => (cell.style = styles.totalRow));
-
-    // Add total student count for the teacher-related students
-    rowIndex++; // Move to the next row after the totals
-    worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`); // Merge all cells for the student count row
-    worksheet.getCell(
-      `A${rowIndex}`
-    ).value = `Total Students for ${teacher.teacherName}: ${teacherRelatedStudents.length}`;
-    worksheet.getCell(`A${rowIndex}`).style = styles.studentCountRow;
+    rowIndex++;
 
     // Adjust column widths
     worksheet.columns = [
@@ -2082,15 +2154,16 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
       { width: 20 }, // Phone Number
       { width: 20 }, // Amount Paid
       { width: 20 }, // Center Fees / Amount Remaining
-      { width: 20 }, // Teacher Fees / Net Profit
+      { width: 20 }, // Net Profit if perSession (column hidden if not)
       { width: 20 }, // Added By
+      { width: 20 }, // Student Code
     ];
 
-    // Export the Excel file to buffer
+    // Export the workbook to a buffer and convert to Base64
     const buffer = await workbook.xlsx.writeBuffer();
     const base64Excel = buffer.toString('base64');
 
-    // File name for download and WhatsApp
+    // Define file name for both download and WhatsApp sending
     const fileName = `Attendance_Report_${teacherName}_${startDate}_to_${endDate}.xlsx`;
 
     // Send file via WhatsApp API
@@ -2100,7 +2173,7 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
           mediaBase64: base64Excel,
           chatId: `2${teacherPhoneNumber}@c.us`,
           mediaName: fileName,
-          mediaCaption: `Attendance Report for ${teacherName} (${startDate} to ${endDate})`,
+          mediaCaption: `Attendance Report for ${teacher.teacherName} (${startDate} to ${endDate})`,
         },
         { id: instanceId } // Replace with actual instance ID if required
       )
@@ -2113,14 +2186,13 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
 
     console.log('Excel file sent via WhatsApp');
 
-    // Send the file as an attachment
+    // Set response headers and send the file as an attachment
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
     res.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     );
-    await workbook.xlsx.write(res);
-    res.end();
+    res.send(buffer);
   } catch (error) {
     console.error('Error generating and sending attendance report:', error);
     if (!res.headersSent) {
@@ -2128,6 +2200,7 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
     }
   }
 };
+
 
 const downloadAndSendExcelForEmployeeByDate = async (req, res) => {
   const { id } = req.params;
