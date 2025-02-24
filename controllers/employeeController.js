@@ -788,6 +788,7 @@ console.log(student);
       message: 'تم تسجيل الحضور',
       studentData: {
       studentName: student.studentName,
+      studentCode: student.studentCode,
       amountRemaining: course.amountRemaining,
       studentTeacher: {
         teacherName: teacher.teacherName,
@@ -1102,10 +1103,10 @@ const downloadAttendanceExcel = async (req, res) => {
 
         studentsData.push([
           student.studentName,
-          student.studentPhoneNumber,
+          // student.studentPhoneNumber,
           amountPaid,
-          feesApplied,
-          amountPaid - feesApplied,
+          // feesApplied,
+          // amountPaid - feesApplied,
           addedBy.employeeName,
         ]);
       }
@@ -1120,10 +1121,10 @@ const downloadAttendanceExcel = async (req, res) => {
     // Add column headers for students
     worksheet.getRow(rowIndex).values = [
       'Student Name',
-      'Phone Number',
+      // 'Phone Number',
       'Amount Paid (EGP)',
-      'Center Fees (EGP)',
-      'Net Profit (EGP)',
+      // 'Center Fees (EGP)',
+      // 'Net Profit (EGP)',
       'Added By',
     ];
     worksheet
@@ -1965,18 +1966,18 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
     const headerRowValues = isPerSession
       ? [
           'Student Name',
-          'Phone Number',
+          // 'Phone Number',
           'Amount Paid (EGP)',
-          'Center Fees (EGP)',
-          'Net Profit (EGP)',
+          // 'Center Fees (EGP)',
+          // 'Net Profit (EGP)',
           'Added By',
           'Student Code',
         ]
       : [
           'Student Name',
-          'Phone Number',
+          // 'Phone Number',
           'Amount Paid (EGP)',
-          'Amount Remaining (EGP)',
+          // 'Amount Remaining (EGP)',
           'Added By',
           'Student Code',
         ];
@@ -1998,10 +1999,10 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
         const netProfit = amountPaid - feesApplied;
         worksheet.getRow(rowIndex).values = [
           studentName,
-          phoneNumber,
+          // phoneNumber,
           amountPaid,
-          feesApplied,
-          netProfit,
+          // feesApplied,
+          // netProfit,
           addedBy,
           studentCode,
         ];
@@ -2009,9 +2010,9 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
         const amountRemaining = amountPaid - feesApplied;
         worksheet.getRow(rowIndex).values = [
           studentName,
-          phoneNumber,
+          // phoneNumber,
           amountPaid,
-          amountRemaining,
+          // amountRemaining,
           addedBy,
           studentCode,
         ];

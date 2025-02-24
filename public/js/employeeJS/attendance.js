@@ -96,7 +96,7 @@ function printReceipt(data = {}) {
     studentName = 'N/A',
     studentTeacher = {},
     amountPaid = 0,
-  
+    studentCode = 'N/A',
     date = new Date().toLocaleDateString() +
       ' ' +
       new Date().toLocaleTimeString(),
@@ -110,8 +110,9 @@ function printReceipt(data = {}) {
     teacherName: 'Teacher Name',
     courseName: 'Course Name',
     studentName: 'Student Name',
+    studentCode: 'Student Code',
     amountPaid: 'Amount Paid',
-    thankYou: ' Thank you for choosing our GTA Center!',
+    thankYou: 'Thank you for choosing our GTA Center!',
   };
 
   // ESC/POS Printer Commands
@@ -123,14 +124,14 @@ function printReceipt(data = {}) {
   const ESC_FEED_LINE = '\x0A'; // Line feed
   const ESC_RESET = '\x1B\x40'; // Reset printer
 
-  const lineSeparator = '-'.repeat(48); // Table line separator
-  const headerSeparator = '='.repeat(48); // Bold section separator
+  const lineSeparator = '-'.repeat(49); // Table line separator
+  const headerSeparator = '='.repeat(49); // Bold section separator
 
   function formatTableRow(field, value) {
     const totalWidth = 48;
     const left = field.padEnd(22, ' ');
     const right = value.toString().padStart(22, ' ');
-    return `| ${left}| ${right} |`;
+    return `| ${left}|${right} |`;
   }
 
   // Build receipt content
@@ -168,6 +169,10 @@ function printReceipt(data = {}) {
     headerSeparator +
     ESC_FEED_LINE +
     formatTableRow(englishLabels.studentName, studentName) +
+    ESC_FEED_LINE +
+    lineSeparator +
+    ESC_FEED_LINE +
+    formatTableRow(englishLabels.studentCode, studentCode) +
     ESC_FEED_LINE +
     lineSeparator +
     ESC_FEED_LINE +
