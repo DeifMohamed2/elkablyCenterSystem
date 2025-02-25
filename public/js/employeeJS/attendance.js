@@ -458,11 +458,13 @@ invoiceForm.addEventListener('submit', async (event) => {
       invoiceForm.reset();
       message.textContent = responseData.message;
       searchStudent.focus();
+      getStudents();
     } else {
       spinner.classList.add('d-none');
       invoiceForm.reset();
       message.textContent = responseData.message;
       searchStudent.focus();
+      getStudents();
     }
   } catch (error) {
     invoiceForm.reset();
@@ -475,16 +477,119 @@ invoiceForm.addEventListener('submit', async (event) => {
 
 // Function to add invoices to the table
 
+
 const addInvoicesToTable = (invoices) => {
   invoiceTBody.innerHTML = '';
   invoices.forEach((invoice) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td class="text-center">${invoice.invoiceDetails}</td>
-      <td class="text-center">${invoice.invoiceAmount}</td>
+      <td class="text-center invoice-details">${invoice.invoiceDetails}</td>
+      <td class="text-center invoice-amount">${invoice.invoiceAmount}</td>
       <td class="text-center">${invoice.time}</td>
       <td class="text-center">${invoice.addedBy.employeeName}</td>
+      <td class="text-center">
+        <button class="btn btn-primary btn-sm edit-invoice">Edit</button>
+        <button class="btn btn-danger btn-sm delete-invoice">Delete</button>
+      </td>
     `;
+
+    const deleteButton = tr.querySelector('.delete-invoice');
+    deleteButton.addEventListener('click', async () => {
+      deleteButton.textContent = '...Deleting';
+      await deleteInvoice(invoice._id);
+      deleteButton.textContent = 'Delete';
+    });
+
+    const editButton = tr.querySelector('.edit-invoice');
+    editButton.addEventListener('click', () => handleEdit(invoice, tr));
+
     invoiceTBody.appendChild(tr);
   });
 };
+
+const handleEdit = (invoice, tr) => {
+  const detailsCell = tr.querySelector('.invoice-details');
+  const amountCell = tr.querySelector('.invoice-amount');
+  const editButton = tr.querySelector('.edit-invoice');
+
+  // Replace text with input fields
+  detailsCell.innerHTML = `<input type="text" class="form-control text-center" style="border:1px solid #000;" value="${invoice.invoiceDetails}" />`;
+  amountCell.innerHTML = `<input type="number" class="form-control text-center w-25" style="border:1px solid #000;" value="${invoice.invoiceAmount}" />`;
+
+  editButton.textContent = 'Update';
+  editButton.classList.remove('edit-invoice');
+  editButton.classList.add('update-invoice');
+
+  // Remove previous event listeners to prevent multiple bindings
+  editButton.replaceWith(editButton.cloneNode(true));
+  const newUpdateButton = tr.querySelector('.update-invoice');
+
+  newUpdateButton.addEventListener('click', async () => {
+    const updatedDetails = detailsCell.querySelector('input').value;
+    const updatedAmount = amountCell.querySelector('input').value;
+
+    await updateInvoice(invoice._id, updatedDetails, updatedAmount);
+
+    detailsCell.textContent = updatedDetails;
+    amountCell.textContent = updatedAmount;
+
+    newUpdateButton.textContent = 'Edit';
+    newUpdateButton.classList.remove('update-invoice');
+    newUpdateButton.classList.add('edit-invoice');
+
+    // Reattach edit event listener
+    newUpdateButton.addEventListener('click', () => handleEdit(invoice, tr));
+  });
+};
+
+async function updateInvoice(invoiceId, invoiceDetails, invoiceAmount) {
+  try {
+    console.log(invoiceId, invoiceDetails, invoiceAmount);
+    spinner.classList.remove('d-none');
+    const response = await fetch(`/employee/update-invoice/${invoiceId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ invoiceDetails, invoiceAmount }),
+    });
+    const responseData = await response.json();
+    if (response.ok) {
+      spinner.classList.add('d-none');
+      message.textContent = responseData.message;
+      getStudents();
+    } else {
+      alert(responseData.message);
+      spinner.classList.add('d-none');
+      message.textContent = responseData.message;
+    }
+  } catch (error) {
+    console.error('Error updating invoice:', error);
+    spinner.classList.add('d-none');
+    message.textContent = 'An error occurred. Please try again later.';
+  }
+}
+
+
+async function deleteInvoice(invoiceId) {
+  try {
+    spinner.classList.remove('d-none');
+    const response = await fetch(`/employee/delete-invoice/${invoiceId}`, {
+      method: 'DELETE',
+    });
+    const responseData = await response.json();
+    if (response.ok) {
+      spinner.classList.add('d-none');
+      message.textContent = responseData.message;
+      getStudents();
+    } else {
+      alert(responseData.message);
+      spinner.classList.add('d-none');
+      message.textContent = responseData.message;
+    }
+  } catch (error) {
+    console.error('Error deleting invoice:', error);
+    spinner.classList.add('d-none');
+    message.textContent = 'An error occurred. Please try again later.';
+  }
+}

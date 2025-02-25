@@ -101,6 +101,10 @@ router.put('/select-device/:deviceId', authMiddleware, employeeController.select
 
 router.post('/add-teacher-invoice', authMiddleware, employeeController.addTeacherInvoice);
 
+router.delete('/delete-invoice/:invoiceId', authMiddleware, employeeController.deleteInvoice);
+
+router.put('/update-invoice/:invoiceId', authMiddleware, employeeController.updateInvoice);
+
 // handel Attendance
 
 router.get('/handel-attendance', authMiddleware, employeeController.handelAttendance);

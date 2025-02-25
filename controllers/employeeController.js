@@ -1091,6 +1091,7 @@ const downloadAttendanceExcel = async (req, res) => {
     let totalAmount = 0;
     let totalFees = 0;
     let netProfit = 0;
+    let totalInvoiceAmount = 0;
     const studentsData = [];
 
     attendance.studentsPresent.forEach(
@@ -1102,12 +1103,13 @@ const downloadAttendanceExcel = async (req, res) => {
         netProfit += amountPaid - feesApplied;
 
         studentsData.push([
+          studentsData.length + 1,
           student.studentName,
           // student.studentPhoneNumber,
           amountPaid,
           // feesApplied,
           // amountPaid - feesApplied,
-          addedBy.employeeName,
+          student.studentCode,
         ]);
       }
     );
@@ -1120,12 +1122,14 @@ const downloadAttendanceExcel = async (req, res) => {
 
     // Add column headers for students
     worksheet.getRow(rowIndex).values = [
+      "#",
       'Student Name',
       // 'Phone Number',
       'Amount Paid (EGP)',
       // 'Center Fees (EGP)',
       // 'Net Profit (EGP)',
-      'Added By',
+      // 'Added By',
+      'Student Code',
     ];
     worksheet
       .getRow(rowIndex)
@@ -1140,85 +1144,112 @@ const downloadAttendanceExcel = async (req, res) => {
     });
 
     rowIndex++; // Space before invoices
+    if (attendance.invoices.length > 0) {
+      // Add invoice section header
+      worksheet.mergeCells(`A${rowIndex}:D${rowIndex}`);
+      worksheet.getCell(`A${rowIndex}`).value = 'Invoice Details';
+      worksheet.getCell(`A${rowIndex}`).style = styles.header;
+      rowIndex++;
 
-    // Add invoice section header
-    worksheet.mergeCells(`A${rowIndex}:D${rowIndex}`);
-    worksheet.getCell(`A${rowIndex}`).value = 'Invoice Details';
-    worksheet.getCell(`A${rowIndex}`).style = styles.header;
-    rowIndex++;
+      // Add invoice headers
+      worksheet.getRow(rowIndex).values = [
+        'Invoice Details',
+        'Invoice Amount (EGP)',
+        'Time',
+        'Added By',
+      ];
+      worksheet
+        .getRow(rowIndex)
+        .eachCell((cell) => (cell.style = styles.invoiceHeader));
+      rowIndex++;
 
-    // Add invoice headers
-    worksheet.getRow(rowIndex).values = [
-      'Invoice Details',
-      'Invoice Amount (EGP)',
-      'Time',
-      'Added By',
-    ];
-    worksheet
-      .getRow(rowIndex)
-      .eachCell((cell) => (cell.style = styles.invoiceHeader));
-    rowIndex++;
+      attendance.invoices.forEach(
+        ({ invoiceDetails, invoiceAmount, time, addedBy }) => {
+          totalInvoiceAmount += invoiceAmount;
 
-    let totalInvoiceAmount = 0;
-    attendance.invoices.forEach(
-      ({ invoiceDetails, invoiceAmount, time, addedBy }) => {
-        totalInvoiceAmount += invoiceAmount;
+          worksheet.getRow(rowIndex).values = [
+            invoiceDetails,
+            invoiceAmount,
+            time,
+            addedBy.employeeName,
+          ];
+          worksheet
+            .getRow(rowIndex)
+            .eachCell((cell) => (cell.style = styles.cell));
+          rowIndex++;
+        }
+      );
 
-        worksheet.getRow(rowIndex).values = [
-          invoiceDetails,
-          invoiceAmount,
-          time,
-          addedBy.employeeName,
-        ];
-        worksheet
-          .getRow(rowIndex)
-          .eachCell((cell) => (cell.style = styles.cell));
-        rowIndex++;
-      }
-    );
+      rowIndex++; // Space before totals
 
-    rowIndex++; // Space before totals
-
-    // Add total invoices row
-    worksheet.mergeCells(`A${rowIndex}:B${rowIndex}`);
-    worksheet.getCell(`A${rowIndex}`).value = 'Total Invoices';
-    worksheet.getCell(`A${rowIndex}`).style = styles.totalRow;
-    worksheet.getCell(`C${rowIndex}`).value = totalInvoiceAmount;
-    worksheet.getCell(`C${rowIndex}`).style = styles.totalRow;
-    rowIndex++;
-
+      // Add total invoices row
+      worksheet.mergeCells(`A${rowIndex}:B${rowIndex}`);
+      worksheet.getCell(`A${rowIndex}`).value = 'Total Invoices';
+      worksheet.getCell(`A${rowIndex}`).style = styles.totalRow;
+      worksheet.getCell(`C${rowIndex}`).value = totalInvoiceAmount;
+      worksheet.getCell(`C${rowIndex}`).style = styles.totalRow;
+      rowIndex++;
+    }
     rowIndex++; // Space before final summary
-
     // Add final summary header
-    worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
+    worksheet.mergeCells(`A${rowIndex}:B${rowIndex}`);
     worksheet.getCell(`A${rowIndex}`).value = 'Final Summary';
     worksheet.getCell(`A${rowIndex}`).style = styles.header;
     rowIndex++;
 
-    // Add total row with new headers
-    worksheet.getRow(rowIndex).values = [
+    // Add summary titles and values in two columns
+    const summaryTitles = [
       'Total Amount Paid (EGP)',
       'Center Fees (EGP)',
       'Total Invoices (EGP)',
       'Net Profit Before Invoice (EGP)',
       'Final Net Profit (EGP)',
     ];
-    worksheet
-      .getRow(rowIndex)
-      .eachCell((cell) => (cell.style = styles.columnHeader));
-    rowIndex++;
-
-    worksheet.getRow(rowIndex).values = [
+    const summaryValues = [
       totalAmount,
       totalFees,
       totalInvoiceAmount,
       netProfit,
       netProfit - totalInvoiceAmount,
     ];
-    worksheet
-      .getRow(rowIndex)
-      .eachCell((cell) => (cell.style = styles.totalRow));
-    rowIndex++;
+
+    summaryTitles.forEach((title, index) => {
+      worksheet.getCell(`A${rowIndex}`).value = title;
+      worksheet.getCell(`A${rowIndex}`).style = { ...styles.columnHeader, font: { bold: true, color: { argb: 'FFFFFF' } } };
+      worksheet.getCell(`B${rowIndex}`).value = summaryValues[index];
+      worksheet.getCell(`B${rowIndex}`).style = { ...styles.cell, font: { bold: true } };
+      rowIndex++;
+    });
+    // Add final summary header
+    // worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
+    // worksheet.getCell(`A${rowIndex}`).value = 'Final Summary';
+    // worksheet.getCell(`A${rowIndex}`).style = styles.header;
+    // rowIndex++;
+
+    // // Add total row with new headers
+    // worksheet.getRow(rowIndex).values = [
+    //   'Total Amount Paid (EGP)',
+    //   'Center Fees (EGP)',
+    //   'Total Invoices (EGP)',
+    //   'Net Profit Before Invoice (EGP)',
+    //   'Final Net Profit (EGP)',
+    // ];
+    // worksheet
+    //   .getRow(rowIndex)
+    //   .eachCell((cell) => (cell.style = styles.columnHeader));
+    // rowIndex++;
+
+    // worksheet.getRow(rowIndex).values = [
+    //   totalAmount,
+    //   totalFees,
+    //   totalInvoiceAmount,
+    //   netProfit,
+    //   netProfit - totalInvoiceAmount,
+    // ];
+    // worksheet
+    //   .getRow(rowIndex)
+    //   .eachCell((cell) => (cell.style = styles.totalRow));
+    // rowIndex++;
 
     // Set column widths
     worksheet.columns = [
@@ -1246,7 +1277,7 @@ const downloadAttendanceExcel = async (req, res) => {
             attendance.teacher.teacherName
           } - ${attendance.course} - ${new Date().toDateString()}`,
         },
-        { id: instanceId }
+        { id: '313' }
       )
       .then((response) => {
         console.log('Excel sent:', response.data);
@@ -1335,8 +1366,63 @@ const addTeacherInvoice = async (req, res) => {
 
 };
 
+const deleteInvoice = async (req, res) => {
+  const { invoiceId } = req.params;
+  try {
+    const attendance = await Attendance.findOne({
+      'invoices._id': invoiceId,
+    });
 
+    if (!attendance) {
+      return res.status(404).json({ message: 'Invoice not found' });
+    }
 
+    const invoiceIndex = attendance.invoices.findIndex(
+      (inv) => inv._id.toString() === invoiceId
+    );
+
+    attendance.invoices.splice(invoiceIndex, 1);
+    await attendance.save();
+
+    res.status(200).json({ message: 'Invoice deleted successfully' });
+  }
+  catch (error) {
+    console.error('Error deleting invoice:', error);
+    res.status(500).json({ message: 'Error deleting invoice' });
+  }
+};
+
+const updateInvoice = async (req, res) => {
+  const { invoiceId } = req.params;
+  const { invoiceDetails, invoiceAmount } = req.body;
+
+  try {
+    const attendance = await Attendance.findOne({
+      'invoices._id': invoiceId,
+    });
+
+    if (!attendance) {
+      return res.status(404).json({ message: 'Invoice not found' });
+    }
+
+    const invoice = attendance.invoices.find(
+      (inv) => inv._id.toString() === invoiceId
+    );
+    console.log('Invoice:', invoiceDetails, invoiceAmount);
+    console.log('Invoice:', invoice);
+    invoice.invoiceDetails = invoiceDetails;
+    invoice.invoiceAmount = invoiceAmount;
+
+    await attendance.save();
+
+    res.status(200).json({ message: 'Invoice updated successfully' });
+  }
+  catch (error) {
+    console.error('Error updating invoice:', error);
+    res.status(500).json({ message: 'Error updating invoice' });
+  } 
+
+};
 
 
 // ======================================== End Attendance ======================================== //
@@ -1970,7 +2056,7 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
           'Amount Paid (EGP)',
           // 'Center Fees (EGP)',
           // 'Net Profit (EGP)',
-          'Added By',
+          // 'Added By',
           'Student Code',
         ]
       : [
@@ -1978,7 +2064,7 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
           // 'Phone Number',
           'Amount Paid (EGP)',
           // 'Amount Remaining (EGP)',
-          'Added By',
+          // 'Added By',
           'Student Code',
         ];
 
@@ -2003,7 +2089,7 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
           amountPaid,
           // feesApplied,
           // netProfit,
-          addedBy,
+          // addedBy,
           studentCode,
         ];
       } else {
@@ -2013,7 +2099,7 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
           // phoneNumber,
           amountPaid,
           // amountRemaining,
-          addedBy,
+          // addedBy,
           studentCode,
         ];
       }
@@ -2439,6 +2525,8 @@ module.exports = {
     downloadAttendanceExcel,
     selectDevice,
     addTeacherInvoice,
+    deleteInvoice,
+    updateInvoice,
 
     // handel Attendance
     handelAttendance,
