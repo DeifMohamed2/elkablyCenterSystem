@@ -1105,7 +1105,7 @@ const downloadAttendanceExcel = async (req, res) => {
         studentsData.push([
           studentsData.length + 1,
           student.studentName,
-          // student.studentPhoneNumber,
+          student.studentPhoneNumber,
           amountPaid,
           // feesApplied,
           // amountPaid - feesApplied,
@@ -1124,7 +1124,7 @@ const downloadAttendanceExcel = async (req, res) => {
     worksheet.getRow(rowIndex).values = [
       "#",
       'Student Name',
-      // 'Phone Number',
+      'Phone Number',
       'Amount Paid (EGP)',
       // 'Center Fees (EGP)',
       // 'Net Profit (EGP)',
@@ -1199,17 +1199,17 @@ const downloadAttendanceExcel = async (req, res) => {
 
     // Add summary titles and values in two columns
     const summaryTitles = [
-      'Total Amount Paid (EGP)',
-      'Center Fees (EGP)',
-      'Total Invoices (EGP)',
-      'Net Profit Before Invoice (EGP)',
+      // 'Total Amount Paid (EGP)',
+      // 'Center Fees (EGP)',
+      // 'Total Invoices (EGP)',
+      // 'Net Profit Before Invoice (EGP)',
       'Final Net Profit (EGP)',
     ];
     const summaryValues = [
-      totalAmount,
-      totalFees,
-      totalInvoiceAmount,
-      netProfit,
+      // totalAmount,
+      // totalFees,
+      // totalInvoiceAmount,
+      // netProfit,
       netProfit - totalInvoiceAmount,
     ];
 
@@ -1277,7 +1277,7 @@ const downloadAttendanceExcel = async (req, res) => {
             attendance.teacher.teacherName
           } - ${attendance.course} - ${new Date().toDateString()}`,
         },
-        { id: '313' }
+        { id: instanceId }
       )
       .then((response) => {
         console.log('Excel sent:', response.data);
