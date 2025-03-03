@@ -593,3 +593,44 @@ async function deleteInvoice(invoiceId) {
     message.textContent = 'An error occurred. Please try again later.';
   }
 }
+
+
+// Function to convert table to Excel sheet
+function tableToExcel() {
+  const table = document.getElementById('studentTable');
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+  const headers = ['#', 'Student Name', 'Parent Phone', 'Student Code'];
+
+  const data = rows.map((row, index) => {
+    const cells = row.querySelectorAll('td');
+    return [
+      index + 1,
+      cells[0].textContent,
+      cells[3].textContent,
+      cells[1].textContent,
+    ];
+  });
+
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Students');
+
+  // Style headers
+  const headerRange = XLSX.utils.decode_range(worksheet['!ref']);
+  for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+    const cell = worksheet[XLSX.utils.encode_cell({ r: 0, c: C })];
+    cell.s = {
+      fill: {
+        fgColor: { rgb: 'FFFF00' },
+      },
+      font: {
+        bold: true,
+      },
+    };
+  }
+
+  XLSX.writeFile(workbook, 'Student_Attendance.xlsx');
+}
+
+// Add event listener to download Excel button
+document.getElementById('AssistantExcelBtn').addEventListener('click', tableToExcel);

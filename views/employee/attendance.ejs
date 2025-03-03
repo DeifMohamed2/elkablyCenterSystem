@@ -244,14 +244,16 @@ hr {
                           </button>
                         </div>
                     
-                      <div class="col-5 text-end">
+                      <div class="col-6 text-end">
                         <button type="button" class="btn bg-gradient-dark mb-0" id="reloadButton">
                           <i class="material-symbols-rounded text-sm">refresh</i>&nbsp;&nbsp;تحديث
                         </button>
                         <button type="button" class="btn bg-gradient-success mb-0" id="downloadExcelBtn" >
                           <i class="material-symbols-rounded text-sm">download</i>&nbsp;&nbsp;Download Excel And Send Copy
                         </button>
-
+                           <button type="button" class="btn bg-gradient-dark mb-0" id="AssistantExcelBtn">
+                             <i class="material-symbols-rounded text-sm">download</i>&nbsp;&nbsp;Assistant Excel
+                           </button>
                       </div>
                       <div class="col-lg-1 col-sm-6" >
                         <div id="spinner" class="spinner mx-auto d-none "></div>
@@ -541,6 +543,7 @@ resolve(selectedDevice.certificate);
 
 
   
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 
   <script src="/js/employeeJS/attendance.js"></script>
   

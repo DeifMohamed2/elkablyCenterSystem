@@ -1,5 +1,7 @@
+
 const addStudentForm = document.getElementById('addStudentForm');
 const spinner = document.getElementById('spinner');
+const spinner2 = document.getElementById('spinner2');
 const successToast = document.getElementById('successToast');
 const messageToast = document.getElementById('messageToast');
 const errorMessage = document.getElementById('errorMessage');
@@ -20,30 +22,42 @@ async function addNewStudent(event) {
   spinner.classList.remove('d-none');
 
   const studentName = document.getElementById('studentName').value;
-  const studentPhoneNumber = document.getElementById('studentPhoneNumber').value;
-  const studentParentPhone = document.getElementById('studentParentPhone').value;
+  const studentPhoneNumber =
+    document.getElementById('studentPhoneNumber').value;
+  const studentParentPhone =
+    document.getElementById('studentParentPhone').value;
   const schoolName = document.getElementById('schoolName').value;
   const paymentType = document.getElementById('paymentType').value;
 
   const selectedTeachers = [];
-  document.querySelectorAll('input[name="teachers[]"]:checked').forEach(teacherCheckbox => {
-    const teacherId = teacherCheckbox.value;
-    const selectedCourses = [];
+  document
+    .querySelectorAll('input[name="teachers[]"]:checked')
+    .forEach((teacherCheckbox) => {
+      const teacherId = teacherCheckbox.value;
+      const selectedCourses = [];
 
-    document.querySelectorAll(`input[name="selectedCourses[${teacherId}][]"]:checked`).forEach(courseCheckbox => {
-      const courseName = courseCheckbox.value;
-      const amountPay = document.getElementById(`price_${courseName}_${teacherId}`).value;
-      const registerPrice = document.getElementById(`registerPrice_${courseName}_${teacherId}`).value;
+      document
+        .querySelectorAll(
+          `input[name="selectedCourses[${teacherId}][]"]:checked`
+        )
+        .forEach((courseCheckbox) => {
+          const courseName = courseCheckbox.value;
+          const amountPay = document.getElementById(
+            `price_${courseName}_${teacherId}`
+          ).value;
+          const registerPrice = document.getElementById(
+            `registerPrice_${courseName}_${teacherId}`
+          ).value;
 
-      if (courseName && amountPay && registerPrice) {
-        selectedCourses.push({ courseName, amountPay, registerPrice });
+          if (courseName && amountPay && registerPrice) {
+            selectedCourses.push({ courseName, amountPay, registerPrice });
+          }
+        });
+
+      if (selectedCourses.length > 0) {
+        selectedTeachers.push({ teacherId, courses: selectedCourses });
       }
     });
-
-    if (selectedCourses.length > 0) {
-      selectedTeachers.push({ teacherId, courses: selectedCourses });
-    }
-  });
 
   const data = {
     studentName,
@@ -70,23 +84,28 @@ async function addNewStudent(event) {
       successToast.classList.add('show');
       messageToast.innerHTML = 'تم إضافة الطالب بنجاح';
       addStudentForm.reset();
-      document.querySelectorAll('input[name="teachers[]"]').forEach(checkbox => {
-        checkbox.checked = false;
-      });
-      document.querySelectorAll('input[name^="selectedCourses"]').forEach(checkbox => {
-        checkbox.checked = false;
-      });
-      document.querySelectorAll('input[id^="price_"], input[id^="registerPrice_"]').forEach(input => {
-        input.value = '';
-        input.disabled = true;
-        input.required = false;
-      });
-      document.querySelectorAll('.courses-container').forEach(container => {
+      document
+        .querySelectorAll('input[name="teachers[]"]')
+        .forEach((checkbox) => {
+          checkbox.checked = false;
+        });
+      document
+        .querySelectorAll('input[name^="selectedCourses"]')
+        .forEach((checkbox) => {
+          checkbox.checked = false;
+        });
+      document
+        .querySelectorAll('input[id^="price_"], input[id^="registerPrice_"]')
+        .forEach((input) => {
+          input.value = '';
+          input.disabled = true;
+          input.required = false;
+        });
+      document.querySelectorAll('.courses-container').forEach((container) => {
         container.style.display = 'none';
       });
       spinner.classList.add('d-none');
       addNewStudentBtn.disabled = false;
-
     } else {
       errorMessage.classList.add('show');
       errorMessage.innerHTML = responseData.message;
@@ -100,7 +119,6 @@ async function addNewStudent(event) {
     addNewStudentBtn.disabled = false;
   }
 }
-
 
 addStudentForm.addEventListener('submit', addNewStudent);
 
@@ -139,14 +157,12 @@ function toggleCoursePrice(courseCheckbox, teacherId, courseName) {
     priceInput.disabled = true;
     priceInput.required = false;
     priceInput.value = '';
-    
+
     registerPriceInput.disabled = true;
     registerPriceInput.required = false;
     registerPriceInput.value = '';
   }
 }
-
-
 
 // Get ALL Students
 
@@ -162,7 +178,9 @@ const addStudentToTable = (student) => {
     <td class="text-center">${student.studentParentPhone}</td>
     <td class="text-center">${student.studentCode}</td>
 
-    <td class="text-center">${student.paymentType == 'perSession' ? 'Per Session' : 'Per Course'}</td>
+    <td class="text-center">${
+      student.paymentType == 'perSession' ? 'Per Session' : 'Per Course'
+    }</td>
 
     <td class="align-middle text-center">
       <button class="edit-student-btn mt-2" data-id="${student._id}" 
@@ -170,7 +188,9 @@ const addStudentToTable = (student) => {
     </td>
 
   <td class="align-middle text-center"></td>
-    <button class="delete-student-btn mt-2" data-id="${student._id}">Delete</button>
+    <button class="delete-student-btn mt-2" data-id="${
+      student._id
+    }">Delete</button>
   </td>
 
 
@@ -182,19 +202,15 @@ const addStudentToTable = (student) => {
     openEditModal(student._id);
   });
 
-
-  tr.querySelector('.delete-student-btn').addEventListener('click',()=>{
-    deleteStudent(student._id)
- });
-
+  tr.querySelector('.delete-student-btn').addEventListener('click', () => {
+    deleteStudent(student._id);
+  });
 };
-
 
 // Function to clear tbody before adding new rows
 const clearStudentTable = () => {
   studentTableBody.innerHTML = '';
 };
-
 
 const getStudents = async () => {
   try {
@@ -207,7 +223,7 @@ const getStudents = async () => {
     console.log(students);
     console.log(students);
     clearStudentTable(); // Clear the table before populating
-    sequenceOfStudets=0;
+    sequenceOfStudets = 0;
     students.forEach(addStudentToTable); // Add each student to the table
   } catch (error) {
     console.error(error);
@@ -227,56 +243,78 @@ const openEditModal = async (id) => {
 
     // Populate basic student info
     document.getElementById('editStudentName').value = student.studentName;
-    document.getElementById('editStudentPhone').value = student.studentPhoneNumber;
-    document.getElementById('editStudentParentPhone').value = student.studentParentPhone;
+    document.getElementById('editStudentPhone').value =
+      student.studentPhoneNumber;
+    document.getElementById('editStudentParentPhone').value =
+      student.studentParentPhone;
     document.getElementById('editStudentId').value = student._id;
 
     // Reset all checkboxes and fields
-    document.querySelectorAll('input[name="editTeachers[]"]').forEach(input => {
-      input.checked = false;
-    });
-    document.querySelectorAll('input[name^="editSelectedCourses"]').forEach(input => {
-      input.checked = false;
-    });
-    document.querySelectorAll('input[id^="edit_price_"], input[id^="edit_registerPrice_"], input[id^="edit_amountRemaining_"]').forEach(input => {
-      input.value = '';
-      input.disabled = true;
-    });
-    document.querySelectorAll('.edit-courses-container').forEach(container => {
-      container.style.display = 'none';
-    });
+    document
+      .querySelectorAll('input[name="editTeachers[]"]')
+      .forEach((input) => {
+        input.checked = false;
+      });
+    document
+      .querySelectorAll('input[name^="editSelectedCourses"]')
+      .forEach((input) => {
+        input.checked = false;
+      });
+    document
+      .querySelectorAll(
+        'input[id^="edit_price_"], input[id^="edit_registerPrice_"], input[id^="edit_amountRemaining_"]'
+      )
+      .forEach((input) => {
+        input.value = '';
+        input.disabled = true;
+      });
+    document
+      .querySelectorAll('.edit-courses-container')
+      .forEach((container) => {
+        container.style.display = 'none';
+      });
 
     // Mark selected teachers and courses
     student.selectedTeachers.forEach(({ teacherId, courses }) => {
-      const teacherCheckbox = document.getElementById(`edit_teacher_${teacherId._id}`);
-      
+      const teacherCheckbox = document.getElementById(
+        `edit_teacher_${teacherId._id}`
+      );
+
       if (teacherCheckbox) {
         teacherCheckbox.checked = true;
         toggleEditCourses(teacherId._id); // Show the teacher's courses
 
-        courses.forEach(({ courseName, amountPay, registerPrice, amountRemaining }) => {
-          const courseCheckbox = document.getElementById(`edit_course_${courseName}_${teacherId._id}`);
-          const priceInput = document.getElementById(`edit_price_${courseName}_${teacherId._id}`);
-          const registerPriceInput = document.getElementById(`edit_registerPrice_${courseName}_${teacherId._id}`);
-          const amountRemainingInput = document.getElementById(`edit_amountRemaining_${courseName}_${teacherId._id}`);
+        courses.forEach(
+          ({ courseName, amountPay, registerPrice, amountRemaining }) => {
+            const courseCheckbox = document.getElementById(
+              `edit_course_${courseName}_${teacherId._id}`
+            );
+            const priceInput = document.getElementById(
+              `edit_price_${courseName}_${teacherId._id}`
+            );
+            const registerPriceInput = document.getElementById(
+              `edit_registerPrice_${courseName}_${teacherId._id}`
+            );
+            const amountRemainingInput = document.getElementById(
+              `edit_amountRemaining_${courseName}_${teacherId._id}`
+            );
 
-          if (courseCheckbox) {
-            courseCheckbox.checked = true;
-            toggleEditCoursePrice(courseCheckbox, teacherId._id, courseName); // Enable inputs
-            priceInput.value = amountPay;
-            registerPriceInput.value = registerPrice;
-            amountRemainingInput.value = amountRemaining;
+            if (courseCheckbox) {
+              courseCheckbox.checked = true;
+              toggleEditCoursePrice(courseCheckbox, teacherId._id, courseName); // Enable inputs
+              priceInput.value = amountPay;
+              registerPriceInput.value = registerPrice;
+              amountRemainingInput.value = amountRemaining;
+            }
           }
-        });
+        );
       }
     });
-
   } catch (error) {
     console.error('Error fetching student details:', error);
     alert('حدثت مشكلة أثناء تحميل بيانات الطالب.');
   }
 };
-
 
 function toggleEditCourses(teacherId) {
   const coursesContainer = document.getElementById(`edit_courses_${teacherId}`);
@@ -295,9 +333,15 @@ function toggleEditCourses(teacherId) {
 }
 
 function toggleEditCoursePrice(courseCheckbox, teacherId, courseName) {
-  const priceInput = document.getElementById(`edit_price_${courseName}_${teacherId}`);
-  const registerPriceInput = document.getElementById(`edit_registerPrice_${courseName}_${teacherId}`);
-  const amountRemainingInput = document.getElementById(`edit_amountRemaining_${courseName}_${teacherId}`);
+  const priceInput = document.getElementById(
+    `edit_price_${courseName}_${teacherId}`
+  );
+  const registerPriceInput = document.getElementById(
+    `edit_registerPrice_${courseName}_${teacherId}`
+  );
+  const amountRemainingInput = document.getElementById(
+    `edit_amountRemaining_${courseName}_${teacherId}`
+  );
 
   if (courseCheckbox.checked) {
     priceInput.disabled = false;
@@ -313,7 +357,6 @@ function toggleEditCoursePrice(courseCheckbox, teacherId, courseName) {
   }
 }
 
-
 // Save updated Data
 const editStudentModal = document.getElementById('editStudentModal');
 const clodeModalBtn = document.getElementById('clodeModalBtn');
@@ -323,38 +366,52 @@ const saveEditStudent = async () => {
   const studentId = document.getElementById('editStudentId').value;
   const studentName = document.getElementById('editStudentName').value;
   const studentPhone = document.getElementById('editStudentPhone').value;
-  const studentParentPhone = document.getElementById('editStudentParentPhone').value;
+  const studentParentPhone = document.getElementById(
+    'editStudentParentPhone'
+  ).value;
 
   // Collect updated teachers and courses
   const selectedTeachers = [];
-  document.querySelectorAll('input[name="editTeachers[]"]:checked').forEach(teacherCheckbox => {
-    const teacherId = teacherCheckbox.value;
-    const selectedCourses = [];
+  document
+    .querySelectorAll('input[name="editTeachers[]"]:checked')
+    .forEach((teacherCheckbox) => {
+      const teacherId = teacherCheckbox.value;
+      const selectedCourses = [];
 
-    document.querySelectorAll(`input[name="editSelectedCourses[${teacherId}][]"]:checked`).forEach(courseCheckbox => {
-      const courseName = courseCheckbox.value;
-      const amountPay = document.getElementById(`edit_price_${courseName}_${teacherId}`).value;
-      const registerPrice = document.getElementById(`edit_registerPrice_${courseName}_${teacherId}`).value;
-      const amountRemaining = document.getElementById(`edit_amountRemaining_${courseName}_${teacherId}`).value;
+      document
+        .querySelectorAll(
+          `input[name="editSelectedCourses[${teacherId}][]"]:checked`
+        )
+        .forEach((courseCheckbox) => {
+          const courseName = courseCheckbox.value;
+          const amountPay = document.getElementById(
+            `edit_price_${courseName}_${teacherId}`
+          ).value;
+          const registerPrice = document.getElementById(
+            `edit_registerPrice_${courseName}_${teacherId}`
+          ).value;
+          const amountRemaining = document.getElementById(
+            `edit_amountRemaining_${courseName}_${teacherId}`
+          ).value;
 
-      selectedCourses.push({
-        courseName,
-        amountPay: parseFloat(amountPay) || 0,
-        registerPrice: parseFloat(registerPrice) || 0,
-        amountRemaining: parseFloat(amountRemaining) || 0
-      });
+          selectedCourses.push({
+            courseName,
+            amountPay: parseFloat(amountPay) || 0,
+            registerPrice: parseFloat(registerPrice) || 0,
+            amountRemaining: parseFloat(amountRemaining) || 0,
+          });
+        });
+
+      if (selectedCourses.length > 0) {
+        selectedTeachers.push({ teacherId, courses: selectedCourses });
+      }
     });
-
-    if (selectedCourses.length > 0) {
-      selectedTeachers.push({ teacherId, courses: selectedCourses });
-    }
-  });
 
   const data = {
     studentName,
     studentPhoneNumber: studentPhone,
     studentParentPhone,
-    selectedTeachers
+    selectedTeachers,
   };
 
   try {
@@ -365,10 +422,13 @@ const saveEditStudent = async () => {
     });
 
     const responseData = await response.json();
-    if (!response.ok) throw new Error(responseData.message || 'Failed to update student');
+    if (!response.ok)
+      throw new Error(responseData.message || 'Failed to update student');
 
     // Update the row in the table dynamically
-    const row = document.querySelector(`button[data-id="${studentId}"]`).closest('tr');
+    const row = document
+      .querySelector(`button[data-id="${studentId}"]`)
+      .closest('tr');
     row.cells[0].textContent = responseData.studentName;
     row.cells[1].textContent = responseData.studentPhoneNumber;
     row.cells[2].textContent = responseData.studentParentPhone;
@@ -386,7 +446,9 @@ const saveEditStudent = async () => {
 };
 
 // Attach event to save button
-document.getElementById('saveEditStudentBtn').addEventListener('click', saveEditStudent);
+document
+  .getElementById('saveEditStudentBtn')
+  .addEventListener('click', saveEditStudent);
 
 // Delete Student
 
@@ -394,7 +456,9 @@ const deleteStudent = async (id) => {
   if (!confirm('هل أنت متأكد أنك تريد حذف هذا الطالب؟')) return;
 
   try {
-    const response = await fetch(`/employee/delete-student/${id}`, { method: 'DELETE' });
+    const response = await fetch(`/employee/delete-student/${id}`, {
+      method: 'DELETE',
+    });
     if (!response.ok) throw new Error('Failed to delete student');
 
     // Remove the row from the table
@@ -408,88 +472,148 @@ const deleteStudent = async (id) => {
   }
 };
 
-
 // Search Student
 
 searchButton.addEventListener('click', async () => {
-    const searchValue = searchStudent.value;
-    const teacherValue = filterTeacherSelection.value;
-    const [teacher, course] = teacherValue.split('_');
-    console.log(teacher,course);
-    try {
-        const response = await fetch(`/employee/search-student?search=${searchValue}&teacher=${teacher}&course=${course}`
-        );
-        if (!response.ok) {
-        throw new Error('Failed to search for student');
-        }
-    
-        const students = await response.json();
-        console.log(students);
-        clearStudentTable(); // Clear the table before populating
-        sequenceOfStudets=0;
-        students.forEach(addStudentToTable); // Add each student to the table
-    } catch (error) {
-        console.error('Error searching for student:', error);
-        errorMessage.classList.add('show');
-        errorMessage.innerHTML = 'No Students Found. Please try again later.';
+  const searchValue = searchStudent.value;
+  const teacherValue = filterTeacherSelection.value;
+  const [teacher, course] = teacherValue.split('_');
+  studentTableBody.innerHTML = '';
+  spinner2.classList.remove('d-none');
+  try {
+    const response = await fetch(
+      `/employee/search-student?search=${searchValue}&teacher=${teacher}&course=${course}`
+    );
+    if (!response.ok) {
+      throw new Error('Failed to search for student');
     }
-    });
 
+    const students = await response.json();
+    console.log(students);
+    clearStudentTable(); // Clear the table before populating
+    sequenceOfStudets = 0;
+    students.forEach(addStudentToTable); // Add each student to the table
+    spinner2.classList.add('d-none');
+  } catch (error) {
+    console.error('Error searching for student:', error);
+    errorMessage.classList.add('show');
+    errorMessage.innerHTML = 'No Students Found. Please try again later.';
+    spinner2.classList.add('d-none');
+  }
+});
 
 // Send WA
 
 sendWaButton.addEventListener('click', async () => {
-    const teacherValue = waTeacherSelection.value;
-    const message = waMessage.value;
+  const teacherValue = waTeacherSelection.value;
+  const message = waMessage.value;
 
-    if (!message) {
-        errorMessage.classList.add('show');
-        errorMessage.innerHTML = 'Please enter a message';
-        return;
+  if (!message) {
+    errorMessage.classList.add('show');
+    errorMessage.innerHTML = 'Please enter a message';
+    return;
+  }
+  if (!teacherValue) {
+    errorMessage.classList.add('show');
+    errorMessage.innerHTML = 'Please select a teacher';
+    return;
+  }
+
+  sendWaButton.innerHTML = 'Please wait the message is sending...';
+  sendWaButton.disabled = true;
+  try {
+    const response = await fetch(
+      `/employee/send-wa?teacher=${teacherValue}&message=${message}`
+    );
+    if (!response.ok) {
+      throw new Error('Failed to send message');
     }
-    if (!teacherValue) {
-        errorMessage.classList.add('show');
-        errorMessage.innerHTML = 'Please select a teacher';
-        return;
+
+    const responseData = await response.json();
+    console.log(responseData);
+    if (response.ok) {
+      successToast.classList.add('show');
+      successToast.innerHTML = responseData.message;
+
+      setTimeout(() => {
+        window.location.reload();
+        sendWaButton.innerHTML =
+          'Messages Sent and the page will reload in 3 seconds';
+      }, 3000);
+    } else {
+      errorMessage.classList.add('show');
+      errorMessage.innerHTML = responseData.message;
+      setTimeout(() => {
+        window.location.reload();
+        sendWaButton.innerHTML =
+          'Messages was not sent and the page will reload in 6 seconds';
+      }, 6000);
     }
+  } catch (error) {
+    console.error('Error sending message:', error);
+    errorMessage.classList.add('show');
+    errorMessage.innerHTML = 'An error occurred. Please try again later.';
+    setTimeout(() => {
+      window.location.reload();
+      sendWaButton.innerHTML =
+        'Messages was not sent and the page will reload in 6 seconds';
+    }, 6000);
+  }
+});
 
+// Convert table to Excel
+const exportToExcelBtn = document.getElementById('exportToExcelBtn');
+exportToExcelBtn.addEventListener('click', () => {
+  const tableData = [];
+  const rows = studentTableBody.querySelectorAll('tr');
 
-    sendWaButton.innerHTML = 'Please wait the message is sending...';
-    sendWaButton.disabled = true;
-    try {
-        const response = await fetch(`/employee/send-wa?teacher=${teacherValue}&message=${message}`
-        );
-        if (!response.ok) {
-        throw new Error('Failed to send message');
-        }
-    
-        const responseData = await response.json();
-        console.log(responseData);
-        if (response.ok) {
-            successToast.classList.add('show');
-            successToast.innerHTML = responseData.message;
-    
-            setTimeout(() => {
-            window.location.reload();
-             sendWaButton.innerHTML = 'Messages Sent and the page will reload in 3 seconds';
-            }, 3000);
-        } else {
-            errorMessage.classList.add('show');
-            errorMessage.innerHTML = responseData.message;
-            setTimeout(() => {
-              window.location.reload();
-             sendWaButton.innerHTML = 'Messages was not sent and the page will reload in 6 seconds';
+  rows.forEach((row, index) => {
+    const sequenceNumber = index + 1;
+    const studentName = row.cells[1].textContent;
+    const studentPhoneNumber = row.cells[2].textContent;
+    const studentParentPhone = row.cells[3].textContent;
+    const studentCode = row.cells[4].textContent;
 
-            }, 6000);
-        }
-    } catch (error) {
-        console.error('Error sending message:', error);
-        errorMessage.classList.add('show');
-        errorMessage.innerHTML = 'An error occurred. Please try again later.';
-         setTimeout(() => {
-           window.location.reload();
-           sendWaButton.innerHTML =
-             'Messages was not sent and the page will reload in 6 seconds';
-         }, 6000);
+    tableData.push({
+      '#': sequenceNumber,
+      'Student Name': studentName,
+      'Student Phone Number': studentPhoneNumber,
+      'Parent Phone Number': studentParentPhone,
+      'Student Code': studentCode,
+    });
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(tableData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Students');
+
+  // Apply styles
+  const headerStyle = {
+    font: { bold: true },
+    alignment: { horizontal: 'center' },
+    fill: { fgColor: { rgb: 'FFFF00' } },
+  };
+
+  const cellStyle = {
+    alignment: { horizontal: 'center' },
+  };
+
+  // Apply header style
+  const range = XLSX.utils.decode_range(worksheet['!ref']);
+  for (let C = range.s.c; C <= range.e.c; ++C) {
+    const address = XLSX.utils.encode_col(C) + '1';
+    if (!worksheet[address]) continue;
+    worksheet[address].s = headerStyle;
+  }
+
+  // Apply cell style
+  for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const address = XLSX.utils.encode_cell({ r: R, c: C });
+      if (!worksheet[address]) continue;
+      worksheet[address].s = cellStyle;
     }
-} );
+  }
+
+  XLSX.writeFile(workbook, 'students.xlsx');
+});

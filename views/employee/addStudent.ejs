@@ -396,10 +396,13 @@ input[type='number'] {
                       <input type="number" class="form-control border border-2 p-2" id="searchStudent" placeholder="  ابحث عن طالب بالكود او برقم الهاتف">
                     </div>
                 
-                    <div class="col-2 text-end  ">
+                    <div class="col-4 text-end  ">
                       <button type="button" class="btn bg-gradient-dark mb-0" id="searchButton">
                         <i class="material-symbols-rounded text-sm">search</i>&nbsp;&nbsp;بحث
                       </button>
+                        <button type="button" class="btn bg-gradient-dark mb-0" id="exportToExcelBtn">
+                        <i class="material-symbols-rounded text-sm">download</i>&nbsp;&nbsp;تصدير إلى Excel
+                        </button>
                     </div>
                  </div>
 
@@ -408,6 +411,7 @@ input[type='number'] {
               <hr>
             <div class="card-body px-0 pb-2">
               <div class="table-responsive p-0">
+                <div id="spinner2" class="spinner mx-auto d-none"></div>
                 <table class="table align-items-center mb-0" id="studentTable">
                   <thead>
                     <tr >
@@ -482,7 +486,7 @@ input[type='number'] {
 
     </div>
   </main>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
   <!--   Core JS Files   -->
   <script src="/js/employeeJS/addStudent.js"></script>
   <script src="../assets/js/core/popper.min.js"></script>

@@ -1312,7 +1312,6 @@ const selectDevice = async (req, res) => {
       
 }
 
-
 const addTeacherInvoice = async (req, res) => {
   const { teacherId, courseName, invoiceDetails,invoiceAmount } = req.body;
   const employeeId = req.employeeId;
