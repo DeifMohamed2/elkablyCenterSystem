@@ -211,12 +211,12 @@ const addStudent = async (req, res) => {
     // Process each selected teacher and their courses
     const processedTeachers = selectedTeachers.map(({ teacherId, courses }) => {
         const processedCourses = courses.map(({ courseName, amountPay, registerPrice }) => {
-            const amountRemaining = 600 - registerPrice;  // Subtract paid amount from full registration fee
+            const amountRemaining = 0;  // Subtract paid amount from full registration fee
             console.log('Amount Remaining:', amountRemaining);
             return {
               courseName,
               amountPay,
-              registerPrice,
+              registerPrice:0,
               amountRemaining: amountRemaining > 0 ? amountRemaining : 0, // Ensure it doesn't go negative
             };
         });
