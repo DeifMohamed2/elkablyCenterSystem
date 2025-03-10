@@ -718,6 +718,14 @@ const attendStudent = async (req, res) => {
     if (isStudentPresent) {
       return res.status(400).json({ message: 'تم تسجيل حضور الطالب بالفعل لهذه المادة' });
     }
+    // Calculate the number of times the student has attended the same course
+    const attendanceCount = await Attendance.countDocuments({
+      'studentsPresent.student': student._id,
+      teacher: teacherId,
+      course: courseName,
+    });
+
+
 
     // Calculate payment details
     const isPerSession = student.paymentType === 'perSession';
@@ -787,15 +795,16 @@ console.log(student);
     res.status(201).json({
       message: 'تم تسجيل الحضور',
       studentData: {
-      studentName: student.studentName,
-      studentCode: student.studentCode,
-      amountRemaining: course.amountRemaining,
-      studentTeacher: {
-        teacherName: teacher.teacherName,
-        subjectName: courseName,
-      },
-      amountPaid,
-      feesApplied,
+        studentName: student.studentName,
+        studentCode: student.studentCode,
+        amountRemaining: course.amountRemaining,
+        studentTeacher: {
+          teacherName: teacher.teacherName,
+          subjectName: courseName,
+        },
+        amountPaid,
+        feesApplied,
+        attendanceCount: attendanceCount + 1,
       },
       students: updatedAttendance.studentsPresent,
     });
@@ -822,6 +831,7 @@ const getAttendedStudents = async (req, res) => {
     })
       .populate({
         path: 'studentsPresent.student',
+        
       })
       .populate('studentsPresent.addedBy', 'employeeName')
       .populate('invoices.addedBy', 'employeeName') // Populate invoice details
@@ -833,6 +843,26 @@ const getAttendedStudents = async (req, res) => {
 
     // Filter out null students (to prevent errors in calculations)
     const filteredStudents = attendance.studentsPresent.filter(sp => sp.student);
+
+    // Calculate attendance count for each student
+    const studentAttendanceCounts = await Promise.all(
+      filteredStudents.map(async ({ student }) => {
+      const attendanceCount = await Attendance.countDocuments({
+        'studentsPresent.student': student._id,
+        teacher: teacherId,
+        course: courseName,
+      });
+      return { studentId: student._id, attendanceCount };
+      })
+    );
+
+    // Add attendance count to each student
+    const studentsWithAttendanceCount = filteredStudents.map((student) => {
+      const attendanceCount = studentAttendanceCounts.find(
+      (count) => count.studentId.toString() === student.student._id.toString()
+      )?.attendanceCount || 0;
+      return { ...student.toObject(), attendanceCount };
+    });
 
     // **Recalculate all values dynamically**
     let totalAmount = 0;
@@ -856,9 +886,9 @@ const getAttendedStudents = async (req, res) => {
     attendance.netProfitToTeacher = netProfitToTeacher;
 
     await attendance.save();
-
+    console.log(studentsWithAttendanceCount);
     res.status(200).json({
-      students: filteredStudents,
+      students: studentsWithAttendanceCount,
       invoices: attendance.invoices, // Include invoices in response
       message: 'حضور المدرس والمادة المحددة',
       totalAmount,
@@ -1199,15 +1229,15 @@ const downloadAttendanceExcel = async (req, res) => {
 
     // Add summary titles and values in two columns
     const summaryTitles = [
-      // 'Total Amount Paid (EGP)',
-      // 'Center Fees (EGP)',
+      'Total Amount Paid (EGP)',
+      'Center Fees (EGP)',
       // 'Total Invoices (EGP)',
       // 'Net Profit Before Invoice (EGP)',
       'Final Net Profit (EGP)',
     ];
     const summaryValues = [
-      // totalAmount,
-      // totalFees,
+      totalAmount,
+      totalFees,
       // totalInvoiceAmount,
       // netProfit,
       netProfit - totalInvoiceAmount,
@@ -2213,8 +2243,8 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
     worksheet.getRow(rowIndex).values = [
       'Total Amount Paid (EGP)',
       'Center Fees (EGP)',
-      'Total Invoices (EGP)',
-      'Net Profit Before Invoice (EGP)',
+      // 'Total Invoices (EGP)',
+      // 'Net Profit Before Invoice (EGP)',
       'Final Net Profit (EGP)',
     ];
     worksheet
@@ -2225,8 +2255,8 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
     worksheet.getRow(rowIndex).values = [
       totalAmountPaid,
       totalFees,
-      totalInvoiceAmount,
-      totalNetProfit,
+      // totalInvoiceAmount,
+      // totalNetProfit,
       totalNetProfit - totalInvoiceAmount,
     ];
     worksheet

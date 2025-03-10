@@ -286,6 +286,7 @@ const addStudentsToTable = (students, teacherId, courseName) => {
                        data-teacher-id="${teacherId}"
                        data-course-name="${courseName}">
             </td>
+            <td class="text-center">${student.attendanceCount}</td>
             <td class="text-center">
                 <button class="btn btn-primary btn-sm edit-amount">Edit</button>
             </td>
