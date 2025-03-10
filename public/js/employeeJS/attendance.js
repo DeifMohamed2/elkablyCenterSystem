@@ -93,6 +93,7 @@ window.addEventListener('beforeunload', () => {
 
 function printReceipt(data = {}) {
   const {
+    attendanceCount = 0,
     studentName = 'N/A',
     studentTeacher = {},
     amountPaid = 0,
@@ -177,6 +178,12 @@ function printReceipt(data = {}) {
     lineSeparator +
     ESC_FEED_LINE +
     formatTableRow(englishLabels.amountPaid, `${amountPaid} EGP`) +
+    ESC_FEED_LINE +
+    lineSeparator +
+    ESC_FEED_LINE +
+    formatTableRow('Sessions Count', attendanceCount) +
+    ESC_FEED_LINE +
+    lineSeparator +
     ESC_FEED_LINE +
     ESC_ALIGN_CENTER +
     ESC_BOLD +
@@ -286,7 +293,9 @@ const addStudentsToTable = (students, teacherId, courseName) => {
                        data-teacher-id="${teacherId}"
                        data-course-name="${courseName}">
             </td>
-            <td class="text-center">${student.attendanceCount}</td>
+            <td class="text-center">${
+              student.attendanceCount || 'Waiting for refresh'
+            }</td>
             <td class="text-center">
                 <button class="btn btn-primary btn-sm edit-amount">Edit</button>
             </td>

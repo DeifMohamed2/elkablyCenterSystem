@@ -725,7 +725,7 @@ const attendStudent = async (req, res) => {
       course: courseName,
     });
 
-
+    console.log('Attendance Count:', attendanceCount);
 
     // Calculate payment details
     const isPerSession = student.paymentType === 'perSession';
