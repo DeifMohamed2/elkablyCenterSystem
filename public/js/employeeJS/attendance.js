@@ -15,7 +15,7 @@ const netProfitToTeacher = document.getElementById('netProfit');
 const invoiceForm = document.getElementById('invoiceForm');
 const invoiceTBody = document.querySelector('#invoiceTable tbody');
 const downloadExcelBtn = document.getElementById('downloadExcelBtn');
-
+const mockCheck = document.getElementById('mockCheck');
 
 const deviceSelect = document.getElementById('deviceSelect');
 let temp3Student = 0;
@@ -28,9 +28,11 @@ async function attendStudent(event) {
     const formData = new FormData(attendStudentForm);
     
     const data = Object.fromEntries(formData);
+    
     const courseSelection = courseSelction.value.split('_');
     data.teacherId = courseSelection[0];
     data.courseName = courseSelection[1];
+    data.mockCheck = mockCheck.checked;
     try {
         const response = await fetch('/employee/attend-student', {
         method: 'POST',

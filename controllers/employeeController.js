@@ -654,8 +654,10 @@ function getDateTime() {
 const attendStudent = async (req, res) => {
   console.time('attendStudentExecutionTime');
 
-  const { searchStudent, teacherId, courseName } = req.body;
+  const { searchStudent, teacherId, courseName, mockCheck } = req.body;
   const employeeId = req.employeeId;
+  const mockAmount = 150;
+  const mockFees = 50;
 
   if (!teacherId || !courseName) {
     return res.status(400).json({ message: 'يجب اختيار الكورس ' });
@@ -718,6 +720,7 @@ const attendStudent = async (req, res) => {
     if (isStudentPresent) {
       return res.status(400).json({ message: 'تم تسجيل حضور الطالب بالفعل لهذه المادة' });
     }
+
     // Calculate the number of times the student has attended the same course
     const attendanceCount = await Attendance.countDocuments({
       'studentsPresent.student': student._id,
@@ -729,8 +732,8 @@ const attendStudent = async (req, res) => {
 
     // Calculate payment details
     const isPerSession = student.paymentType === 'perSession';
-    const amountPaid = isPerSession ? course.amountPay : 0;
-    const feesApplied = isPerSession ? teacher.teacherFees : 0;
+    const amountPaid = mockCheck ? mockAmount : (isPerSession ? course.amountPay : 0);
+    const feesApplied = mockCheck ? mockFees : (isPerSession ? teacher.teacherFees : 0);
     const teacherProfit = isPerSession ? amountPaid - feesApplied : 0;
 
     // Add the student to the attendance record
@@ -754,7 +757,6 @@ const attendStudent = async (req, res) => {
     // Save the attendance record
     await attendance.save();
 
-
     // Send message to parent in Arabic
     const parentMessage = `
 عزيزي ولي أمر الطالب ${student.studentName},
@@ -772,7 +774,7 @@ const attendStudent = async (req, res) => {
           chatId: `2${student.studentParentPhone}@c.us`,
           message: parentMessage,
         },
-        { id: instanceId }
+        { id: '3' }
       )
       .then((response) => {
         console.log('Message sent:', response.data);
@@ -787,11 +789,11 @@ const attendStudent = async (req, res) => {
         path: 'studentsPresent.student',
       })
       .populate('studentsPresent.addedBy', 'employeeName')
-      .populate('invoices.addedBy', 'employeeName') // Populate invoice details
+      .populate('invoices.addedBy', 'employeeName'); // Populate invoice details
 
     console.timeEnd('attendStudentExecutionTime');
 
-console.log(student);
+    console.log(student);
     res.status(201).json({
       message: 'تم تسجيل الحضور',
       studentData: {
@@ -814,7 +816,6 @@ console.log(student);
     res.status(500).json({ message: 'يبدو ان هناك مشكله ما حاول مره اخري' });
   }
 };
-
 
 const getAttendedStudents = async (req, res) => {
   try {
@@ -1135,8 +1136,8 @@ const downloadAttendanceExcel = async (req, res) => {
         studentsData.push([
           studentsData.length + 1,
           student.studentName,
-          student.studentPhoneNumber,
-          amountPaid,
+          // student.studentPhoneNumber,
+          amountPaid - feesApplied,
           // feesApplied,
           // amountPaid - feesApplied,
           student.studentCode,
@@ -1152,9 +1153,9 @@ const downloadAttendanceExcel = async (req, res) => {
 
     // Add column headers for students
     worksheet.getRow(rowIndex).values = [
-      "#",
+      '#',
       'Student Name',
-      'Phone Number',
+      // 'Phone Number',
       'Amount Paid (EGP)',
       // 'Center Fees (EGP)',
       // 'Net Profit (EGP)',
@@ -1231,23 +1232,35 @@ const downloadAttendanceExcel = async (req, res) => {
     const summaryTitles = [
       'Total Amount Paid (EGP)',
       'Center Fees (EGP)',
-      // 'Total Invoices (EGP)',
+      'Total Invoices (EGP)',
       // 'Net Profit Before Invoice (EGP)',
       'Final Net Profit (EGP)',
     ];
+  
     const summaryValues = [
       totalAmount,
       totalFees,
-      // totalInvoiceAmount,
-      // netProfit,
+      totalInvoiceAmount,
       netProfit - totalInvoiceAmount,
     ];
 
     summaryTitles.forEach((title, index) => {
       worksheet.getCell(`A${rowIndex}`).value = title;
-      worksheet.getCell(`A${rowIndex}`).style = { ...styles.columnHeader, font: { bold: true, color: { argb: 'FFFFFF' } } };
+      worksheet.getCell(`A${rowIndex}`).style = {
+        ...styles.columnHeader,
+        font: { bold: true, color: { argb: 'FFFFFF' } },
+      };
+
       worksheet.getCell(`B${rowIndex}`).value = summaryValues[index];
-      worksheet.getCell(`B${rowIndex}`).style = { ...styles.cell, font: { bold: true } };
+      worksheet.getCell(`B${rowIndex}`).style = {
+        ...styles.cell,
+        font: { bold: true },
+        fill: {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: index === 3 ? '4CAF50' : 'FF5733' }, // Green for net profit, Red for others
+        },
+      };
       rowIndex++;
     });
     // Add final summary header
@@ -1323,7 +1336,6 @@ const downloadAttendanceExcel = async (req, res) => {
     res.status(500).json({ message: 'Error generating attendance Excel' });
   }
 };
-
 
 const selectDevice = async (req, res) => {
   const {deviceId} = req.params;
