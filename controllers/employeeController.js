@@ -774,7 +774,7 @@ const attendStudent = async (req, res) => {
           chatId: `2${student.studentParentPhone}@c.us`,
           message: parentMessage,
         },
-        { id: attendance._id }
+        { id: instanceId }
       )
       .then((response) => {
         console.log('Message sent:', response.data);
