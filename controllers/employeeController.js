@@ -1050,7 +1050,7 @@ const downloadAttendanceExcel = async (req, res) => {
     })
       .populate('studentsPresent.student')
       .populate('studentsPresent.addedBy', 'employeeName')
-      .populate('invoices.addedBy', 'employeeName') // Include invoice details
+      .populate('invoices.addedBy', 'employeeName')
       .populate('teacher');
 
     if (!attendance) {
@@ -1091,31 +1091,21 @@ const downloadAttendanceExcel = async (req, res) => {
           right: { style: 'thin' },
         },
       },
-      totalRow: {
-        font: { bold: true, color: { argb: 'FFFFFF' }, size: 12 },
+      summaryCell: {
+        font: { bold: true },
         alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FF5733' },
+        border: {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
         },
-      },
-      invoiceHeader: {
-        font: { bold: true, color: { argb: 'FFFFFF' }, size: 12 },
-        alignment: { horizontal: 'center', vertical: 'middle' },
-        fill: {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: '7030A0' },
-        }, // Purple
-      },
+      }
     };
 
     // Add report title
-    worksheet.mergeCells('A1:F1');
-    worksheet.getCell(
-      'A1'
-    ).value = `Attendance Report - ${attendance.teacher.teacherName} - ${attendance.course}`;
+    worksheet.mergeCells('A1:D1');
+    worksheet.getCell('A1').value = `Attendance Report - ${attendance.teacher.teacherName} - ${attendance.course}`;
     worksheet.getCell('A1').style = styles.header;
 
     let rowIndex = 2;
@@ -1123,211 +1113,93 @@ const downloadAttendanceExcel = async (req, res) => {
     let totalFees = 0;
     let netProfit = 0;
     let totalInvoiceAmount = 0;
-    const studentsData = [];
 
-    attendance.studentsPresent.forEach(
-      ({ student, addedBy, amountPaid, feesApplied }) => {
-        if (!student) return;
-
-        totalAmount += amountPaid;
-        totalFees += feesApplied;
-        netProfit += amountPaid - feesApplied;
-
-        studentsData.push([
-          studentsData.length + 1,
-          student.studentName,
-          // student.studentPhoneNumber,
-          amountPaid - feesApplied,
-          // feesApplied,
-          // amountPaid - feesApplied,
-          student.studentCode,
-        ]);
-      }
-    );
-
-    // Add student section header
-    worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
-    worksheet.getCell(`A${rowIndex}`).value = 'Student Attendance Details';
-    worksheet.getCell(`A${rowIndex}`).style = styles.header;
-    rowIndex++;
-
-    // Add column headers for students
+    // Add column headers
     worksheet.getRow(rowIndex).values = [
       '#',
       'Student Name',
-      // 'Phone Number',
       'Amount Paid (EGP)',
-      // 'Center Fees (EGP)',
-      // 'Net Profit (EGP)',
-      // 'Added By',
-      'Student Code',
+      'Student Code'
     ];
-    worksheet
-      .getRow(rowIndex)
-      .eachCell((cell) => (cell.style = styles.columnHeader));
+    worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = styles.columnHeader));
     rowIndex++;
 
     // Add student data
-    studentsData.forEach((row) => {
-      worksheet.getRow(rowIndex).values = row;
+    attendance.studentsPresent.forEach(({ student, amountPaid, feesApplied }, index) => {
+      if (!student) return;
+
+      totalAmount += amountPaid;
+      totalFees += feesApplied;
+      netProfit += amountPaid - feesApplied;
+
+      worksheet.getRow(rowIndex).values = [
+        index + 1,
+        student.studentName,
+        amountPaid - feesApplied,
+        student.studentCode
+      ];
       worksheet.getRow(rowIndex).eachCell((cell) => (cell.style = styles.cell));
       rowIndex++;
     });
 
-    rowIndex++; // Space before invoices
-    if (attendance.invoices.length > 0) {
-      // Add invoice section header
-      worksheet.mergeCells(`A${rowIndex}:D${rowIndex}`);
-      worksheet.getCell(`A${rowIndex}`).value = 'Invoice Details';
-      worksheet.getCell(`A${rowIndex}`).style = styles.header;
-      rowIndex++;
+    // Calculate total invoices
+    attendance.invoices.forEach(({ invoiceAmount }) => {
+      totalInvoiceAmount += invoiceAmount;
+    });
 
-      // Add invoice headers
-      worksheet.getRow(rowIndex).values = [
-        'Invoice Details',
-        'Invoice Amount (EGP)',
-        'Time',
-        'Added By',
-      ];
-      worksheet
-        .getRow(rowIndex)
-        .eachCell((cell) => (cell.style = styles.invoiceHeader));
-      rowIndex++;
+    rowIndex++; // Add space
 
-      attendance.invoices.forEach(
-        ({ invoiceDetails, invoiceAmount, time, addedBy }) => {
-          totalInvoiceAmount += invoiceAmount;
-
-          worksheet.getRow(rowIndex).values = [
-            invoiceDetails,
-            invoiceAmount,
-            time,
-            addedBy.employeeName,
-          ];
-          worksheet
-            .getRow(rowIndex)
-            .eachCell((cell) => (cell.style = styles.cell));
-          rowIndex++;
-        }
-      );
-
-      rowIndex++; // Space before totals
-
-      // Add total invoices row
-      worksheet.mergeCells(`A${rowIndex}:B${rowIndex}`);
-      worksheet.getCell(`A${rowIndex}`).value = 'Total Invoices';
-      worksheet.getCell(`A${rowIndex}`).style = styles.totalRow;
-      worksheet.getCell(`C${rowIndex}`).value = totalInvoiceAmount;
-      worksheet.getCell(`C${rowIndex}`).style = styles.totalRow;
-      rowIndex++;
-    }
-    rowIndex++; // Space before final summary
-    // Add final summary header
-    worksheet.mergeCells(`A${rowIndex}:B${rowIndex}`);
-    worksheet.getCell(`A${rowIndex}`).value = 'Final Summary';
-    worksheet.getCell(`A${rowIndex}`).style = styles.header;
-    rowIndex++;
-
-    // Add summary titles and values in two columns
-    const summaryTitles = [
-      'Total Amount Paid (EGP)',
-      'Center Fees (EGP)',
-      'Total Invoices (EGP)',
-      // 'Net Profit Before Invoice (EGP)',
-      'Final Net Profit (EGP)',
-    ];
-  
-    const summaryValues = [
-      totalAmount,
-      totalFees,
-      totalInvoiceAmount,
-      netProfit - totalInvoiceAmount,
+    // Add summary rows
+    const summaryData = [
+      { title: 'Center Fees Total (EGP)', value: totalFees, color: 'FF0000' },
+      { title: 'Total Invoices (EGP)', value: totalInvoiceAmount, color: 'FFA500' },
+      { title: 'Total Net Profit (EGP)', value: netProfit - totalInvoiceAmount, color: '4CAF50' }
     ];
 
-    summaryTitles.forEach((title, index) => {
+    summaryData.forEach(({ title, value, color }) => {
       worksheet.getCell(`A${rowIndex}`).value = title;
-      worksheet.getCell(`A${rowIndex}`).style = {
-        ...styles.columnHeader,
-        font: { bold: true, color: { argb: 'FFFFFF' } },
-      };
-
-      worksheet.getCell(`B${rowIndex}`).value = summaryValues[index];
+      worksheet.getCell(`A${rowIndex}`).style = styles.summaryCell;
+      
+      worksheet.getCell(`B${rowIndex}`).value = value;
       worksheet.getCell(`B${rowIndex}`).style = {
-        ...styles.cell,
-        font: { bold: true },
+        ...styles.summaryCell,
         fill: {
           type: 'pattern',
           pattern: 'solid',
-          fgColor: { argb: index === 3 ? '4CAF50' : 'FF5733' }, // Green for net profit, Red for others
-        },
+          fgColor: { argb: color }
+        }
       };
       rowIndex++;
     });
-    // Add final summary header
-    // worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
-    // worksheet.getCell(`A${rowIndex}`).value = 'Final Summary';
-    // worksheet.getCell(`A${rowIndex}`).style = styles.header;
-    // rowIndex++;
-
-    // // Add total row with new headers
-    // worksheet.getRow(rowIndex).values = [
-    //   'Total Amount Paid (EGP)',
-    //   'Center Fees (EGP)',
-    //   'Total Invoices (EGP)',
-    //   'Net Profit Before Invoice (EGP)',
-    //   'Final Net Profit (EGP)',
-    // ];
-    // worksheet
-    //   .getRow(rowIndex)
-    //   .eachCell((cell) => (cell.style = styles.columnHeader));
-    // rowIndex++;
-
-    // worksheet.getRow(rowIndex).values = [
-    //   totalAmount,
-    //   totalFees,
-    //   totalInvoiceAmount,
-    //   netProfit,
-    //   netProfit - totalInvoiceAmount,
-    // ];
-    // worksheet
-    //   .getRow(rowIndex)
-    //   .eachCell((cell) => (cell.style = styles.totalRow));
-    // rowIndex++;
 
     // Set column widths
     worksheet.columns = [
-      { width: 30 }, // Student Name
-      { width: 20 }, // Phone Number
+      { width: 30 }, // Title/Student Name
+      { width: 20 }, // Value/Amount
       { width: 20 }, // Amount Paid
-      { width: 20 }, // Fees Applied
-      { width: 20 }, // Net Profit
-      { width: 20 }, // Added By
+      { width: 20 }  // Student Code
     ];
 
     // Send file via WhatsApp API
     const buffer = await workbook.xlsx.writeBuffer();
     const base64Excel = buffer.toString('base64');
-    const fileName = `Attendance_Report_${attendance.teacher.teacherName}_${
-      attendance.course
-    }_${new Date().toISOString().split('T')[0]}.xlsx`;
-    await waapi
-      .postInstancesIdClientActionSendMedia(
-        {
-          mediaBase64: base64Excel,
-          chatId: `2${attendance.teacher.teacherPhoneNumber}@c.us`,
-          mediaName: fileName,
-          mediaCaption: `Attendance Report for ${
-            attendance.teacher.teacherName
-          } - ${attendance.course} - ${new Date().toDateString()}`,
-        },
-        { id: instanceId }
-      )
-      .then((response) => {
-        console.log('Excel sent:', response.data);
-      })
-      .catch((error) => {
-        console.error('Error sending Excel:', error);
-      });
+    const fileName = `Attendance_Report_${attendance.teacher.teacherName}_${attendance.course}_${new Date().toISOString().split('T')[0]}.xlsx`;
+    
+    await waapi.postInstancesIdClientActionSendMedia(
+      {
+        mediaBase64: base64Excel,
+        chatId: `2${attendance.teacher.teacherPhoneNumber}@c.us`,
+        mediaName: fileName,
+        mediaCaption: `Attendance Report for ${attendance.teacher.teacherName} - ${attendance.course} - ${new Date().toDateString()}`,
+      },
+      { id: instanceId }
+    )
+    .then((response) => {
+      console.log('Excel sent:', response.data);
+    })
+    .catch((error) => {
+      console.error('Error sending Excel:', error);
+    });
 
     await workbook.xlsx.write(res);
     res.end();
