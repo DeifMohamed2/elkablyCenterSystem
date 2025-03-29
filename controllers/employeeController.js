@@ -1151,9 +1151,17 @@ const downloadAttendanceExcel = async (req, res) => {
 
     // Add summary rows
     const summaryData = [
-      { title: 'Center Fees Total (EGP)', value: totalFees, color: 'FF0000' },
-      { title: 'Total Invoices (EGP)', value: totalInvoiceAmount, color: 'FFA500' },
-      { title: 'Total Net Profit (EGP)', value: netProfit - totalInvoiceAmount, color: '4CAF50' }
+      { title: 'Total', value: netProfit, color: '0000FF' }, // Blue for Total
+      {
+      title: 'Total Invoices (EGP)',
+      value: totalInvoiceAmount,
+      color: 'FFA500', // Orange for Invoices
+      },
+      {
+      title: 'Total Net Profit (EGP)',
+      value: netProfit - totalInvoiceAmount,
+      color: '4CAF50', // Green for Net Profit
+      },
     ];
 
     summaryData.forEach(({ title, value, color }) => {
