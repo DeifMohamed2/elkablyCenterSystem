@@ -1151,7 +1151,7 @@ const downloadAttendanceExcel = async (req, res) => {
 
     // Add summary rows
     const summaryData = [
-      { title: 'Total', value: netProfit, color: '0000FF' }, // Blue for Total
+      { title: 'Total', value: netProfit, color: 'e2ed47' }, // New color for Total
       {
       title: 'Total Invoices (EGP)',
       value: totalInvoiceAmount,
