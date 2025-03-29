@@ -1148,7 +1148,7 @@ const downloadAttendanceExcel = async (req, res) => {
   rowIndex++; // Space before invoices
     if (attendance.invoices.length > 0) {
       // Add invoice section header
-      worksheet.mergeCells(`A${rowIndex}:D${rowIndex}`);
+      worksheet.mergeCells(`A${rowIndex}:C${rowIndex}`);
       worksheet.getCell(`A${rowIndex}`).value = 'Invoice Details';
       worksheet.getCell(`A${rowIndex}`).style = styles.header;
       rowIndex++;
