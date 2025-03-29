@@ -1142,11 +1142,50 @@ const downloadAttendanceExcel = async (req, res) => {
       rowIndex++;
     });
 
-    // Calculate total invoices
-    attendance.invoices.forEach(({ invoiceAmount }) => {
-      totalInvoiceAmount += invoiceAmount;
-    });
 
+
+
+  rowIndex++; // Space before invoices
+    if (attendance.invoices.length > 0) {
+      // Add invoice section header
+      worksheet.mergeCells(`A${rowIndex}:D${rowIndex}`);
+      worksheet.getCell(`A${rowIndex}`).value = 'Invoice Details';
+      worksheet.getCell(`A${rowIndex}`).style = styles.header;
+      rowIndex++;
+
+      // Add invoice headers
+      worksheet.getRow(rowIndex).values = [
+        'Invoice Details',
+        'Invoice Amount (EGP)',
+       
+      ];
+      worksheet
+        .getRow(rowIndex)
+        .eachCell((cell) => (cell.style = styles.invoiceHeader));
+      rowIndex++;
+
+      attendance.invoices.forEach(
+        ({ invoiceDetails, invoiceAmount, time, addedBy }) => {
+          totalInvoiceAmount += invoiceAmount;
+
+          worksheet.getRow(rowIndex).values = [
+            invoiceDetails,
+            invoiceAmount,
+         
+          ];
+          worksheet
+            .getRow(rowIndex)
+            .eachCell((cell) => (cell.style = styles.cell));
+          rowIndex++;
+        }
+      );
+
+      rowIndex++; // Space before totals
+    }
+
+
+
+    
     rowIndex++; // Add space
 
     // Add summary rows
