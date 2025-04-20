@@ -103,6 +103,19 @@ const getAllBills = async (req, res) => {
 const getAddStudent = async (req, res) => {
     const allTeachers = await Teacher.find({}, { teacherName: 1 , paymentType: 1 , courses:1 });
     console.log(allTeachers);
+
+
+    // await Student.updateMany(
+    //   { 'selectedTeachers.teacherId': '67a7b22e3f5027fb751af043', 'selectedTeachers.courses.courseName': 'EST ADV' },
+    //   { $set: { 'selectedTeachers.$[teacher].courses.$[course].amountPay': 270 } },
+    //   {
+    //     arrayFilters: [
+    //       { 'teacher.teacherId': '67a7b22e3f5027fb751af043' },
+    //       { 'course.courseName': 'EST ADV' },
+    //     ],
+    //   }
+    // );
+
     res.render('employee/addStudent', {
       title: 'Add Student',
       path: '/employee/add-student',
@@ -1155,29 +1168,63 @@ const downloadAttendanceExcel = async (req, res) => {
 
       // Add invoice headers
       worksheet.getRow(rowIndex).values = [
-        'Invoice Details',
-        'Invoice Amount (EGP)',
-       
+      'Invoice Details',
+      'Invoice Amount (EGP)',
+      'Type',
       ];
       worksheet
-        .getRow(rowIndex)
-        .eachCell((cell) => (cell.style = styles.invoiceHeader));
+      .getRow(rowIndex)
+      .eachCell((cell) => (cell.style = styles.columnHeader));
       rowIndex++;
 
       attendance.invoices.forEach(
-        ({ invoiceDetails, invoiceAmount, time, addedBy }) => {
-          totalInvoiceAmount += invoiceAmount;
+      ({ invoiceDetails, invoiceAmount, time, addedBy }) => {
+      const isNegative = invoiceAmount < 0;
+      const displayAmount = isNegative ? Math.abs(invoiceAmount) : invoiceAmount;
+      totalInvoiceAmount += invoiceAmount;
+      
+      const invoiceType = isNegative ? 'اضافه' : 'خصم';
 
-          worksheet.getRow(rowIndex).values = [
-            invoiceDetails,
-            invoiceAmount,
-         
-          ];
-          worksheet
-            .getRow(rowIndex)
-            .eachCell((cell) => (cell.style = styles.cell));
-          rowIndex++;
-        }
+      worksheet.getRow(rowIndex).values = [
+      invoiceDetails,
+      displayAmount, // Using absolute value for display
+      invoiceType,
+      ];
+      
+      // Apply special styling based on type (green for اضافه, red for خصم)
+      worksheet
+      .getRow(rowIndex)
+      .eachCell((cell) => {
+      if (isNegative) {
+      cell.style = {
+      ...styles.cell,
+      fill: {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'CCFFCC' } // Light green background for اضافه
+      },
+      font: {
+      color: { argb: '008000' }, // Green text for اضافه
+      bold: true
+      }
+      };
+      } else {
+      cell.style = {
+      ...styles.cell,
+      fill: {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFCCCB' } // Light red background for خصم
+      },
+      font: {
+      color: { argb: 'FF0000' }, // Red text for خصم
+      bold: true
+      }
+      };
+      }
+      });
+      rowIndex++;
+      }
       );
 
       rowIndex++; // Space before totals
