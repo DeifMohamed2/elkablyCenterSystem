@@ -181,7 +181,13 @@ const addStudentToTable = (student) => {
     <td class="text-center">${
       student.paymentType == 'perSession' ? 'Per Session' : 'Per Course'
     }</td>
-
+    <td class="text-center">
+      ${student.createdAt ? new Date(student.createdAt).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }) : 'N/A'}
+    </td>
     <td class="align-middle text-center">
       <button class="edit-student-btn mt-2" data-id="${student._id}" 
       data-bs-toggle="modal" data-bs-target="#editStudentModal">Edit</button>

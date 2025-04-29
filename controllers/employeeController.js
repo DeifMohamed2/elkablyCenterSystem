@@ -101,8 +101,11 @@ const getAllBills = async (req, res) => {
 // ======================================== Add Student ======================================== //
 
 const getAddStudent = async (req, res) => {
-    const allTeachers = await Teacher.find({}, { teacherName: 1 , paymentType: 1 , courses:1 });
-    console.log(allTeachers);
+  const allTeachers = await Teacher.find(
+    {},
+    { teacherName: 1, paymentType: 1, courses: 1 }
+  );
+  console.log(allTeachers);
 
 
     // await Student.updateMany(
@@ -116,11 +119,11 @@ const getAddStudent = async (req, res) => {
     //   }
     // );
 
-    res.render('employee/addStudent', {
-      title: 'Add Student',
-      path: '/employee/add-student',
-      allTeachers,
-    });
+  res.render('employee/addStudent', {
+    title: 'Add Student',
+    path: '/employee/add-student',
+    allTeachers,
+  });
 }
 
 
@@ -128,7 +131,7 @@ const getAllStudents = async (req, res) => {
     const allStudents = await Student.find().populate({
       path: 'selectedTeachers.teacherId',
 
-    });
+    }).sort({createdAt: -1});
     allStudents.forEach((student) => {
       student.selectedTeachers.forEach((teacher) => {
         console.log(teacher.teacherId.teacherName);
@@ -865,6 +868,7 @@ const getAttendedStudents = async (req, res) => {
         'studentsPresent.student': student._id,
         teacher: teacherId,
         course: courseName,
+        createdAt: { $gte: new Date('2025-04-20T00:00:00.000Z') }
       });
       return { studentId: student._id, attendanceCount };
       })
