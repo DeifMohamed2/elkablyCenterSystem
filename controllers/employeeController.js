@@ -476,6 +476,39 @@ const deleteStudent = async (req, res) => {
 };
 
 
+const sendCodeAgain = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const student = await Student.findById(id).populate('selectedTeachers.teacherId', 'teacherName');
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+    let message = `📌 *تفاصيل تسجيل الطالب*\n\n`;
+    message += `👤 *اسم الطالب:* ${student.studentName}\n`;
+    message += `🏫 *المدرسة:* ${student.schoolName}\n`;
+    message += `📞 *رقم الهاتف:* ${student.studentPhoneNumber}\n`;
+    message += `📞 *رقم ولي الأمر:* ${student.studentParentPhone}\n`;
+    message += `🆔 *كود الطالب:* ${student.studentCode}\n\n`;
+
+    message += `📚 *تفاصيل الكورسات المسجلة:*\n`;
+
+    student.selectedTeachers.forEach(({ teacherId, courses }) => {
+      message += `\n👨‍🏫 *المعلم:* ${teacherId.teacherName}\n`;
+      courses.forEach(({ courseName }) => {
+        message += `   ➖ *الكورس:* ${courseName}\n`;
+      });
+    });
+
+    // Send the message via WhatsApp or another service
+    sendQRCode(`2${student.studentPhoneNumber}@c.us`, `Scan the QR code to check in\n\n${message}`, student.studentCode);
+
+    res.status(200).json({ message: 'QR code sent successfully' });
+  } catch (error) {
+    console.error('Error sending QR code:', error);
+    res.status(500).json({ message: 'An error occurred while sending QR code' });
+  }
+};
+   
 // ======================================== End Add Student ======================================== //
 
 
@@ -922,9 +955,9 @@ const getAttendedStudents = async (req, res) => {
 };
 
 
-const editStudentAmountRemaining = async (req, res) => {
+const editStudentAmountRemainingAndPaid = async (req, res) => {
   const { id } = req.params;
-  const { amountRemaining, teacherId, courseName } = req.body;
+  const { amountRemaining,amountPaid, teacherId, courseName } = req.body;
 
   try {
     const student = await Student.findById(id);
@@ -969,6 +1002,7 @@ const editStudentAmountRemaining = async (req, res) => {
       );
 
       if (studentAttendance) {
+        studentAttendance.amountPaid = amountPaid;
         studentAttendance.amountPaid += difference;
         studentAttendance.feesApplied = await Teacher.findById(teacherId).then(
           (t) => t.teacherFees
@@ -1053,18 +1087,19 @@ const deleteAttendStudent = async (req, res) => {
 const downloadAttendanceExcel = async (req, res) => {
   try {
     const { teacherId, courseName } = req.query;
-    if (!teacherId || !courseName) {
-      return res
-        .status(400)
-        .json({ message: 'Teacher ID and course name are required' });
-    }
+    // if (!teacherId || !courseName) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: 'Teacher ID and course name are required' });
+    // }
 
     // Fetch today's attendance for the specific teacher and course
-    const attendance = await Attendance.findOne({
-      date: getDateTime(),
-      teacher: teacherId,
-      course: courseName,
-    })
+    // const attendance = await Attendance.findOne({
+    //   date: getDateTime(),
+    //   teacher: teacherId,
+    //   course: courseName,
+    // })
+    const attendance = await Attendance.findById('680e45618eff402363dc620a')
       .populate('studentsPresent.student')
       .populate('studentsPresent.addedBy', 'employeeName')
       .populate('invoices.addedBy', 'employeeName')
@@ -1469,7 +1504,7 @@ const getAttendanceByDate = async (req, res) => {
       .populate('invoices.addedBy', 'employeeName')
       .populate('teacher', 'teacherName subjectName paymentType');
 
-
+      
     if (!attendances.length) {
       return res
         .status(404)
@@ -2499,52 +2534,52 @@ const logOut = (req, res) => {
 };
 
 module.exports = {
-    dashboard,
-    teacherSechdule,
-    // Billing
-    billing_Get,
-    addBill,
-    getAllBills,
+  dashboard,
+  teacherSechdule,
+  // Billing
+  billing_Get,
+  addBill,
+  getAllBills,
 
-    // Add Student
-    getAddStudent,
-    getAllStudents,
-    getStudent,
-    updateStudent,
-    addStudent,
-    getDeviceData,
-    searchStudent,
-    sendWa,
-    deleteStudent,
+  // Add Student
+  getAddStudent,
+  getAllStudents,
+  getStudent,
+  updateStudent,
+  addStudent,
+  getDeviceData,
+  searchStudent,
+  sendWa,
+  deleteStudent,
+  sendCodeAgain,
 
-    // Teacher
-    
-    teacher_Get,
-    addTeacher,
-    getTeachers,
-    getTeacher,
-    updateTeacher,
+  // Teacher
 
+  teacher_Get,
+  addTeacher,
+  getTeachers,
+  getTeacher,
+  updateTeacher,
 
-    // Attendance
+  // Attendance
 
-    getAttendance,
-    attendStudent,
-    getAttendedStudents,
-    deleteAttendStudent,
-    editStudentAmountRemaining,
-    downloadAttendanceExcel,
-    selectDevice,
-    addTeacherInvoice,
-    deleteInvoice,
-    updateInvoice,
+  getAttendance,
+  attendStudent,
+  getAttendedStudents,
+  deleteAttendStudent,
+  editStudentAmountRemainingAndPaid,
+  downloadAttendanceExcel,
+  selectDevice,
+  addTeacherInvoice,
+  deleteInvoice,
+  updateInvoice,
 
-    // handel Attendance
-    handelAttendance,
-    getAttendanceByDate,
-    downloadAttendanceExcelByDate,
-    downloadAndSendExcelForTeacherByDate,
-    downloadAndSendExcelForEmployeeByDate,
+  // handel Attendance
+  handelAttendance,
+  getAttendanceByDate,
+  downloadAttendanceExcelByDate,
+  downloadAndSendExcelForTeacherByDate,
+  downloadAndSendExcelForEmployeeByDate,
 
-    logOut,
-}
+  logOut,
+};

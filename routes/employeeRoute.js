@@ -68,6 +68,8 @@ router.get('/send-wa', authMiddleware, employeeController.sendWa);
 
 router.delete('/delete-student/:id', authMiddleware, employeeController.deleteStudent);
 
+router.post('/send-code-again/:id', authMiddleware, employeeController.sendCodeAgain);
+
 // Teahcer 
 router.get('/teacher', authMiddleware, employeeController.teacher_Get);
 
@@ -95,7 +97,7 @@ router.delete('/delete-attend-student/:id', authMiddleware, employeeController.d
 
 router.get('/download-attendance-excel', authMiddleware, employeeController.downloadAttendanceExcel);
 
-router.put('/edit-student-amount-remaining/:id', authMiddleware, employeeController.editStudentAmountRemaining);
+router.put('/edit-student-amount-remaining-and-paid/:id', authMiddleware, employeeController.editStudentAmountRemainingAndPaid);
 
 router.put('/select-device/:deviceId', authMiddleware, employeeController.selectDevice);
 

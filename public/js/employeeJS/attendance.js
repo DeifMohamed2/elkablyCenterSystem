@@ -282,42 +282,50 @@ const addStudentsToTable = (students, teacherId, courseName) => {
          ?.courses.find((c) => c.courseName === courseName);
 
        const tr = document.createElement('tr');
-       tr.innerHTML = `
+      tr.innerHTML = `
             <td class="text-center">${student.student.studentName}</td>
             <td class="text-center">${student.student.studentCode}</td>
             <td class="text-center">${student.student.studentPhoneNumber}</td>
             <td class="text-center">${student.student.studentParentPhone}</td>
-            <td class="text-center">${student.amountPaid}</td>
             <td class="text-center">
-                <input type="text" class="amountRemaining" 
-                       value="${courseData?.amountRemaining || 0}"
-                       data-student-id="${student.student._id}"
-                       data-teacher-id="${teacherId}"
-                       data-course-name="${courseName}">
+              <input type="text" class="amountPaid" 
+                   value="${student.amountPaid}"
+                   data-student-id="${student.student._id}"
+                   data-teacher-id="${teacherId}"
+                   data-course-name="${courseName}">
+            </td>
+            <td class="text-center">
+              <input type="text" class="amountRemaining" 
+                   value="${courseData?.amountRemaining || 0}"
+                   data-student-id="${student.student._id}"
+                   data-teacher-id="${teacherId}"
+                   data-course-name="${courseName}">
             </td>
             <td class="text-center">${
               student.attendanceCount || 'Waiting for refresh'
             }</td>
             <td class="text-center">
-                <button class="btn btn-primary btn-sm edit-amount">Edit</button>
+              <button class="btn btn-primary btn-sm edit-amount">Edit</button>
             </td>
             <td class="text-center">
-                <button class="btn btn-danger btn-sm delete">Delete</button>
+              <button class="btn btn-danger btn-sm delete">Delete</button>
             </td>
             <td class="text-center">${student.addedBy.employeeName}</td>
-        `;
+          `;
 
        // Event listeners
        tr.querySelector('.edit-amount').addEventListener('click', (event) => {
          // Get tr reference from event target
          const row = event.target.closest('tr');
          const input = row.querySelector('.amountRemaining');
+          const amountPaidInput = row.querySelector('.amountPaid');
          const studentId = input.dataset.studentId;
          const teacherId = input.dataset.teacherId;
          const courseName = input.dataset.courseName;
          const amount = input.value;
+          const amountPaid = amountPaidInput.value;
 
-         editStudentAmountRemaining(studentId, amount, teacherId, courseName);
+         editStudentAmountRemainingAndAmountPaid(studentId, amount,amountPaid, teacherId, courseName);
        });
 
        tr.querySelector('.delete').addEventListener('click', (event) => {
@@ -362,13 +370,14 @@ async function deleteStudent(studentId , teacherId , courseName) {
     }
 }
 
-async function editStudentAmountRemaining(studentId, amount, teacherId, courseName) {
+async function editStudentAmountRemainingAndAmountPaid(studentId, amount,amountPaid, teacherId, courseName) {
     try {
-        const response = await fetch(`/employee/edit-student-amount-remaining/${studentId}`, {
+        const response = await fetch(`/employee/edit-student-amount-remaining-and-paid/${studentId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 amountRemaining: amount,
+                amountPaid,
                 teacherId,
                 courseName
             }),

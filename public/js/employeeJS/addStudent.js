@@ -182,25 +182,34 @@ const addStudentToTable = (student) => {
       student.paymentType == 'perSession' ? 'Per Session' : 'Per Course'
     }</td>
     <td class="text-center">
-      ${student.createdAt ? new Date(student.createdAt).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      }) : 'N/A'}
+      ${
+        student.createdAt
+          ? new Date(student.createdAt).toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            })
+          : 'N/A'
+      }
     </td>
     <td class="align-middle text-center">
       <button class="edit-student-btn mt-2" data-id="${student._id}" 
       data-bs-toggle="modal" data-bs-target="#editStudentModal">Edit</button>
     </td>
 
-  <td class="align-middle text-center"></td>
-    <button class="delete-student-btn mt-2" data-id="${
-      student._id
-    }">Delete</button>
-  </td>
+    <td class="align-middle text-center">
+      <button class="delete-student-btn mt-2" data-id="${
+        student._id
+      }">Delete</button>
+    </td>
 
+    <td class="align-middle text-center">
+      <button class="send-code-btn mt-2" data-id="${
+        student._id
+      }">Send Code</button>
+    </td>
+    `;
 
-  `;
   studentTableBody.appendChild(tr);
 
   // Attach the event listener for the edit button dynamically
@@ -210,6 +219,11 @@ const addStudentToTable = (student) => {
 
   tr.querySelector('.delete-student-btn').addEventListener('click', () => {
     deleteStudent(student._id);
+  });
+
+  // Attach event listener for the send code button
+  tr.querySelector('.send-code-btn').addEventListener('click', () => {
+    sendCodeAgain(student._id);
   });
 };
 
@@ -623,3 +637,29 @@ exportToExcelBtn.addEventListener('click', () => {
 
   XLSX.writeFile(workbook, 'students.xlsx');
 });
+
+
+
+
+// send code again 
+
+const sendCodeAgain = async (studentId) => {
+  if (!confirm('Are you sure you want to send the code again?')) return;
+
+  try {
+    const response = await fetch(`/employee/send-code-again/${studentId}`, {
+      method: 'POST',
+    });
+
+    if (!response.ok) throw new Error('Failed to send code');
+
+    const responseData = await response.json();
+    successToast.classList.add('show');
+    messageToast.innerHTML = responseData.message;
+  } catch (error) {
+    console.error('Error sending code:', error);
+    errorMessage.classList.add('show');
+    errorMessage.innerHTML = 'An error occurred. Please try again later.';
+  }
+}
+// Close modal
