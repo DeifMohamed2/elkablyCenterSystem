@@ -1099,6 +1099,10 @@ const downloadAttendanceExcel = async (req, res) => {
       teacher: teacherId,
       course: courseName,
     })
+      .populate('studentsPresent.student')
+      .populate('studentsPresent.addedBy', 'employeeName')
+      .populate('invoices.addedBy', 'employeeName')
+      .populate('teacher');
 
     if (!attendance) {
       return res
