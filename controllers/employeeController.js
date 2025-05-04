@@ -1087,23 +1087,18 @@ const deleteAttendStudent = async (req, res) => {
 const downloadAttendanceExcel = async (req, res) => {
   try {
     const { teacherId, courseName } = req.query;
-    // if (!teacherId || !courseName) {
-    //   return res
-    //     .status(400)
-    //     .json({ message: 'Teacher ID and course name are required' });
-    // }
+    if (!teacherId || !courseName) {
+      return res
+        .status(400)
+        .json({ message: 'Teacher ID and course name are required' });
+    }
 
     // Fetch today's attendance for the specific teacher and course
-    // const attendance = await Attendance.findOne({
-    //   date: getDateTime(),
-    //   teacher: teacherId,
-    //   course: courseName,
-    // })
-    const attendance = await Attendance.findById('680e45618eff402363dc620a')
-      .populate('studentsPresent.student')
-      .populate('studentsPresent.addedBy', 'employeeName')
-      .populate('invoices.addedBy', 'employeeName')
-      .populate('teacher');
+    const attendance = await Attendance.findOne({
+      date: getDateTime(),
+      teacher: teacherId,
+      course: courseName,
+    })
 
     if (!attendance) {
       return res
