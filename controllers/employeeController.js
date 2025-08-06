@@ -16,6 +16,32 @@ waapi.auth(waapiAPI);
 
 const dashboard = (req, res) => {
 
+  // // Function to add 'G' to the end of student codes if it doesn't already exist
+  // const updateStudentCodes = async () => {
+  //   try {
+  //     // Find all students
+  //     const students = await Student.find();
+      
+  //     for (const student of students) {
+  //       // Check if the student code already ends with 'G'
+  //       if (!student.studentCode.endsWith('G')) {
+  //         // Add 'G' to the end of the code
+  //         student.studentCode = student.studentCode + 'G';
+  //         await student.save();
+  //         console.log(`Updated student code for ${student.name} to ${student.studentCode}`);
+  //       }
+  //     }
+      
+  //     console.log('All student codes have been updated successfully');
+  //   } catch (error) {
+  //     console.error('Error updating student codes:', error);
+  //   }
+  // };
+  
+  // // Call the function to update student codes
+  // updateStudentCodes();
+
+  
   res.render('employee/dashboard', {
     title: 'Dashboard',
     path: '/employee/dashboard',
@@ -101,23 +127,65 @@ const getAllBills = async (req, res) => {
 // ======================================== Add Student ======================================== //
 
 const getAddStudent = async (req, res) => {
+  // First, get all teachers
   const allTeachers = await Teacher.find(
     {},
     { teacherName: 1, paymentType: 1, courses: 1 }
   );
-  console.log(allTeachers);
 
-
-    // await Student.updateMany(
-    //   { 'selectedTeachers.teacherId': '67a7b22e3f5027fb751af043', 'selectedTeachers.courses.courseName': 'EST ADV' },
-    //   { $set: { 'selectedTeachers.$[teacher].courses.$[course].amountPay': 270 } },
-    //   {
-    //     arrayFilters: [
-    //       { 'teacher.teacherId': '67a7b22e3f5027fb751af043' },
-    //       { 'course.courseName': 'EST ADV' },
-    //     ],
-    //   }
-    // );
+  // Only add the Est Advanced revision course without printing teacher names
+  // try {
+  //   // Step 1: Find the specific teacher
+  //   const teacherId = '67a77a76720b939a0f7dc6ee';
+  //   const teacher = await Teacher.findById(teacherId);
+    
+  //   if (teacher) {
+  //     // Step 2: Add the new course to the teacher if it doesn't already exist
+  //     const newCourseName = 'Est Advanced revision';
+  //     const courseExists = teacher.courses.includes(newCourseName);
+      
+  //     if (!courseExists) {
+  //       // Add the new course to the teacher (courses is an array of strings in the Teacher model)
+  //       teacher.courses.push(newCourseName);
+  //       await teacher.save();
+  //     }
+      
+  //     // Step 3: Find all students with Est Advanced and the specific teacher
+  //     const studentsInCourse = await Student.find({
+  //       'selectedTeachers.teacherId': teacherId,
+  //       'selectedTeachers.courses.courseName': 'Est Advanced'
+  //     });
+      
+  //     // Step 4: Add the new course to each student
+  //     for (const student of studentsInCourse) {
+  //       // Find the teacher entry for this student
+  //       const teacherIndex = student.selectedTeachers.findIndex(t => 
+  //         t.teacherId.toString() === teacherId
+  //       );
+        
+  //       if (teacherIndex !== -1) {
+  //         // Check if student already has the revision course
+  //         const hasRevisionCourse = student.selectedTeachers[teacherIndex].courses.some(c => 
+  //           c.courseName === newCourseName
+  //         );
+          
+  //         if (!hasRevisionCourse) {
+  //           // Add the new course to the student
+  //           student.selectedTeachers[teacherIndex].courses.push({
+  //             courseName: newCourseName,
+  //             amountPay: 200,
+  //             registerPrice: 0,
+  //             amountRemaining: 0
+  //           });
+            
+  //           await student.save();
+  //         }
+  //       }
+  //     }
+  //   }
+  // } catch (error) {
+  //   console.error('Error updating courses:', error);
+  // }
 
   res.render('employee/addStudent', {
     title: 'Add Student',
@@ -133,9 +201,7 @@ const getAllStudents = async (req, res) => {
 
     }).sort({createdAt: -1});
     allStudents.forEach((student) => {
-      student.selectedTeachers.forEach((teacher) => {
-        console.log(teacher.teacherId.teacherName);
-      })
+  
     });
     res.send(allStudents);
 }
@@ -247,7 +313,7 @@ const addStudent = async (req, res) => {
         schoolName,
         selectedTeachers: processedTeachers,
         amountRemaining: paymentType === 'perSession' ? 0 : studentAmount,
-        studentCode,
+        studentCode: studentCode + 'G',
         paymentType,
     });
 
