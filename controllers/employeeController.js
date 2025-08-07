@@ -17,29 +17,29 @@ waapi.auth(waapiAPI);
 const dashboard = (req, res) => {
 
   // // Function to add 'G' to the end of student codes if it doesn't already exist
-  // const updateStudentCodes = async () => {
-  //   try {
-  //     // Find all students
-  //     const students = await Student.find();
+  const updateStudentCodes = async () => {
+    try {
+      // Find all students
+      const students = await Student.find();
       
-  //     for (const student of students) {
-  //       // Check if the student code already ends with 'G'
-  //       if (!student.studentCode.endsWith('G')) {
-  //         // Add 'G' to the end of the code
-  //         student.studentCode = student.studentCode + 'G';
-  //         await student.save();
-  //         console.log(`Updated student code for ${student.name} to ${student.studentCode}`);
-  //       }
-  //     }
+      for (const student of students) {
+        // Check if the student code ends with 'G'
+        if (student.studentCode.endsWith('G')) {
+          // Remove 'G' from the end and add it to the start
+          student.studentCode = 'G' + student.studentCode.slice(0, -1);
+          await student.save();
+          console.log(`Updated student code for ${student.studentName} to ${student.studentCode}`);
+        }
+      }
       
-  //     console.log('All student codes have been updated successfully');
-  //   } catch (error) {
-  //     console.error('Error updating student codes:', error);
-  //   }
-  // };
+      console.log('All student codes have been updated successfully');
+    } catch (error) {
+      console.error('Error updating student codes:', error);
+    }
+  };
   
-  // // Call the function to update student codes
-  // updateStudentCodes();
+  // Call the function to update student codes
+  updateStudentCodes();
 
   
   res.render('employee/dashboard', {
@@ -445,10 +445,18 @@ const searchStudent = async (req, res) => {
     const query = {};
 
     if (search) {
-      if(search.length > 4){
-        query.studentPhoneNumber = search; // Search by phone number
+      // Check if search contains only numbers
+      const isOnlyNumbers = /^\d+$/.test(search);
+      
+      if (isOnlyNumbers) {
+        // If it's only numbers, search by both phone number and student code
+        query.$or = [
+          { studentPhoneNumber: search },
+          { studentCode: "G" + search }
+        ];
       } else {
-      query.studentCode = search; // Search by student code
+        // If it contains text (like "G123"), search by student code only
+        query.studentCode = search;
       }
     }
     if (teacher) {
@@ -780,9 +788,31 @@ const attendStudent = async (req, res) => {
 
   try {
     // Find the student
-    const student = await Student.findOne({
-      $or: [{ barCode: searchStudent }, { studentCode: searchStudent }],
-    }).populate('selectedTeachers.teacherId', 'teacherName subjectName teacherFees');
+    let studentQuery;
+    
+    // Check if search contains only numbers
+    const isOnlyNumbers = /^\d+$/.test(searchStudent);
+    
+    if (isOnlyNumbers) {
+      // If it's only numbers, search by barCode, studentCode, and phone number
+      studentQuery = {
+        $or: [
+          { barCode: searchStudent }, 
+          { studentCode: "G" + searchStudent },
+          { studentPhoneNumber: searchStudent }
+        ]
+      };
+    } else {
+      // If it contains text (like "G123"), search by barCode and studentCode only
+      studentQuery = {
+        $or: [
+          { barCode: searchStudent }, 
+          { studentCode: "G" + searchStudent }
+        ]
+      };
+    }
+    
+    const student = await Student.findOne(studentQuery).populate('selectedTeachers.teacherId', 'teacherName subjectName teacherFees');
 
     if (!student) {
       return res.status(404).json({ message: 'هذا الطالب غير موجود' });
