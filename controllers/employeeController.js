@@ -799,7 +799,6 @@ const attendStudent = async (req, res) => {
         $or: [
           { barCode: searchStudent }, 
           { studentCode: "G" + searchStudent },
-          { studentPhoneNumber: searchStudent }
         ]
       };
     } else {
@@ -807,7 +806,7 @@ const attendStudent = async (req, res) => {
       studentQuery = {
         $or: [
           { barCode: searchStudent }, 
-          { studentCode: "G" + searchStudent }
+          { studentCode: searchStudent }
         ]
       };
     }
