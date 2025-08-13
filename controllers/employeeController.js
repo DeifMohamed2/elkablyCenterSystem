@@ -760,24 +760,24 @@ const attendStudent = async (req, res) => {
   try {
     // Find the student
     let studentQuery;
-    
+    const SearchStudent = searchStudent.trim();
     // Check if search contains only numbers
-    const isOnlyNumbers = /^\d+$/.test(searchStudent);
+    const isOnlyNumbers = /^\d+$/.test(SearchStudent);
     
     if (isOnlyNumbers) {
       // If it's only numbers, search by barCode, studentCode, and phone number
       studentQuery = {
         $or: [
-          { barCode: searchStudent }, 
-          { studentCode: "G" + searchStudent },
+          { barCode: SearchStudent }, 
+          { studentCode: "G" + SearchStudent },
         ]
       };
     } else {
       // If it contains text (like "G123"), search by barCode and studentCode only
       studentQuery = {
         $or: [
-          { barCode: searchStudent }, 
-          { studentCode: searchStudent }
+          { barCode: SearchStudent }, 
+          { studentCode: SearchStudent }
         ]
       };
     }
