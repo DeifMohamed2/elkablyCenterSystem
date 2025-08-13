@@ -7,39 +7,37 @@ const qrcode = require('qrcode');
 const ExcelJS = require('exceljs');
 
 
-const waapi = require('@api/waapi');
-const waapiAPI = process.env.WAAPIAPI;
-const instanceId = process.env.instanceId;
-waapi.auth(waapiAPI);
+const waziper = require('../utils/waziper');
+const instanceId = '68536629B61C9';
 
 
 
 const dashboard = (req, res) => {
 
   // // Function to add 'G' to the end of student codes if it doesn't already exist
-  const updateStudentCodes = async () => {
-    try {
-      // Find all students
-      const students = await Student.find();
+  // const updateStudentCodes = async () => {
+  //   try {
+  //     // Find all students
+  //     const students = await Student.find();
       
-      for (const student of students) {
-        // Check if the student code ends with 'G'
-        if (student.studentCode.endsWith('G')) {
-          // Remove 'G' from the end and add it to the start
-          student.studentCode = 'G' + student.studentCode.slice(0, -1);
-          await student.save();
-          console.log(`Updated student code for ${student.studentName} to ${student.studentCode}`);
-        }
-      }
+  //     for (const student of students) {
+  //       // Check if the student code ends with 'G'
+  //       if (student.studentCode.endsWith('G')) {
+  //         // Remove 'G' from the end and add it to the start
+  //         student.studentCode = 'G' + student.studentCode.slice(0, -1);
+  //         await student.save();
+  //         console.log(`Updated student code for ${student.studentName} to ${student.studentCode}`);
+  //       }
+  //     }
       
-      console.log('All student codes have been updated successfully');
-    } catch (error) {
-      console.error('Error updating student codes:', error);
-    }
-  };
+  //     console.log('All student codes have been updated successfully');
+  //   } catch (error) {
+  //     console.error('Error updating student codes:', error);
+  //   }
+  // };
   
-  // Call the function to update student codes
-  updateStudentCodes();
+  // // Call the function to update student codes
+  // updateStudentCodes();
 
   
   res.render('employee/dashboard', {
@@ -214,27 +212,12 @@ const getStudent = async (req, res) => {
 
 async function sendQRCode(chatId, message, studentCode) {
   try {
-    // Generate a high-quality QR code in Base64 format
-    const qrData = await qrcode.toDataURL(studentCode, {
-      margin: 2, // White border around the QR code
-      scale: 10, // Scale factor (default is 4, increase for better quality)
-      width: 500, // Adjust width for higher resolution (optional)
-    });
-    const base64Image = qrData.split(',')[1]; // Extract only the Base64 data
-
-    console.log('Generated QR Code Base64:', base64Image);
+    // Use a public QR code URL (align with working Elkably app)
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(studentCode)}`;
+    console.log('Generated QR Code URL:', qrCodeUrl);
     console.log('Sending to Chat ID:', chatId);
 
-    const response = await waapi.postInstancesIdClientActionSendMedia(
-      {
-        chatId: chatId, // Target chat ID
-        mediaBase64: base64Image,
-        mediaName: 'qrcode.png',
-        mediaCaption: message,
-        asSticker: false, // Set true if you want to send as a sticker
-      },
-      { id: instanceId } // Replace with your actual instance ID
-    );
+    const response = await waziper.sendMediaMessage(instanceId, chatId, message, qrCodeUrl, 'qrcode.png');
 
     console.log('QR code sent successfully:', response.data);
   } catch (error) {
@@ -422,13 +405,7 @@ const updateStudent = async (req, res) => {
 شكرًا لتعاونكم.
     `;
 
-      await waapi.postInstancesIdClientActionSendMessage(
-        {
-          chatId: `2${student.studentParentPhone}@c.us`,
-          message: parentMessage,
-        },
-        { id: instanceId }
-      );
+          await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage);
     }
     await student.save();
   }
@@ -509,14 +486,8 @@ ${message}
 تحياتنا
 `;
 
-    await waapi
-      .postInstancesIdClientActionSendMessage(
-        {
-          chatId: waNumber,
-          message: messageUpdate,
-        },
-        { id: instanceId }
-      )
+    await waziper
+      .sendTextMessage(instanceId, waNumber, messageUpdate)
       .then((response) => {
         console.log('Message sent:', response.data);
       })
@@ -912,20 +883,16 @@ const attendStudent = async (req, res) => {
 شكرًا لتعاونكم.
 `;
 
-    await waapi
-      .postInstancesIdClientActionSendMessage(
-        {
-          chatId: `2${student.studentParentPhone}@c.us`,
-          message: parentMessage,
-        },
-        { id: instanceId }
-      )
-      .then((response) => {
+    try {
+      await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage).then((response) => {
         console.log('Message sent:', response.data);
-      })
-      .catch((error) => {
+      }).catch((error) => {
         console.error('Error sending message:', error);
       });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      // Continue with the process even if message sending fails
+    }
 
     // Populate updated attendance data
     const updatedAttendance = await Attendance.findById(attendance._id)
@@ -935,7 +902,6 @@ const attendStudent = async (req, res) => {
       .populate('studentsPresent.addedBy', 'employeeName')
       .populate('invoices.addedBy', 'employeeName'); // Populate invoice details
 
-    console.timeEnd('attendStudentExecutionTime');
 
     console.log(student);
     res.status(201).json({
@@ -1412,14 +1378,12 @@ const downloadAttendanceExcel = async (req, res) => {
     const base64Excel = buffer.toString('base64');
     const fileName = `Attendance_Report_${attendance.teacher.teacherName}_${attendance.course}_${new Date().toISOString().split('T')[0]}.xlsx`;
     
-    await waapi.postInstancesIdClientActionSendMedia(
-      {
-        mediaBase64: base64Excel,
-        chatId: `2${attendance.teacher.teacherPhoneNumber}@c.us`,
-        mediaName: fileName,
-        mediaCaption: `Attendance Report for ${attendance.teacher.teacherName} - ${attendance.course} - ${new Date().toDateString()}`,
-      },
-      { id: instanceId }
+    await waziper.sendMediaMessage(
+      instanceId,
+      `2${attendance.teacher.teacherPhoneNumber}@c.us`,
+      `Attendance Report for ${attendance.teacher.teacherName} - ${attendance.course} - ${new Date().toDateString()}`,
+      base64Excel,
+      fileName
     )
     .then((response) => {
       console.log('Excel sent:', response.data);
@@ -2394,15 +2358,13 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
     const fileName = `Attendance_Report_${teacherName}_${startDate}_to_${endDate}.xlsx`;
 
     // Send file via WhatsApp API
-    await waapi
-      .postInstancesIdClientActionSendMedia(
-        {
-          mediaBase64: base64Excel,
-          chatId: `2${teacherPhoneNumber}@c.us`,
-          mediaName: fileName,
-          mediaCaption: `Attendance Report for ${teacher.teacherName} (${startDate} to ${endDate})`,
-        },
-        { id: instanceId } // Replace with actual instance ID if required
+    await waziper
+      .sendMediaMessage(
+        instanceId,
+        `2${teacherPhoneNumber}@c.us`,
+        `Attendance Report for ${teacher.teacherName} (${startDate} to ${endDate})`,
+        base64Excel,
+        fileName
       )
       .then((response) => {
         console.log('WhatsApp response:', response.data);
@@ -2569,15 +2531,13 @@ const downloadAndSendExcelForEmployeeByDate = async (req, res) => {
 
     // Send file via WhatsApp API
 
-    await waapi
-      .postInstancesIdClientActionSendMedia(
-        {
-          mediaBase64: base64Excel,
-          chatId: `2${employeePhoneNumber}@c.us`,
-          mediaName: fileName,
-          mediaCaption: `Attendance Report for ${employeeName} (${startDate} to ${endDate})`,
-        },
-        { id: instanceId } // Replace with actual instance ID if required
+    await waziper
+      .sendMediaMessage(
+        instanceId,
+        `2${employeePhoneNumber}@c.us`,
+        `Attendance Report for ${employeeName} (${startDate} to ${endDate})`,
+        base64Excel,
+        fileName
       )
       .then((response) => {
         console.log('WhatsApp response:', response.data);
