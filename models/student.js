@@ -96,10 +96,10 @@ const studentSchema = new Schema(
       unique: true,
       validate: {
         validator: function(v) {
-          // Ensure the code follows the pattern: 4 digits + 'G'
-          return /^\d{4}G$/.test(v);
+          // Ensure the code follows the pattern: 'G' + 4 digits
+          return /^G\d{4}$/.test(v);
         },
-        message: 'Student code must be 4 digits followed by G (e.g., 1234G)'
+        message: 'Student code must be G followed by 4 digits (e.g., G1234)'
       }
     },
   },

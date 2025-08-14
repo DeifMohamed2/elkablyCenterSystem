@@ -14,32 +14,6 @@ const instanceId = '68536629B61C9';
 
 
 const dashboard = (req, res) => {
-
-  // // Function to add 'G' to the end of student codes if it doesn't already exist
-  // const updateStudentCodes = async () => {
-  //   try {
-  //     // Find all students
-  //     const students = await Student.find();
-      
-  //     for (const student of students) {
-  //       // Check if the student code ends with 'G'
-  //       if (student.studentCode.endsWith('G')) {
-  //         // Remove 'G' from the end and add it to the start
-  //         student.studentCode = 'G' + student.studentCode.slice(0, -1);
-  //         await student.save();
-  //         console.log(`Updated student code for ${student.studentName} to ${student.studentCode}`);
-  //       }
-  //     }
-      
-  //     console.log('All student codes have been updated successfully');
-  //   } catch (error) {
-  //     console.error('Error updating student codes:', error);
-  //   }
-  // };
-  
-  // // Call the function to update student codes
-  // updateStudentCodes();
-
   
   res.render('employee/dashboard', {
     title: 'Dashboard',
@@ -131,60 +105,6 @@ const getAddStudent = async (req, res) => {
     {},
     { teacherName: 1, paymentType: 1, courses: 1 }
   );
-
-  // Only add the Est Advanced revision course without printing teacher names
-  // try {
-  //   // Step 1: Find the specific teacher
-  //   const teacherId = '67a77a76720b939a0f7dc6ee';
-  //   const teacher = await Teacher.findById(teacherId);
-    
-  //   if (teacher) {
-  //     // Step 2: Add the new course to the teacher if it doesn't already exist
-  //     const newCourseName = 'Est Advanced revision';
-  //     const courseExists = teacher.courses.includes(newCourseName);
-      
-  //     if (!courseExists) {
-  //       // Add the new course to the teacher (courses is an array of strings in the Teacher model)
-  //       teacher.courses.push(newCourseName);
-  //       await teacher.save();
-  //     }
-      
-  //     // Step 3: Find all students with Est Advanced and the specific teacher
-  //     const studentsInCourse = await Student.find({
-  //       'selectedTeachers.teacherId': teacherId,
-  //       'selectedTeachers.courses.courseName': 'Est Advanced'
-  //     });
-      
-  //     // Step 4: Add the new course to each student
-  //     for (const student of studentsInCourse) {
-  //       // Find the teacher entry for this student
-  //       const teacherIndex = student.selectedTeachers.findIndex(t => 
-  //         t.teacherId.toString() === teacherId
-  //       );
-        
-  //       if (teacherIndex !== -1) {
-  //         // Check if student already has the revision course
-  //         const hasRevisionCourse = student.selectedTeachers[teacherIndex].courses.some(c => 
-  //           c.courseName === newCourseName
-  //         );
-          
-  //         if (!hasRevisionCourse) {
-  //           // Add the new course to the student
-  //           student.selectedTeachers[teacherIndex].courses.push({
-  //             courseName: newCourseName,
-  //             amountPay: 200,
-  //             registerPrice: 0,
-  //             amountRemaining: 0
-  //           });
-            
-  //           await student.save();
-  //         }
-  //       }
-  //     }
-  //   }
-  // } catch (error) {
-  //   console.error('Error updating courses:', error);
-  // }
 
   res.render('employee/addStudent', {
     title: 'Add Student',
@@ -436,19 +356,15 @@ const searchStudent = async (req, res) => {
       
       if (isOnlyNumbers) {
         // If it's only numbers, search by phone number and create proper student code
-        const studentCode = StudentCodeUtils.createStudentCode(searchTerm);
+        const studentCode = "G"+searchTerm;
         query.$or = [
           { studentPhoneNumber: searchTerm },
           { studentCode: studentCode }
         ];
       } else {
-        // If it contains text, validate if it's a proper student code format
-        if (StudentCodeUtils.isValidStudentCode(searchTerm)) {
+      
           query.studentCode = searchTerm;
-        } else {
-          // If not a valid format, search by student name (partial match)
-          query.studentName = { $regex: searchTerm, $options: 'i' };
-        }
+     
       }
     }
     if (teacher) {
@@ -779,30 +695,26 @@ const attendStudent = async (req, res) => {
     
     // Check if search contains only numbers
     const isOnlyNumbers = /^\d+$/.test(SearchStudent);
-    
+
+
     if (isOnlyNumbers) {
       // If it's only numbers, search by barCode, studentCode, and phone number
-      const studentCode = StudentCodeUtils.createStudentCode(SearchStudent);
       studentQuery = {
         $or: [
           { barCode: SearchStudent }, 
-          { studentCode: studentCode },
-          { studentPhoneNumber: SearchStudent }
+          { studentCode: "G"+SearchStudent },
         ]
       };
     } else {
       // If it contains text, validate if it's a proper student code format
-      if (StudentCodeUtils.isValidStudentCode(SearchStudent)) {
+      if (SearchStudent.includes('G')) {
         studentQuery = {
           $or: [
             { barCode: SearchStudent }, 
             { studentCode: SearchStudent }
           ]
         };
-      } else {
-        // If not a valid format, search by student name (partial match)
-        studentQuery = { studentName: { $regex: SearchStudent, $options: 'i' } };
-      }
+      } 
     }
     
     const student = await Student.findOne(studentQuery).populate('selectedTeachers.teacherId', 'teacherName subjectName teacherFees');
@@ -907,11 +819,11 @@ const attendStudent = async (req, res) => {
 `;
 
     try {
-      await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage).then((response) => {
-        console.log('Message sent:', response.data);
-      }).catch((error) => {
-        console.error('Error sending message:', error);
-      });
+      // await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage).then((response) => {
+      //   console.log('Message sent:', response.data);
+      // }).catch((error) => {
+      //   console.error('Error sending message:', error);
+      // });
     } catch (error) {
       console.error('Error sending message:', error);
       // Continue with the process even if message sending fails

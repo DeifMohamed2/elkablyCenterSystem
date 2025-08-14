@@ -3,8 +3,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // Get API details from environment variables with fallbacks
-const BASE_URL = process.env.WAZIPER_API_URL || 'https://waziper.com/api';
-const ACCESS_TOKEN = process.env.WAZIPER_ACCESS_TOKEN || '685334261fcbe';
+const BASE_URL = 'https://waziper.com/api';
+const ACCESS_TOKEN = '685334261fcbe';
 
 /**
  * Waziper API Client
@@ -384,7 +384,7 @@ const StudentCodeUtils = {
     while (attempts < maxAttempts) {
       // Generate a random 4-digit code
       const randomCode = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
-      const fullCode = randomCode + 'G';
+      const fullCode = 'G'+randomCode;
       
       // Check if this code already exists in the database
       const existingStudent = await Student.findOne({ studentCode: fullCode });
@@ -400,36 +400,11 @@ const StudentCodeUtils = {
     throw new Error('Unable to generate unique student code after maximum attempts');
   },
 
-  /**
-   * Validate student code format
-   * @param {string} code - The student code to validate
-   * @returns {boolean} True if valid, false otherwise
-   */
-  isValidStudentCode(code) {
-    return /^\d{4}G$/.test(code);
-  },
 
-  /**
-   * Extract numeric part from student code
-   * @param {string} code - The student code (e.g., "1234G")
-   * @returns {string} The numeric part (e.g., "1234")
-   */
-  extractNumericCode(code) {
-    if (this.isValidStudentCode(code)) {
-      return code.slice(0, -1); // Remove the 'G' suffix
-    }
-    return null;
-  },
 
-  /**
-   * Create student code from numeric part
-   * @param {string|number} numericCode - The numeric part
-   * @returns {string} The full student code
-   */
-  createStudentCode(numericCode) {
-    const numStr = String(numericCode).padStart(4, '0');
-    return numStr + 'G';
-  }
+
+
+
 };
 
 // Create and export a singleton instance
