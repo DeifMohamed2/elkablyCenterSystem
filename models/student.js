@@ -92,12 +92,24 @@ const studentSchema = new Schema(
     },
     studentCode: {
       type: String,
-      required: false,
+      required: true,
       unique: true,
+      validate: {
+        validator: function(v) {
+          // Ensure the code follows the pattern: 4 digits + 'G'
+          return /^\d{4}G$/.test(v);
+        },
+        message: 'Student code must be 4 digits followed by G (e.g., 1234G)'
+      }
     },
   },
   { timestamps: true }
 );
+
+// Add indexes for better performance
+studentSchema.index({ studentCode: 1 }, { unique: true });
+studentSchema.index({ studentPhoneNumber: 1 }, { unique: true });
+studentSchema.index({ barCode: 1 });
 
 const Student = mongoose.model('Student', studentSchema);
 

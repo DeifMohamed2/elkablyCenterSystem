@@ -370,6 +370,69 @@ class WaziperClient {
   }
 }
 
+// Student Code Generation Utility
+const StudentCodeUtils = {
+  /**
+   * Generate a unique student code
+   * @param {Object} Student - The Student model
+   * @returns {Promise<string>} A unique student code
+   */
+  async generateUniqueStudentCode(Student) {
+    let attempts = 0;
+    const maxAttempts = 100; // Prevent infinite loops
+    
+    while (attempts < maxAttempts) {
+      // Generate a random 4-digit code
+      const randomCode = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+      const fullCode = randomCode + 'G';
+      
+      // Check if this code already exists in the database
+      const existingStudent = await Student.findOne({ studentCode: fullCode });
+      
+      if (!existingStudent) {
+        return fullCode; // Code is unique, return it
+      }
+      
+      attempts++;
+    }
+    
+    // If we've tried too many times, throw an error
+    throw new Error('Unable to generate unique student code after maximum attempts');
+  },
+
+  /**
+   * Validate student code format
+   * @param {string} code - The student code to validate
+   * @returns {boolean} True if valid, false otherwise
+   */
+  isValidStudentCode(code) {
+    return /^\d{4}G$/.test(code);
+  },
+
+  /**
+   * Extract numeric part from student code
+   * @param {string} code - The student code (e.g., "1234G")
+   * @returns {string} The numeric part (e.g., "1234")
+   */
+  extractNumericCode(code) {
+    if (this.isValidStudentCode(code)) {
+      return code.slice(0, -1); // Remove the 'G' suffix
+    }
+    return null;
+  },
+
+  /**
+   * Create student code from numeric part
+   * @param {string|number} numericCode - The numeric part
+   * @returns {string} The full student code
+   */
+  createStudentCode(numericCode) {
+    const numStr = String(numericCode).padStart(4, '0');
+    return numStr + 'G';
+  }
+};
+
 // Create and export a singleton instance
 const waziper = new WaziperClient();
-module.exports = waziper; 
+module.exports = waziper;
+module.exports.StudentCodeUtils = StudentCodeUtils; 

@@ -8,6 +8,7 @@ const ExcelJS = require('exceljs');
 
 
 const waziper = require('../utils/waziper');
+const { StudentCodeUtils } = require('../utils/waziper');
 const instanceId = '68536629B61C9';
 
 
@@ -271,70 +272,76 @@ const addStudent = async (req, res) => {
         return;
     }
 
-    const studentCode = Math.floor(Math.random() * (6000 - 1000 + 1)) + 1000;
+    try {
+        // Generate a unique student code using the utility function
+        const studentCode = await StudentCodeUtils.generateUniqueStudentCode(Student);
 
-    // Process each selected teacher and their courses
-    const processedTeachers = selectedTeachers.map(({ teacherId, courses }) => {
-        const processedCourses = courses.map(({ courseName, amountPay, registerPrice }) => {
-            const amountRemaining = 0;  // Subtract paid amount from full registration fee
-            console.log('Amount Remaining:', amountRemaining);
-            return {
-              courseName,
-              amountPay,
-              registerPrice:0,
-              amountRemaining: amountRemaining > 0 ? amountRemaining : 0, // Ensure it doesn't go negative
-            };
-        });
-
-        return { teacherId, courses: processedCourses };
-    });
-
-    const student = new Student({
-        studentName,
-        studentPhoneNumber,
-        studentParentPhone,
-        schoolName,
-        selectedTeachers: processedTeachers,
-        amountRemaining: paymentType === 'perSession' ? 0 : studentAmount,
-        studentCode: studentCode + 'G',
-        paymentType,
-    });
-
-    student
-        .save()
-        .then(async (result) => {
-            const populatedStudent = await result.populate('selectedTeachers.teacherId', 'teacherName');
-
-            let message = `📌 *تفاصيل تسجيل الطالب*\n\n`;
-            message += `👤 *اسم الطالب:* ${populatedStudent.studentName}\n`;
-            message += `🏫 *المدرسة:* ${populatedStudent.schoolName}\n`;
-            message += `📞 *رقم الهاتف:* ${populatedStudent.studentPhoneNumber}\n`;
-            message += `📞 *رقم ولي الأمر:* ${populatedStudent.studentParentPhone}\n`;
-            message += `🆔 *كود الطالب:* ${populatedStudent.studentCode}\n\n`;
-
-            message += `📚 *تفاصيل الكورسات المسجلة:*\n`;
-
-            populatedStudent.selectedTeachers.forEach(({ teacherId, courses }) => {
-                message += `\n👨‍🏫 *المعلم:* ${teacherId.teacherName}\n`;
-                courses.forEach(({ courseName}) => {
-                    message += `   ➖ *الكورس:* ${courseName}\n`;
-              
-                });
+        // Process each selected teacher and their courses
+        const processedTeachers = selectedTeachers.map(({ teacherId, courses }) => {
+            const processedCourses = courses.map(({ courseName, amountPay, registerPrice }) => {
+                const amountRemaining = 0;  // Subtract paid amount from full registration fee
+                console.log('Amount Remaining:', amountRemaining);
+                return {
+                  courseName,
+                  amountPay,
+                  registerPrice:0,
+                  amountRemaining: amountRemaining > 0 ? amountRemaining : 0, // Ensure it doesn't go negative
+                };
             });
 
-            // Send the message via WhatsApp or another service
-            sendQRCode(`2${populatedStudent.studentPhoneNumber}@c.us`, `Scan the QR code to check in\n\n${message}`, populatedStudent.studentCode);
-
-            res.status(201).send(populatedStudent);
-        })
-        .catch((err) => {
-          if (err.code === 11000) {
-            res.status(400).send({ message: ' خطأ: إدخال مكرر تم ادخال الطالب من قبل' });
-          }else{
-
-            res.status(400).send({ message: 'هناك مشكله فنيه' });
-          }
+            return { teacherId, courses: processedCourses };
         });
+
+        const student = new Student({
+            studentName,
+            studentPhoneNumber,
+            studentParentPhone,
+            schoolName,
+            selectedTeachers: processedTeachers,
+            amountRemaining: paymentType === 'perSession' ? 0 : studentAmount,
+            studentCode: studentCode,
+            paymentType,
+        });
+
+        student
+            .save()
+            .then(async (result) => {
+                const populatedStudent = await result.populate('selectedTeachers.teacherId', 'teacherName');
+
+                let message = `📌 *تفاصيل تسجيل الطالب*\n\n`;
+                message += `👤 *اسم الطالب:* ${populatedStudent.studentName}\n`;
+                message += `🏫 *المدرسة:* ${populatedStudent.schoolName}\n`;
+                message += `📞 *رقم الهاتف:* ${populatedStudent.studentPhoneNumber}\n`;
+                message += `📞 *رقم ولي الأمر:* ${populatedStudent.studentParentPhone}\n`;
+                message += `🆔 *كود الطالب:* ${populatedStudent.studentCode}\n\n`;
+
+                message += `📚 *تفاصيل الكورسات المسجلة:*\n`;
+
+                populatedStudent.selectedTeachers.forEach(({ teacherId, courses }) => {
+                    message += `\n👨‍🏫 *المعلم:* ${teacherId.teacherName}\n`;
+                    courses.forEach(({ courseName}) => {
+                        message += `   ➖ *الكورس:* ${courseName}\n`;
+                  
+                    });
+                });
+
+                // Send the message via WhatsApp or another service
+                sendQRCode(`2${populatedStudent.studentPhoneNumber}@c.us`, `Scan the QR code to check in\n\n${message}`, populatedStudent.studentCode);
+
+                res.status(201).send(populatedStudent);
+            })
+            .catch((err) => {
+              if (err.code === 11000) {
+                res.status(400).send({ message: ' خطأ: إدخال مكرر تم ادخال الطالب من قبل' });
+              }else{
+
+                res.status(400).send({ message: 'هناك مشكله فنيه' });
+              }
+            });
+    } catch (error) {
+        console.error('Error generating unique student code:', error);
+        res.status(500).send({ message: 'خطأ في إنشاء كود الطالب، يرجى المحاولة مرة أخرى' });
+    }
 };
 
 const updateStudent = async (req, res) => {
@@ -422,18 +429,26 @@ const searchStudent = async (req, res) => {
     const query = {};
 
     if (search) {
+      const searchTerm = search.trim();
+      
       // Check if search contains only numbers
-      const isOnlyNumbers = /^\d+$/.test(search);
+      const isOnlyNumbers = /^\d+$/.test(searchTerm);
       
       if (isOnlyNumbers) {
-        // If it's only numbers, search by both phone number and student code
+        // If it's only numbers, search by phone number and create proper student code
+        const studentCode = StudentCodeUtils.createStudentCode(searchTerm);
         query.$or = [
-          { studentPhoneNumber: search },
-          { studentCode: "G" + search }
+          { studentPhoneNumber: searchTerm },
+          { studentCode: studentCode }
         ];
       } else {
-        // If it contains text (like "G123"), search by student code only
-        query.studentCode = search;
+        // If it contains text, validate if it's a proper student code format
+        if (StudentCodeUtils.isValidStudentCode(searchTerm)) {
+          query.studentCode = searchTerm;
+        } else {
+          // If not a valid format, search by student name (partial match)
+          query.studentName = { $regex: searchTerm, $options: 'i' };
+        }
       }
     }
     if (teacher) {
@@ -761,25 +776,33 @@ const attendStudent = async (req, res) => {
     // Find the student
     let studentQuery;
     const SearchStudent = searchStudent.trim();
+    
     // Check if search contains only numbers
     const isOnlyNumbers = /^\d+$/.test(SearchStudent);
     
     if (isOnlyNumbers) {
       // If it's only numbers, search by barCode, studentCode, and phone number
+      const studentCode = StudentCodeUtils.createStudentCode(SearchStudent);
       studentQuery = {
         $or: [
           { barCode: SearchStudent }, 
-          { studentCode: "G" + SearchStudent },
+          { studentCode: studentCode },
+          { studentPhoneNumber: SearchStudent }
         ]
       };
     } else {
-      // If it contains text (like "G123"), search by barCode and studentCode only
-      studentQuery = {
-        $or: [
-          { barCode: SearchStudent }, 
-          { studentCode: SearchStudent }
-        ]
-      };
+      // If it contains text, validate if it's a proper student code format
+      if (StudentCodeUtils.isValidStudentCode(SearchStudent)) {
+        studentQuery = {
+          $or: [
+            { barCode: SearchStudent }, 
+            { studentCode: SearchStudent }
+          ]
+        };
+      } else {
+        // If not a valid format, search by student name (partial match)
+        studentQuery = { studentName: { $regex: SearchStudent, $options: 'i' } };
+      }
     }
     
     const student = await Student.findOne(studentQuery).populate('selectedTeachers.teacherId', 'teacherName subjectName teacherFees');
