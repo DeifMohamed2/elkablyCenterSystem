@@ -119,6 +119,10 @@ router.get('/download-sendExcelTeachrByDate/:teacherId', authMiddleware, employe
 
 router.get('/download-sendExcelEmployeeByDate/:id', authMiddleware, employeeController.downloadAndSendExcelForEmployeeByDate);
 
+// Student Logs
+router.get('/student-logs', authMiddleware, employeeController.getStudentLogs);
+router.get('/student-logs-data/:studentId', authMiddleware, employeeController.getStudentLogsData);
+
 // LogOut
 
 router.get('/logout', authMiddleware, employeeController.logOut);

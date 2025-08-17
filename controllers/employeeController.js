@@ -15,6 +15,117 @@ const instanceId = '68536629B61C9';
 
 const dashboard = (req, res) => {
   
+
+
+  // Dashboard data preparation
+  // const prepareStudentData = async () => {
+  //   try {
+  //     // Find all students
+  //     const students = await Student.find({});
+      
+  //     // Check for students with incorrectly formatted codes (G at the end instead of beginning)
+  //     const studentsToUpdate = students.filter(student => 
+  //       student.studentCode && 
+  //       student.studentCode.endsWith('G') && 
+  //       /^\d{4}G$/.test(student.studentCode)
+  //     );
+      
+  //     // Update student codes to have G prefix instead of suffix
+  //     for (const student of studentsToUpdate) {
+  //       const oldCode = student.studentCode;
+  //       const newCode = `G${oldCode.substring(0, 4)}`; // Remove G from end and add to beginning
+        
+  //       // Check if the new code already exists to avoid duplicates
+  //       const existingStudent = await Student.findOne({ studentCode: newCode });
+        
+  //       if (!existingStudent) {
+  //         await Student.findByIdAndUpdate(student._id, { 
+  //           studentCode: newCode 
+  //         });
+  //         console.log(`Updated student code from ${oldCode} to ${newCode} for student ${student.studentName}`);
+  //       } else {
+  //         // Generate a new unique code with G prefix for duplicate cases
+  //         let isUnique = false;
+  //         let newUniqueCode;
+          
+  //         while (!isUnique) {
+  //           // Generate a random 4-digit number
+  //           const randomDigits = Math.floor(1000 + Math.random() * 9000);
+  //           newUniqueCode = `G${randomDigits}`;
+            
+  //           // Check if this code already exists
+  //           const duplicateCheck = await Student.findOne({ studentCode: newUniqueCode });
+  //           if (!duplicateCheck) {
+  //             isUnique = true;
+  //           }
+  //         }
+          
+  //         await Student.findByIdAndUpdate(student._id, { 
+  //           studentCode: newUniqueCode 
+  //         });
+  //         console.log(`Generated new unique code ${newUniqueCode} for student ${student.studentName} (old code ${oldCode} conflicted with existing record)`);
+  //       }
+  //     }
+      
+  //     // Also check for students missing the G prefix entirely
+  //     const studentsWithoutG = students.filter(student => 
+  //       student.studentCode && 
+  //       !student.studentCode.startsWith('G') && 
+  //       !student.studentCode.endsWith('G') && 
+  //       /^\d{4}$/.test(student.studentCode)
+  //     );
+      
+  //     // Update these students too
+  //     for (const student of studentsWithoutG) {
+  //       const oldCode = student.studentCode;
+  //       const newCode = `G${oldCode}`;
+        
+  //       const existingStudent = await Student.findOne({ studentCode: newCode });
+        
+  //       if (!existingStudent) {
+  //         await Student.findByIdAndUpdate(student._id, { 
+  //           studentCode: newCode 
+  //         });
+  //         console.log(`Updated student code from ${oldCode} to ${newCode} for student ${student.studentName}`);
+  //       } else {
+  //         // Generate a new unique code with G prefix for duplicate cases
+  //         let isUnique = false;
+  //         let newUniqueCode;
+          
+  //         while (!isUnique) {
+  //           // Generate a random 4-digit number
+  //           const randomDigits = Math.floor(1000 + Math.random() * 9000);
+  //           newUniqueCode = `G${randomDigits}`;
+            
+  //           // Check if this code already exists
+  //           const duplicateCheck = await Student.findOne({ studentCode: newUniqueCode });
+  //           if (!duplicateCheck) {
+  //             isUnique = true;
+  //           }
+  //         }
+          
+  //         await Student.findByIdAndUpdate(student._id, { 
+  //           studentCode: newUniqueCode 
+  //         });
+  //         console.log(`Generated new unique code ${newUniqueCode} for student ${student.studentName} (old code ${oldCode} conflicted with existing record)`);
+  //       }
+  //     }
+      
+  //     return {
+  //       totalStudents: students.length,
+  //       updatedStudents: studentsToUpdate.length + studentsWithoutG.length
+  //     };
+  //   } catch (error) {
+  //     console.error('Error updating student codes:', error);
+  //     return {
+  //       error: 'Failed to update student codes'
+  //     };
+  //   }
+  // };
+  
+  // // Run the code update on dashboard load
+  // prepareStudentData();
+  
   res.render('employee/dashboard', {
     title: 'Dashboard',
     path: '/employee/dashboard',
@@ -25,8 +136,49 @@ const dashboard = (req, res) => {
 
 const teacherSechdule = async(req, res) => {
     try {
+      // Get all teachers with their schedules
       const teachers = await Teacher.find({});
-      res.send(teachers);
+      
+      // Extract unique rooms from all teacher schedules
+      const rooms = new Set();
+      
+      teachers.forEach(teacher => {
+        // Handle schedule as a Map object
+        if (teacher.schedule && teacher.schedule instanceof Map) {
+          for (const [day, sessions] of teacher.schedule.entries()) {
+            if (Array.isArray(sessions)) {
+              sessions.forEach(session => {
+                if (session.roomID) {
+                  rooms.add(session.roomID);
+                }
+              });
+            }
+          }
+        } 
+        // Handle schedule as a plain object
+        else if (teacher.schedule && typeof teacher.schedule === 'object') {
+          Object.entries(teacher.schedule).forEach(([day, sessions]) => {
+            if (Array.isArray(sessions)) {
+              sessions.forEach(session => {
+                if (session.roomID) {
+                  rooms.add(session.roomID);
+                }
+              });
+            }
+          });
+        }
+      });
+      
+      // Add room information to the response
+      const response = {
+        teachers,
+        rooms: Array.from(rooms).map(roomID => ({
+          id: roomID,
+          title: `Room ${roomID}`
+        }))
+      };
+      
+      res.send(response);
     } catch (error) {
       console.error('Error fetching teachers:', error);
       res
@@ -233,7 +385,7 @@ const addStudent = async (req, res) => {
                 message += `🏫 *المدرسة:* ${populatedStudent.schoolName}\n`;
                 message += `📞 *رقم الهاتف:* ${populatedStudent.studentPhoneNumber}\n`;
                 message += `📞 *رقم ولي الأمر:* ${populatedStudent.studentParentPhone}\n`;
-                message += `🆔 *كود الطالب:* ${populatedStudent.studentCode}\n\n`;
+                message += `🆔 *كود الطالب:* ${populatedStudent.studentCode.substring(1)}\n\n`;
 
                 message += `📚 *تفاصيل الكورسات المسجلة:*\n`;
 
@@ -679,10 +831,23 @@ function getDateTime() {
 const attendStudent = async (req, res) => {
   console.time('attendStudentExecutionTime');
 
-  const { searchStudent, teacherId, courseName, mockCheck } = req.body;
+  const { searchStudent, teacherId, courseName, mockCheck, fixedAmountCheck, fixedAmount } = req.body;
   const employeeId = req.employeeId;
   const mockAmount = 150;
   const mockFees = 50;
+  
+  // Debug the incoming values
+  console.log('Request body:', { 
+    searchStudent, 
+    teacherId, 
+    courseName, 
+    mockCheck, 
+    fixedAmountCheck, 
+    fixedAmount,
+    mockCheckType: typeof mockCheck,
+    fixedAmountCheckType: typeof fixedAmountCheck,
+    fixedAmountType: typeof fixedAmount
+  });
 
   if (!teacherId || !courseName) {
     return res.status(400).json({ message: 'يجب اختيار الكورس ' });
@@ -695,7 +860,6 @@ const attendStudent = async (req, res) => {
     
     // Check if search contains only numbers
     const isOnlyNumbers = /^\d+$/.test(SearchStudent);
-
 
     if (isOnlyNumbers) {
       // If it's only numbers, search by barCode, studentCode, and phone number
@@ -782,8 +946,21 @@ const attendStudent = async (req, res) => {
 
     // Calculate payment details
     const isPerSession = student.paymentType === 'perSession';
-    const amountPaid = mockCheck ? mockAmount : (isPerSession ? course.amountPay : 0);
-    const feesApplied = mockCheck ? mockFees : (isPerSession ? teacher.teacherFees : 0);
+    let amountPaid;
+    
+    // Handle fixed amount with proper type checking
+    if ((fixedAmountCheck === true || fixedAmountCheck === "true") && fixedAmount) {
+      console.log('Using fixed amount:', fixedAmount);
+      amountPaid = parseFloat(fixedAmount);
+      if (isNaN(amountPaid)) {
+        console.error('Invalid fixed amount value:', fixedAmount);
+        amountPaid = isPerSession ? course.amountPay : 0;
+      }
+    } else {
+      // Handle mock check or regular amount
+      amountPaid = (mockCheck === true || mockCheck === "true") ? mockAmount : (isPerSession ? course.amountPay : 0);
+    }
+    const feesApplied = mockCheck === "true" ? mockFees : (isPerSession ? teacher.teacherFees : 0);
     const teacherProfit = isPerSession ? amountPaid - feesApplied : 0;
 
     // Add the student to the attendance record
@@ -819,11 +996,11 @@ const attendStudent = async (req, res) => {
 `;
 
     try {
-      // await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage).then((response) => {
-      //   console.log('Message sent:', response.data);
-      // }).catch((error) => {
-      //   console.error('Error sending message:', error);
-      // });
+      await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage).then((response) => {
+        console.log('Message sent:', response.data);
+      }).catch((error) => {
+        console.error('Error sending message:', error);
+      });
     } catch (error) {
       console.error('Error sending message:', error);
       // Continue with the process even if message sending fails
@@ -866,6 +1043,7 @@ const getAttendedStudents = async (req, res) => {
   try {
     const { teacherId, courseName } = req.query;
     if (!teacherId || !courseName) {
+      console.log(teacherId, courseName);
       return res.status(400).json({ message: 'Teacher ID and course name are required' });
     }
 
@@ -884,6 +1062,7 @@ const getAttendedStudents = async (req, res) => {
       .populate('teacher', 'teacherName teacherFees');
 
     if (!attendance) {
+      console.log('No attendance found');
       return res.status(404).json({ message: 'لا يوجد حضور اليوم' });
     }
 
@@ -2522,6 +2701,126 @@ const logOut = (req, res) => {
   res.redirect('/');
 };
 
+// ======================================== Student Logs ======================================== //
+
+const getStudentLogs = async (req, res) => {
+  try {
+    const allTeachers = await Teacher.find({}, { teacherName: 1, courses: 1 });
+    
+    res.render('employee/studentLogs', {
+      title: 'Student Logs',
+      path: '/employee/student-logs',
+      allTeachers
+    });
+  } catch (error) {
+    console.error('Error loading student logs page:', error);
+    res.status(500).send('An error occurred while loading the student logs page');
+  }
+};
+
+const getStudentLogsData = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const { teacherId, courseName, startDate, endDate, showTimeline } = req.query;
+    
+    // Validate student ID
+    if (!studentId) {
+      return res.status(400).json({ message: 'Student ID is required' });
+    }
+
+    // Get student details
+    const student = await Student.findById(studentId).populate('selectedTeachers.teacherId');
+    
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    // Build query for attendance records
+    const query = {
+      'studentsPresent.student': studentId
+    };
+
+    // If showTimeline is true and teacherId is provided, we don't apply date filters
+    if (showTimeline === 'true' && teacherId) {
+      // Only filter by teacher, showing all timeline data
+      console.log('Showing full timeline for teacher:', teacherId);
+    } else {
+      // Add date range filter if provided
+      if (startDate && endDate) {
+        query.date = { $gte: startDate, $lte: endDate };
+      }
+    }
+
+    // Add teacher filter if provided
+    if (teacherId) {
+      query.teacher = teacherId;
+    }
+
+    // Add course filter if provided
+    if (courseName) {
+      query.course = courseName;
+    }
+
+    // Get attendance records
+    const attendanceRecords = await Attendance.find(query)
+      .populate('teacher', 'teacherName')
+      .populate('studentsPresent.addedBy', 'employeeName')
+      .sort({ date: -1 });
+
+    // Process attendance records to get student-specific data
+    const studentAttendance = attendanceRecords.map(record => {
+      const studentPresent = record.studentsPresent.find(
+        sp => sp.student.toString() === studentId
+      );
+
+      if (studentPresent) {
+        return {
+          date: record.date,
+          course: record.course,
+          teacher: record.teacher,
+          amountPaid: studentPresent.amountPaid,
+          feesApplied: studentPresent.feesApplied,
+          addedBy: studentPresent.addedBy,
+          time: studentPresent.time || record.createdAt
+        };
+      }
+      return null;
+    }).filter(record => record !== null);
+
+    // Get payment history
+    const paymentHistory = student.paidHistory || [];
+
+    // Calculate statistics
+    const totalAttendance = studentAttendance.length;
+    const totalAmountPaid = studentAttendance.reduce((sum, record) => sum + record.amountPaid, 0);
+    
+    // Get courses the student is enrolled in
+    const enrolledCourses = student.selectedTeachers.flatMap(teacher => 
+      teacher.courses.map(course => ({
+        teacherId: teacher.teacherId._id,
+        teacherName: teacher.teacherId.teacherName,
+        courseName: course.courseName,
+        amountPay: course.amountPay,
+        amountRemaining: course.amountRemaining
+      }))
+    );
+
+    res.status(200).json({
+      student,
+      attendanceRecords: studentAttendance,
+      paymentHistory,
+      statistics: {
+        totalAttendance,
+        totalAmountPaid
+      },
+      enrolledCourses
+    });
+  } catch (error) {
+    console.error('Error fetching student logs data:', error);
+    res.status(500).json({ message: 'An error occurred while fetching student logs data' });
+  }
+};
+
 module.exports = {
   dashboard,
   teacherSechdule,
@@ -2543,7 +2842,6 @@ module.exports = {
   sendCodeAgain,
 
   // Teacher
-
   teacher_Get,
   addTeacher,
   getTeachers,
@@ -2551,7 +2849,6 @@ module.exports = {
   updateTeacher,
 
   // Attendance
-
   getAttendance,
   attendStudent,
   getAttendedStudents,
@@ -2570,5 +2867,11 @@ module.exports = {
   downloadAndSendExcelForTeacherByDate,
   downloadAndSendExcelForEmployeeByDate,
 
+  // Student Logs
+  getStudentLogs,
+  getStudentLogsData,
+
   logOut,
 };
+
+

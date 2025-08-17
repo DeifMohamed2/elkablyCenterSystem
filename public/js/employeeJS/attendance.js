@@ -32,7 +32,21 @@ async function attendStudent(event) {
     const courseSelection = courseSelction.value.split('_');
     data.teacherId = courseSelection[0];
     data.courseName = courseSelection[1];
-    data.mockCheck = mockCheck.checked;
+    data.mockCheck = mockCheck.checked ? true : false;
+    
+    // Add fixed amount data if checkbox is checked
+    const fixedAmountCheck = document.getElementById('fixedAmountCheck');
+    const fixedAmount = document.getElementById('fixedAmount');
+    
+    if (fixedAmountCheck.checked && fixedAmount.value) {
+      data.fixedAmountCheck = true;
+      data.fixedAmount = parseFloat(fixedAmount.value);
+      console.log('Fixed amount enabled:', {
+        fixedAmountCheck: data.fixedAmountCheck,
+        fixedAmount: data.fixedAmount,
+        fixedAmountType: typeof data.fixedAmount
+      });
+    }
     try {
         const response = await fetch('/employee/attend-student', {
         method: 'POST',

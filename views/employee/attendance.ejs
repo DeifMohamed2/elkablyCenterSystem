@@ -239,6 +239,19 @@ hr {
             </label>
             </div>
         </div>
+        <div class="col-md-6">
+            <div class="d-flex align-items-center">
+              <div class="form-check me-3 mt-3">
+                <input class="form-check-input" type="checkbox" value="true" id="fixedAmountCheck">
+                <label class="form-check-label fw-bold" for="fixedAmountCheck">
+                  <span class="text-dark">مبلغ ثابت</span>
+                </label>
+              </div>
+              <div class="input-group w-50">
+                <input type="number" class="form-control border border-2 p-2 text-center fw-bold" id="fixedAmount" name="fixedAmount" placeholder="المبلغ الثابت" disabled>
+              </div>
+            </div>
+        </div>
       </div>
       <div class="row">
         <div class="col-12">
@@ -386,6 +399,19 @@ hr {
             document.getElementById('courseSelction').disabled = false;
             document.getElementById('changeCourseButton').classList.add('d-none');
           }
+          
+          // Fixed amount checkbox handler
+          document.addEventListener('DOMContentLoaded', function() {
+            const fixedAmountCheck = document.getElementById('fixedAmountCheck');
+            const fixedAmount = document.getElementById('fixedAmount');
+            
+            fixedAmountCheck.addEventListener('change', function() {
+              fixedAmount.disabled = !this.checked;
+              if (!this.checked) {
+                fixedAmount.value = '';
+              }
+            });
+          });
   </script>
 
 

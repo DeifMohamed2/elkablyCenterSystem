@@ -239,7 +239,6 @@ class WaziperClient {
       }
       
       console.log(`Sending media message to ${normalizedNumber} using instance ${instanceId}`);
-      console.log(`Media URL: ${mediaUrl}`);
       
       const payload = {
         number: normalizedNumber,

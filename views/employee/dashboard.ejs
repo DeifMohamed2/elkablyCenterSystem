@@ -34,11 +34,355 @@
    margin: 8.9px;
 }
 
-
 @keyframes spinner-e04l1k {
    100% {
       transform: rotate(1turn);
    }
+}
+
+/* Custom Calendar Styles */
+.custom-calendar {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.calendar-header {
+  background-color: #f8f9fa;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.calendar-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #344767;
+}
+
+.calendar-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.calendar-controls button {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calendar-controls button:hover {
+  background-color: #f8f9fa;
+}
+
+.calendar-controls button.active {
+  background-color: #43A047;
+  color: white;
+  border-color: #43A047;
+}
+
+.calendar-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.time-labels {
+  display: flex;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.time-label {
+  flex: 0 0 60px;
+  text-align: center;
+  padding: 10px 0;
+  font-weight: 500;
+  color: #6c757d;
+  border-right: 1px solid #e9ecef;
+}
+
+.room-header {
+  display: flex;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.empty-cell {
+  flex: 0 0 60px;
+  border-right: 1px solid #e9ecef;
+}
+
+.room-cell {
+  flex: 1;
+  text-align: center;
+  padding: 10px 5px;
+  font-weight: 600;
+  background-color: #f8f9fa;
+  color: #344767;
+  border-right: 1px solid #e9ecef;
+}
+
+.calendar-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.time-row {
+  display: flex;
+  height: 80px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.time-slot {
+  flex: 0 0 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #6c757d;
+  border-right: 1px solid #e9ecef;
+}
+
+.room-slots {
+  flex: 1;
+  display: flex;
+}
+
+.room-time-slot {
+  flex: 1;
+  position: relative;
+  border-right: 1px solid #e9ecef;
+  background-color: rgba(67, 160, 71, 0.05);
+}
+
+.calendar-event {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: white;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  min-height: 60px;
+  border-left: 3px solid transparent;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Day-specific styling for week view */
+.calendar-event.day-Sunday { border-left: 3px solid #FF5722; }  /* Sunday */
+.calendar-event.day-Monday { border-left: 3px solid #2196F3; }  /* Monday */
+.calendar-event.day-Tuesday { border-left: 3px solid #4CAF50; }  /* Tuesday */
+.calendar-event.day-Wednesday { border-left: 3px solid #9C27B0; }  /* Wednesday */
+.calendar-event.day-Thursday { border-left: 3px solid #FFC107; }  /* Thursday */
+.calendar-event.day-Friday { border-left: 3px solid #795548; }  /* Friday */
+.calendar-event.day-Saturday { border-left: 3px solid #607D8B; }  /* Saturday */
+
+.calendar-event.overlapping-1 {
+  width: 48%;
+  right: auto;
+}
+
+.calendar-event.overlapping-2 {
+  width: 48%;
+  left: auto;
+}
+
+.calendar-event.overlapping-3 {
+  width: 32%;
+  right: auto;
+}
+
+.calendar-event.overlapping-4 {
+  width: 32%;
+  left: 34%;
+  right: auto;
+}
+
+.calendar-event.overlapping-5 {
+  width: 32%;
+  left: auto;
+}
+
+.calendar-event-text {
+  font-weight: 500;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-event-details {
+  font-size: 0.7rem;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+
+.calendar-event-time {
+  font-size: 0.7rem;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.calendar-event-indicator {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #333;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.event-tooltip {
+  position: fixed;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
+  padding: 10px 15px;
+  z-index: 9999;
+  max-width: 300px;
+  display: none;
+  border: 1px solid #dee2e6;
+}
+
+.event-tooltip.show {
+  display: block;
+}
+
+.tooltip-title {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #344767;
+}
+
+.tooltip-detail {
+  margin-bottom: 3px;
+  color: #6c757d;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  margin-top: 15px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend-color {
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+}
+
+.day-selector {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 15px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.day-button {
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.day-button.active {
+  background-color: #43A047 !important;
+  color: white !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.no-events-message {
+  text-align: center;
+  padding: 30px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .calendar-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .calendar-controls {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+  
+  .time-label, .time-slot {
+    flex: 0 0 40px;
+    font-size: 0.7rem;
+  }
+  
+  .room-cell {
+    padding: 5px 2px;
+    font-size: 0.8rem;
+  }
+  
+  .calendar-event {
+    font-size: 0.7rem;
+    padding: 3px 4px;
+    min-height: 50px;
+  }
+  
+  .calendar-event-text {
+    font-size: 0.7rem;
+  }
+  
+  .calendar-event-details, 
+  .calendar-event-time {
+    font-size: 0.6rem;
+  }
+  
+  .time-row {
+    height: 70px;
+  }
+  
+  .event-tooltip {
+    max-width: 80%;
+    left: 10% !important;
+    right: 10% !important;
+  }
 }
 </style>
 <body class="g-sidenav-show rtl bg-gray-100">
@@ -52,11 +396,44 @@
     <!-- End Navbar -->
   
 
-      <div class="row mt-5" dir="ltr">
-        <div id="spinner" class="spinner mx-auto d-none"></div>
-
-        <div id="calendar" style="height: 500px"></div>
-
+      <div class="row mt-5">
+        <div class="col-12">
+          <div id="spinner" class="spinner mx-auto d-none"></div>
+          
+          <!-- Day selector -->
+          <div class="day-selector mb-3" id="daySelector"></div>
+          
+          <!-- Custom Calendar -->
+          <div class="custom-calendar" id="customCalendar">
+            <div class="calendar-header">
+              <div class="calendar-title">جدول الغرف</div>
+              <div class="calendar-controls">
+                <button id="dayViewBtn" class="active">يوم</button>
+                <button id="weekViewBtn">أسبوع</button>
+                <button id="todayBtn">اليوم</button>
+              </div>
+            </div>
+            
+            <div id="calendarContent">
+              <!-- Calendar content will be generated dynamically -->
+            </div>
+          </div>
+          
+          <!-- Legend -->
+          <div class="legend mt-3" id="legendContainer">
+            <!-- Legend items will be generated dynamically -->
+          </div>
+          
+          <!-- Event tooltip -->
+          <div class="event-tooltip" id="eventTooltip">
+            <div class="tooltip-title" id="tooltipTitle"></div>
+            <div class="tooltip-detail" id="tooltipTeacher"></div>
+            <div class="tooltip-detail" id="tooltipSubject"></div>
+            <div class="tooltip-detail" id="tooltipRoom"></div>
+            <div class="tooltip-detail" id="tooltipTime"></div>
+            <div class="tooltip-detail" id="tooltipCourses"></div>
+          </div>
+        </div>
       </div>
 
 
@@ -68,7 +445,7 @@
   <!--   Core JS Files   -->
   
 
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js' defer></script>
+    <!-- No external calendar library needed for custom implementation -->
 
   <script src="/js/employeeJS/dash.js" ></script>
   <script src="..//assets/js/core/popper.min.js"></script>
@@ -77,237 +454,7 @@
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/chartjs.min.js"></script>
   <script>
-    var ctx = document.getElementById("chart-bars").getContext("2d");
-
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: ["M", "T", "W", "T", "F", "S", "S"],
-        datasets: [{
-          label: "Views",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "#43A047",
-          data: [50, 45, 22, 28, 50, 60, 76],
-          barThickness: 'flex'
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: '#e5e5e5'
-            },
-            ticks: {
-              suggestedMin: 0,
-              suggestedMax: 500,
-              beginAtZero: true,
-              padding: 10,
-              font: {
-                size: 14,
-                lineHeight: 2
-              },
-              color: "#737373"
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 14,
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-
-    var ctx2 = document.getElementById("chart-line").getContext("2d");
-
-    new Chart(ctx2, {
-      type: "line",
-      data: {
-        labels: ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
-        datasets: [{
-          label: "Sales",
-          tension: 0,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointBackgroundColor: "#43A047",
-          pointBorderColor: "transparent",
-          borderColor: "#43A047",
-          backgroundColor: "transparent",
-          fill: true,
-          data: [120, 230, 130, 440, 250, 360, 270, 180, 90, 300, 310, 220],
-          maxBarThickness: 6
-
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            callbacks: {
-              title: function(context) {
-                const fullMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                return fullMonths[context[0].dataIndex];
-              }
-            }
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [4, 4],
-              color: '#e5e5e5'
-            },
-            ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 12,
-                lineHeight: 2
-              },
-            }
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 12,
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
-
-    new Chart(ctx3, {
-      type: "line",
-      data: {
-        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-        datasets: [{
-          label: "Tasks",
-          tension: 0,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointBackgroundColor: "#43A047",
-          pointBorderColor: "transparent",
-          borderColor: "#43A047",
-          backgroundColor: "transparent",
-          fill: true,
-          data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-          maxBarThickness: 6
-
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [4, 4],
-              color: '#e5e5e5'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#737373',
-              font: {
-                size: 14,
-                lineHeight: 2
-              },
-            }
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [4, 4]
-            },
-            ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 14,
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
+    // Skip chart initialization since we're using FullCalendar for the dashboard
   </script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
