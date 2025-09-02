@@ -14,16 +14,28 @@ const billingSchema = new Schema(
         },
         billNote: {
             type: String,
-            required: true,
+            required: false,
+            default: '',
         },
         billPhoto: {
             type: String,
             required: false,
         },
+        billCategory: {
+            type: String,
+            enum: ['salaries', 'canteen_in', 'canteen_out', 'government_fees', 'electric_invoices', 'equipments', 'other'],
+            default: 'other',
+            required: true,
+        },
         employee:{
                 type: Schema.Types.ObjectId,
                 ref: 'Employee',
                 required: true,
+        },
+        salaryEmployee: {
+                type: Schema.Types.ObjectId,
+                ref: 'Employee',
+                required: false,
         },
 
     },

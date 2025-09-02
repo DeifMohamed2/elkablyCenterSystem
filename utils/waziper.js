@@ -17,10 +17,10 @@ class WaziperClient {
       headers: {
         'Content-Type': 'application/json',
       },
-      // Increase timeout and body limits to handle slow API responses and large payloads
-      timeout: 90000,
-      maxBodyLength: Infinity,
-      maxContentLength: Infinity,
+          // Increase timeout and body limits to handle slow API responses and large payloads
+    timeout: 30000, // Reduced from 90 seconds to 30 seconds
+    maxBodyLength: Infinity,
+    maxContentLength: Infinity,
     });
     
     // Add request interceptor for logging
@@ -171,6 +171,8 @@ class WaziperClient {
     }
   }
 
+
+
   /**
    * Send a text message
    * @param {string} instanceId - The instance ID
@@ -182,15 +184,39 @@ class WaziperClient {
     try {
       const normalizedNumber = this.normalizeNumber(number);
       console.log(`Sending text message to ${normalizedNumber} using instance ${instanceId}`);
-      return await this.axios.post('/send', {
+      
+      // Validate inputs
+      if (!normalizedNumber || normalizedNumber.length < 10) {
+        throw new Error('Invalid phone number');
+      }
+      
+      if (!message || message.trim().length === 0) {
+        throw new Error('Message cannot be empty');
+      }
+      
+      const response = await this.axios.post('/send', {
         number: normalizedNumber,
         type: 'text',
-        message,
+        message: message.trim(),
         instance_id: instanceId,
         access_token: this.accessToken,
       });
+      
+      // Log successful response
+      console.log(`Message sent successfully to ${normalizedNumber}`);
+      return response;
+      
     } catch (error) {
       console.error(`Error sending text message to ${this.normalizeNumber(number)}:`, error.message);
+      
+      // Enhanced error logging
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+      } else if (error.request) {
+        console.error('No response received - request timeout or network issue');
+      }
+      
       throw error;
     }
   }

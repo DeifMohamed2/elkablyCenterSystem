@@ -1,0 +1,2880 @@
+[{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6806"
+  },
+  "billName": "مصروفات حكومية",
+  "billAmount": 422,
+  "billNote": "مصروف ١٥‏/٨‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "government_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-08-15T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f681c"
+  },
+  "billName": "إيراد طلاب ٢١‏/٦‏/٢٠٢٥",
+  "billAmount": 745,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-21T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f681d"
+  },
+  "billName": "إيراد طلاب ١٢‏/٦‏/٢٠٢٥",
+  "billAmount": 1068,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-12T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6821"
+  },
+  "billName": "إيراد طلاب ٢٥‏/٦‏/٢٠٢٥",
+  "billAmount": 613,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-25T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f682d"
+  },
+  "billName": "إيراد طلاب ١٦‏/٥‏/٢٠٢٥",
+  "billAmount": 882,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-16T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f684c"
+  },
+  "billName": "إيراد طلاب ٢٨‏/٤‏/٢٠٢٥",
+  "billAmount": 1327,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-28T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6873"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 177,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-03T15:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67f5"
+  },
+  "billName": "إيراد طلاب ١٤‏/٨‏/٢٠٢٥",
+  "billAmount": 891,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-14T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.110Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67f6"
+  },
+  "billName": "إيراد طلاب ١٩‏/٨‏/٢٠٢٥",
+  "billAmount": 640,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-19T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.110Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6803"
+  },
+  "billName": "مصروفات أخرى",
+  "billAmount": 290,
+  "billNote": "مصروف ٧‏/٨‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "other_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-08-07T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f680c"
+  },
+  "billName": "إيراد طلاب ٢١‏/٧‏/٢٠٢٥",
+  "billAmount": 1473,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-21T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6819"
+  },
+  "billName": "مصروفات أخرى",
+  "billAmount": 357,
+  "billNote": "مصروف ١٠‏/٧‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "other_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-07-10T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6828"
+  },
+  "billName": "مصروفات حكومية",
+  "billAmount": 246,
+  "billNote": "مصروف ١٠‏/٦‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "government_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-06-10T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f683b"
+  },
+  "billName": "إيراد طلاب ١‏/٥‏/٢٠٢٥",
+  "billAmount": 1069,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-01T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f684e"
+  },
+  "billName": "إيراد طلاب ١٠‏/٤‏/٢٠٢٥",
+  "billAmount": 1455,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-10T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f685f"
+  },
+  "billName": "إيراد طلاب ٦‏/٣‏/٢٠٢٥",
+  "billAmount": 1472,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-06T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6869"
+  },
+  "billName": "مشتريات الكانتين",
+  "billAmount": 585,
+  "billNote": "مصروف ١٦‏/٣‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "canteen_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-03-16T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f686a"
+  },
+  "billName": "مصروفات حكومية",
+  "billAmount": 458,
+  "billNote": "مصروف ٢٥‏/٣‏/٢٠٢٥",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "government_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-03-25T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f687c"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 210,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-29T14:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6808"
+  },
+  "billName": "فاتورة الكهرباء",
+  "billAmount": 324,
+  "billNote": "مصروف ١٨‏/٨‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "electric_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-08-18T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6817"
+  },
+  "billName": "مصروفات أخرى",
+  "billAmount": 242,
+  "billNote": "مصروف ٢٠‏/٧‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "other_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-07-20T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6818"
+  },
+  "billName": "مشتريات الكانتين",
+  "billAmount": 872,
+  "billNote": "مصروف ٦‏/٧‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "canteen_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-07-06T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6824"
+  },
+  "billName": "إيراد طلاب ٩‏/٦‏/٢٠٢٥",
+  "billAmount": 1005,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-09T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6826"
+  },
+  "billName": "مرتبات المعلمين",
+  "billAmount": 2004,
+  "billNote": "مصروف ٤‏/٦‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "salaries_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-06-04T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f682f"
+  },
+  "billName": "إيراد طلاب ٧‏/٥‏/٢٠٢٥",
+  "billAmount": 1315,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-07T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6831"
+  },
+  "billName": "إيراد طلاب ٥‏/٥‏/٢٠٢٥",
+  "billAmount": 960,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-05T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6835"
+  },
+  "billName": "إيراد طلاب ٢٥‏/٥‏/٢٠٢٥",
+  "billAmount": 1360,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-25T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f683f"
+  },
+  "billName": "إيراد طلاب ٢٧‏/٤‏/٢٠٢٥",
+  "billAmount": 1371,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-27T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6863"
+  },
+  "billName": "إيراد طلاب ٥‏/٣‏/٢٠٢٥",
+  "billAmount": 1448,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-05T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6867"
+  },
+  "billName": "إيراد طلاب ١٤‏/٣‏/٢٠٢٥",
+  "billAmount": 1226,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-14T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67fa"
+  },
+  "billName": "إيراد طلاب ٢١‏/٨‏/٢٠٢٥",
+  "billAmount": 1337,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-21T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6802"
+  },
+  "billName": "مشتريات الكانتين",
+  "billAmount": 496,
+  "billNote": "مصروف ٩‏/٨‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "canteen_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-08-09T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6810"
+  },
+  "billName": "إيراد طلاب ٢٠‏/٧‏/٢٠٢٥",
+  "billAmount": 1264,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-20T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f684f"
+  },
+  "billName": "إيراد طلاب ٢٨‏/٤‏/٢٠٢٥",
+  "billAmount": 1377,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-28T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6853"
+  },
+  "billName": "مصروفات أخرى",
+  "billAmount": 350,
+  "billNote": "مصروف ٦‏/٤‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "other_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-04-06T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67f0"
+  },
+  "billName": "إيراد طلاب ١٤‏/٨‏/٢٠٢٥",
+  "billAmount": 694,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-14T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.110Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67f9"
+  },
+  "billName": "إيراد طلاب ١٨‏/٨‏/٢٠٢٥",
+  "billAmount": 1281,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-18T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.110Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67fb"
+  },
+  "billName": "إيراد طلاب ٢٥‏/٨‏/٢٠٢٥",
+  "billAmount": 1289,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-25T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6801"
+  },
+  "billName": "إيراد طلاب ١٨‏/٨‏/٢٠٢٥",
+  "billAmount": 721,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-18T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6809"
+  },
+  "billName": "إيراد طلاب ٧‏/٧‏/٢٠٢٥",
+  "billAmount": 535,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-07T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f680f"
+  },
+  "billName": "إيراد طلاب ٦‏/٧‏/٢٠٢٥",
+  "billAmount": 1051,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-06T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6830"
+  },
+  "billName": "إيراد طلاب ٢‏/٥‏/٢٠٢٥",
+  "billAmount": 1281,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-02T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f685a"
+  },
+  "billName": "إيراد طلاب ١٨‏/٣‏/٢٠٢٥",
+  "billAmount": 847,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-18T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f686c"
+  },
+  "billName": "فاتورة الكهرباء",
+  "billAmount": 755,
+  "billNote": "مصروف ١‏/٣‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "electric_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-03-01T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67f2"
+  },
+  "billName": "إيراد طلاب ٩‏/٨‏/٢٠٢٥",
+  "billAmount": 1214,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-09T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.110Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67f4"
+  },
+  "billName": "إيراد طلاب ٢٦‏/٨‏/٢٠٢٥",
+  "billAmount": 1122,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-26T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.110Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67fd"
+  },
+  "billName": "إيراد طلاب ٨‏/٨‏/٢٠٢٥",
+  "billAmount": 1324,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-08T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6804"
+  },
+  "billName": "مصروفات أخرى",
+  "billAmount": 386,
+  "billNote": "مصروف ٨‏/٨‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "other_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-08-08T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6844"
+  },
+  "billName": "إيراد طلاب ٢٤‏/٤‏/٢٠٢٥",
+  "billAmount": 1039,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-24T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6849"
+  },
+  "billName": "إيراد طلاب ٢‏/٤‏/٢٠٢٥",
+  "billAmount": 880,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-02T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6875"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 264,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-22T14:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6878"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 345,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-13T14:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67fc"
+  },
+  "billName": "إيراد طلاب ٥‏/٨‏/٢٠٢٥",
+  "billAmount": 886,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-05T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67fe"
+  },
+  "billName": "إيراد طلاب ٥‏/٨‏/٢٠٢٥",
+  "billAmount": 1321,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-05T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6800"
+  },
+  "billName": "إيراد طلاب ١٢‏/٨‏/٢٠٢٥",
+  "billAmount": 1335,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-12T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f682c"
+  },
+  "billName": "إيراد طلاب ١٩‏/٥‏/٢٠٢٥",
+  "billAmount": 511,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-19T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f684b"
+  },
+  "billName": "إيراد طلاب ٦‏/٤‏/٢٠٢٥",
+  "billAmount": 1316,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-06T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f685d"
+  },
+  "billName": "إيراد طلاب ١٤‏/٣‏/٢٠٢٥",
+  "billAmount": 1493,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-14T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f686f"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 361,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-23T14:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f680b"
+  },
+  "billName": "إيراد طلاب ٣‏/٧‏/٢٠٢٥",
+  "billAmount": 916,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-03T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6812"
+  },
+  "billName": "إيراد طلاب ٢٦‏/٧‏/٢٠٢٥",
+  "billAmount": 775,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-26T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6825"
+  },
+  "billName": "إيراد طلاب ٩‏/٦‏/٢٠٢٥",
+  "billAmount": 1316,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-09T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6833"
+  },
+  "billName": "إيراد طلاب ١٣‏/٥‏/٢٠٢٥",
+  "billAmount": 1110,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-13T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6846"
+  },
+  "billName": "إيراد طلاب ٢٠‏/٤‏/٢٠٢٥",
+  "billAmount": 502,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-20T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6866"
+  },
+  "billName": "إيراد طلاب ٧‏/٣‏/٢٠٢٥",
+  "billAmount": 1481,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-07T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6871"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 360,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-15T15:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f687a"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 298,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-08T14:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67f8"
+  },
+  "billName": "إيراد طلاب ٣‏/٨‏/٢٠٢٥",
+  "billAmount": 1420,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-03T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.110Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f681e"
+  },
+  "billName": "إيراد طلاب ١١‏/٦‏/٢٠٢٥",
+  "billAmount": 893,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-11T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6823"
+  },
+  "billName": "إيراد طلاب ١٦‏/٦‏/٢٠٢٥",
+  "billAmount": 1206,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-16T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6836"
+  },
+  "billName": "إيراد طلاب ٣‏/٥‏/٢٠٢٥",
+  "billAmount": 1429,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-03T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6842"
+  },
+  "billName": "إيراد طلاب ٢٤‏/٤‏/٢٠٢٥",
+  "billAmount": 647,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-24T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6845"
+  },
+  "billName": "إيراد طلاب ١٠‏/٤‏/٢٠٢٥",
+  "billAmount": 1415,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-10T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f684a"
+  },
+  "billName": "إيراد طلاب ٣‏/٤‏/٢٠٢٥",
+  "billAmount": 1363,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-03T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6860"
+  },
+  "billName": "إيراد طلاب ٢٣‏/٣‏/٢٠٢٥",
+  "billAmount": 1307,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-23T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6861"
+  },
+  "billName": "إيراد طلاب ٢٧‏/٣‏/٢٠٢٥",
+  "billAmount": 1096,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-27T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6870"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 228,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-26T14:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6872"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 394,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-16T14:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6805"
+  },
+  "billName": "مصروفات حكومية",
+  "billAmount": 185,
+  "billNote": "مصروف ١٢‏/٨‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "government_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-08-12T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f680e"
+  },
+  "billName": "إيراد طلاب ٨‏/٧‏/٢٠٢٥",
+  "billAmount": 1449,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-08T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6816"
+  },
+  "billName": "إيراد طلاب ٢٨‏/٧‏/٢٠٢٥",
+  "billAmount": 1130,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-28T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f681b"
+  },
+  "billName": "إيراد طلاب ١٩‏/٦‏/٢٠٢٥",
+  "billAmount": 908,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-19T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6832"
+  },
+  "billName": "إيراد طلاب ١٥‏/٥‏/٢٠٢٥",
+  "billAmount": 1471,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-15T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6834"
+  },
+  "billName": "إيراد طلاب ٢‏/٥‏/٢٠٢٥",
+  "billAmount": 706,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-02T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f683c"
+  },
+  "billName": "مصروفات أخرى",
+  "billAmount": 167,
+  "billNote": "مصروف ١١‏/٥‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "other_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-05-11T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6852"
+  },
+  "billName": "مشتريات الكانتين",
+  "billAmount": 638,
+  "billNote": "مصروف ١٩‏/٤‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "canteen_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-04-19T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f685b"
+  },
+  "billName": "إيراد طلاب ٤‏/٣‏/٢٠٢٥",
+  "billAmount": 1360,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-04T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f686b"
+  },
+  "billName": "مصروفات حكومية",
+  "billAmount": 399,
+  "billNote": "مصروف ١٠‏/٣‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "government_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-03-10T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67f7"
+  },
+  "billName": "إيراد طلاب ٢٣‏/٨‏/٢٠٢٥",
+  "billAmount": 1187,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-23T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.110Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67ff"
+  },
+  "billName": "إيراد طلاب ١٩‏/٨‏/٢٠٢٥",
+  "billAmount": 770,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-19T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6807"
+  },
+  "billName": "فاتورة الكهرباء",
+  "billAmount": 493,
+  "billNote": "مصروف ٢٣‏/٨‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "electric_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-08-23T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6814"
+  },
+  "billName": "إيراد طلاب ١٧‏/٧‏/٢٠٢٥",
+  "billAmount": 579,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-17T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f682a"
+  },
+  "billName": "مصروفات حكومية",
+  "billAmount": 360,
+  "billNote": "مصروف ١٠‏/٦‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "government_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-06-10T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6848"
+  },
+  "billName": "إيراد طلاب ٢٠‏/٤‏/٢٠٢٥",
+  "billAmount": 656,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-20T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6851"
+  },
+  "billName": "مصروفات حكومية",
+  "billAmount": 375,
+  "billNote": "مصروف ٢٣‏/٤‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "government_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-04-23T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6855"
+  },
+  "billName": "مرتبات المعلمين",
+  "billAmount": 2839,
+  "billNote": "مصروف ٩‏/٤‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "salaries_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-04-09T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f685e"
+  },
+  "billName": "إيراد طلاب ١٣‏/٣‏/٢٠٢٥",
+  "billAmount": 555,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-13T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6864"
+  },
+  "billName": "إيراد طلاب ٢٥‏/٣‏/٢٠٢٥",
+  "billAmount": 1481,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-25T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6865"
+  },
+  "billName": "إيراد طلاب ١٥‏/٣‏/٢٠٢٥",
+  "billAmount": 568,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-15T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6876"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 122,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-08T14:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6879"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 340,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-12T14:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6858"
+  },
+  "billName": "إيراد طلاب ١٧‏/٣‏/٢٠٢٥",
+  "billAmount": 1065,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-17T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f685c"
+  },
+  "billName": "إيراد طلاب ٢‏/٣‏/٢٠٢٥",
+  "billAmount": 1239,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-02T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f687b"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 148,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-25T14:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67ef"
+  },
+  "billName": "إيراد طلاب ١٤‏/٨‏/٢٠٢٥",
+  "billAmount": 1216,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-14T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.110Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67f1"
+  },
+  "billName": "إيراد طلاب ٨‏/٨‏/٢٠٢٥",
+  "billAmount": 1402,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-08T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.110Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6813"
+  },
+  "billName": "إيراد طلاب ٨‏/٧‏/٢٠٢٥",
+  "billAmount": 1269,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-08T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6829"
+  },
+  "billName": "مرتبات المعلمين",
+  "billAmount": 2832,
+  "billNote": "مصروف ٢٧‏/٦‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "salaries_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-06-27T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f682e"
+  },
+  "billName": "إيراد طلاب ١٦‏/٥‏/٢٠٢٥",
+  "billAmount": 1429,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-16T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6837"
+  },
+  "billName": "إيراد طلاب ٤‏/٥‏/٢٠٢٥",
+  "billAmount": 670,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-04T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6838"
+  },
+  "billName": "إيراد طلاب ١٨‏/٥‏/٢٠٢٥",
+  "billAmount": 1224,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-18T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f683a"
+  },
+  "billName": "إيراد طلاب ١٧‏/٥‏/٢٠٢٥",
+  "billAmount": 1333,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-17T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f683e"
+  },
+  "billName": "مصروفات أخرى",
+  "billAmount": 71,
+  "billNote": "مصروف ١٥‏/٥‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "other_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-05-15T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f684d"
+  },
+  "billName": "إيراد طلاب ٢٥‏/٤‏/٢٠٢٥",
+  "billAmount": 1425,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-25T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6857"
+  },
+  "billName": "فاتورة الكهرباء",
+  "billAmount": 573,
+  "billNote": "مصروف ٢٢‏/٤‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "electric_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-04-22T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6868"
+  },
+  "billName": "إيراد طلاب ٨‏/٣‏/٢٠٢٥",
+  "billAmount": 1476,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-08T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f686d"
+  },
+  "billName": "مرتبات المعلمين",
+  "billAmount": 1852,
+  "billNote": "مصروف ٥‏/٣‏/٢٠٢٥",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "salaries_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-03-05T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6815"
+  },
+  "billName": "إيراد طلاب ٢٢‏/٧‏/٢٠٢٥",
+  "billAmount": 1123,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-22T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f681a"
+  },
+  "billName": "إيراد طلاب ١٤‏/٦‏/٢٠٢٥",
+  "billAmount": 581,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-14T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6820"
+  },
+  "billName": "إيراد طلاب ٢٨‏/٦‏/٢٠٢٥",
+  "billAmount": 697,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-28T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6843"
+  },
+  "billName": "إيراد طلاب ٢٤‏/٤‏/٢٠٢٥",
+  "billAmount": 1215,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-24T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6854"
+  },
+  "billName": "مشتريات الكانتين",
+  "billAmount": 419,
+  "billNote": "مصروف ٦‏/٤‏/٢٠٢٥",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "canteen_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-04-06T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6856"
+  },
+  "billName": "مصروفات أخرى",
+  "billAmount": 288,
+  "billNote": "مصروف ٩‏/٤‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "other_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-04-09T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6862"
+  },
+  "billName": "إيراد طلاب ١٧‏/٣‏/٢٠٢٥",
+  "billAmount": 737,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-17T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6874"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 272,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-08T14:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6877"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 145,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-31T14:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67ee"
+  },
+  "billName": "إيراد طلاب ١٠‏/٨‏/٢٠٢٥",
+  "billAmount": 1373,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-10T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.110Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f67f3"
+  },
+  "billName": "إيراد طلاب ٢٣‏/٨‏/٢٠٢٥",
+  "billAmount": 561,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643859d2e8596e9ec4912"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-08-23T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.110Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f680a"
+  },
+  "billName": "إيراد طلاب ١٩‏/٧‏/٢٠٢٥",
+  "billAmount": 1103,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-19T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6822"
+  },
+  "billName": "إيراد طلاب ١٨‏/٦‏/٢٠٢٥",
+  "billAmount": 904,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-18T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6827"
+  },
+  "billName": "مصروفات أخرى",
+  "billAmount": 109,
+  "billNote": "مصروف ١٤‏/٦‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "other_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-06-14T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f682b"
+  },
+  "billName": "إيراد طلاب ١٩‏/٥‏/٢٠٢٥",
+  "billAmount": 650,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-19T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6840"
+  },
+  "billName": "إيراد طلاب ١٢‏/٤‏/٢٠٢٥",
+  "billAmount": 1044,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-12T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6841"
+  },
+  "billName": "إيراد طلاب ٩‏/٤‏/٢٠٢٥",
+  "billAmount": 1298,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-09T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6859"
+  },
+  "billName": "إيراد طلاب ١٣‏/٣‏/٢٠٢٥",
+  "billAmount": 878,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-03-13T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f680d"
+  },
+  "billName": "إيراد طلاب ٤‏/٧‏/٢٠٢٥",
+  "billAmount": 820,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-04T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6811"
+  },
+  "billName": "إيراد طلاب ٢١‏/٧‏/٢٠٢٥",
+  "billAmount": 1300,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-07-21T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f681f"
+  },
+  "billName": "إيراد طلاب ٢‏/٦‏/٢٠٢٥",
+  "billAmount": 695,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a6434a9d2e8596e9ec490f"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-02T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6839"
+  },
+  "billName": "إيراد طلاب ٣‏/٥‏/٢٠٢٥",
+  "billAmount": 887,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-05-03T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f683d"
+  },
+  "billName": "مصروفات حكومية",
+  "billAmount": 224,
+  "billNote": "مصروف ١١‏/٥‏/٢٠٢٥",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "government_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-05-11T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.111Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6847"
+  },
+  "billName": "إيراد طلاب ٢٨‏/٤‏/٢٠٢٥",
+  "billAmount": 503,
+  "billNote": "إيراد من حضور الطلاب",
+  "employee": {
+    "$oid": "67a643a29d2e8596e9ec4915"
+  },
+  "category": "income",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-04-28T14:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f6850"
+  },
+  "billName": "مصروفات أخرى",
+  "billAmount": 136,
+  "billNote": "مصروف ٢‏/٤‏/٢٠٢٥",
+  "employee": {
+    "$oid": "680b776f8eff402363d734e6"
+  },
+  "category": "other_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-04-02T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f686e"
+  },
+  "billName": "مصروفات أخرى",
+  "billAmount": 208,
+  "billNote": "مصروف ٢٢‏/٣‏/٢٠٢٥",
+  "employee": {
+    "$oid": "67a643179d2e8596e9ec490c"
+  },
+  "category": "other_out",
+  "isExpense": true,
+  "createdAt": {
+    "$date": "2025-03-22T15:05:38.039Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689f3eb2cea300e3e02f687d"
+  },
+  "billName": "إيراد الكانتين",
+  "billAmount": 112,
+  "billNote": "إيراد من مبيعات الكانتين",
+  "employee": {
+    "$oid": "67b9f330745d3b080a39f0a0"
+  },
+  "category": "canteen_in",
+  "isExpense": false,
+  "createdAt": {
+    "$date": "2025-06-03T14:05:38.093Z"
+  },
+  "__v": 0,
+  "updatedAt": {
+    "$date": "2025-08-15T14:05:38.112Z"
+  }
+}]

@@ -70,6 +70,11 @@ router.delete('/delete-student/:id', authMiddleware, employeeController.deleteSt
 
 router.post('/send-code-again/:id', authMiddleware, employeeController.sendCodeAgain);
 
+// Installment Management
+router.post('/add-installment', authMiddleware, employeeController.addInstallmentPayment);
+router.get('/installment-history/:studentId', authMiddleware, employeeController.getInstallmentHistory);
+router.put('/update-course-details', authMiddleware, employeeController.updateCourseDetails);
+
 // Teahcer 
 router.get('/teacher', authMiddleware, employeeController.teacher_Get);
 
@@ -122,6 +127,17 @@ router.get('/download-sendExcelEmployeeByDate/:id', authMiddleware, employeeCont
 // Student Logs
 router.get('/student-logs', authMiddleware, employeeController.getStudentLogs);
 router.get('/student-logs-data/:studentId', authMiddleware, employeeController.getStudentLogsData);
+
+// Notification Management Routes
+router.get('/notifications', employeeController.getNotificationsPage);
+router.get('/api/students-with-balances', employeeController.getStudentsWithBalances);
+router.get('/api/students-with-installments', employeeController.getStudentsWithInstallments);
+router.post('/send-notification', employeeController.sendNotification);
+router.post('/send-bulk-notifications', employeeController.sendBulkNotifications);
+router.get('/api/notification-templates', employeeController.getNotificationTemplates);
+router.post('/save-notification-template', employeeController.saveNotificationTemplate);
+router.put('/update-notification-template/:templateId', employeeController.updateNotificationTemplate);
+router.delete('/delete-notification-template/:templateId', employeeController.deleteNotificationTemplate);
 
 // LogOut
 

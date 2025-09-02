@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+    <%- include("./partials/head.ejs") %>
+<style>
+.spinner {
+   width: 56px;
+   height: 56px;
+   display: grid;
+   border: 4.5px solid #0000;
+   border-radius: 50%;
+   border-color: #dbdcef #0000;
+   animation: spinner-e04l1k 1s infinite linear;
+}
+
+.spinner::before,
+.spinner::after {
+   content: "";
+   grid-area: 1/1;
+   margin: 2.2px;
+   border: inherit;
+   border-radius: 50%;
+}
+
+.spinner::before {
+   border-color: #ff9847 #0000;
+   animation: inherit;
+   animation-duration: 0.5s;
+   animation-direction: reverse;
+}
+
+.spinner::after {
+   margin: 8.9px;
+}
+
+.teacher-info-card {
+  background: #ffffff;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.teacher-info-card h5 {
+  color: #000000;
+  margin-bottom: 15px;
+  font-weight: bold;
+  border-bottom: 2px solid #000000;
+  padding-bottom: 10px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.info-label {
+  font-weight: bold;
+  color: #000000;
+}
+
+.info-value {
+  color: #000000;
+  font-weight: 500;
+}
+
+.stats-card {
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.stats-card h4 {
+  color: #000000;
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 1.8rem;
+}
+
+.stats-card p {
+  color: #666666;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Info icon styling */
+.info-icon {
+  font-size: 16px !important;
+  color: #6c757d;
+  cursor: help;
+  margin-left: 5px;
+  vertical-align: middle;
+  transition: color 0.3s ease;
+}
+
+.info-icon:hover {
+  color: #28a745;
+}
+
+/* Tooltip customization */
+.tooltip {
+  font-size: 0.85rem;
+}
+
+.tooltip-inner {
+  background-color: #000000;
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  max-width: 250px;
+  text-align: center;
+}
+
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+  border-top-color: #000000;
+}
+
+.tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+  border-bottom-color: #000000;
+}
+
+.tooltip.bs-tooltip-start .tooltip-arrow::before {
+  border-left-color: #000000;
+}
+
+.tooltip.bs-tooltip-end .tooltip-arrow::before {
+  border-right-color: #000000;
+}
+
+/* Color-coded statistics */
+.stats-card.primary {
+  border-left: 4px solid #007bff;
+}
+
+.stats-card.success {
+  border-left: 4px solid #28a745;
+}
+
+.stats-card.warning {
+  border-left: 4px solid #ffc107;
+}
+
+.stats-card.info {
+  border-left: 4px solid #17a2b8;
+}
+
+.stats-card.danger {
+  border-left: 4px solid #dc3545;
+}
+
+.stats-card.secondary {
+  border-left: 4px solid #6c757d;
+}
+
+/* Number highlighting */
+.stats-card.primary h4 {
+  color: #007bff;
+}
+
+.stats-card.success h4 {
+  color: #28a745;
+}
+
+.stats-card.warning h4 {
+  color: #ffc107;
+}
+
+.stats-card.info h4 {
+  color: #17a2b8;
+}
+
+.stats-card.danger h4 {
+  color: #dc3545;
+}
+
+.stats-card.secondary h4 {
+  color: #6c757d;
+}
+
+/* Enhanced card design */
+.enhanced-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border: 2px solid #000000;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.enhanced-card h5 {
+  color: #000000;
+  margin-bottom: 20px;
+  font-weight: bold;
+  border-bottom: 2px solid #000000;
+  padding-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.enhanced-card h5 i {
+  margin-left: 10px;
+  font-size: 1.2rem;
+}
+
+/* Responsive grid improvements */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.avg-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+/* Progress indicators */
+.progress-indicator {
+  width: 100%;
+  height: 4px;
+  background: #e9ecef;
+  border-radius: 2px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #20c997);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Summary highlights */
+.summary-highlight {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.summary-highlight h6 {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.summary-highlight p {
+  color: #6c757d;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.green-btn {
+  background-color: #28a745 !important;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.green-btn:hover {
+  background-color: #218838 !important;
+  transform: scale(1.05);
+}
+
+.table-responsive {
+  max-height: 400px;
+  overflow: auto;
+}
+
+#studentTable th, #studentTable td,
+#invoiceTable th, #invoiceTable td {
+  text-align: center;
+  color: black !important;
+}
+
+hr {
+  border-top: 1px solid #000;
+  border: 1px solid #000; 
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+@keyframes spinner-e04l1k {
+   100% {
+      transform: rotate(1turn);
+   }
+}
+
+/* Additional enhancements */
+.performance-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 5px;
+}
+
+.performance-indicator.excellent {
+  background: #d4edda;
+  color: #155724;
+}
+
+.performance-indicator.good {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.performance-indicator.average {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.performance-indicator.poor {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Enhanced table styling */
+.table th {
+  background: #f8f9fa !important;
+  border-bottom: 2px solid #000000 !important;
+  font-weight: 700 !important;
+}
+
+.table td {
+  border-bottom: 1px solid #dee2e6 !important;
+  vertical-align: middle !important;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa !important;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+  }
+  
+  .avg-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .stats-card h4 {
+    font-size: 1.5rem;
+  }
+  
+  .enhanced-card {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .stats-card {
+    padding: 12px;
+  }
+  
+  .stats-card h4 {
+    font-size: 1.3rem;
+  }
+}
+
+/* Animation for cards */
+.stats-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Staggered animation for cards */
+.stats-card:nth-child(1) { animation-delay: 0.1s; }
+.stats-card:nth-child(2) { animation-delay: 0.2s; }
+.stats-card:nth-child(3) { animation-delay: 0.3s; }
+.stats-card:nth-child(4) { animation-delay: 0.4s; }
+.stats-card:nth-child(5) { animation-delay: 0.5s; }
+.stats-card:nth-child(6) { animation-delay: 0.6s; }
+ 
+/* Card-based layouts for details */
+.sessions-cards-grid,
+.students-cards-grid,
+.invoices-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+ 
+.detail-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+ 
+.detail-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(135deg, #28a745, #20c997);
+}
+ 
+.detail-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  border-color: #28a745;
+}
+ 
+.detail-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+ 
+.detail-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+ 
+.detail-card-status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+ 
+.detail-card-status.finalized {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+ 
+.detail-card-status.pending {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+ 
+.detail-card-content {
+  margin-bottom: 15px;
+}
+ 
+.detail-card-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+ 
+.detail-card-item:last-child {
+  border-bottom: none;
+}
+ 
+.detail-card-label {
+  font-weight: 500;
+  color: #666666;
+  font-size: 0.9rem;
+  min-width: 120px;
+  flex-shrink: 0;
+}
+ 
+.detail-card-value {
+  font-weight: 600;
+  color: #000000;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
+  flex: 1;
+  margin-left: 10px;
+}
+ 
+.detail-card-value.amount {
+  color: #28a745;
+  font-weight: 700;
+}
+ 
+.detail-card-value.negative {
+  color: #dc3545;
+  font-weight: 700;
+}
+ 
+.detail-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid #f0f0f0;
+}
+ 
+.detail-card-metrics {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+ 
+.metric-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #dee2e6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+ 
+.metric-badge.efficiency {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border-color: #bbdefb;
+}
+ 
+.metric-badge.profit {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+  border-color: #c8e6c9;
+}
+ 
+/* Session card specific styles */
+.session-card {
+  border-left-color: #007bff;
+}
+ 
+.session-card::before {
+  background: linear-gradient(180deg, #007bff, #0056b3);
+}
+ 
+/* Student card specific styles */
+.student-card {
+  border-left-color: #28a745;
+}
+ 
+.student-card::before {
+  background: linear-gradient(180deg, #28a745, #20c997);
+}
+ 
+/* Invoice card specific styles */
+.invoice-card {
+  border-left-color: #ffc107;
+}
+ 
+.invoice-card::before {
+  background: linear-gradient(180deg, #ffc107, #e0a800);
+}
+ 
+/* Category badges for invoices */
+.category-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+ 
+.category-badge.materials {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+ 
+.category-badge.transportation {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+ 
+.category-badge.food {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+ 
+.category-badge.extra {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+ 
+.category-badge.other {
+  background: #f5f5f5;
+  color: #424242;
+}
+ 
+/* Responsive improvements for cards */
+@media (max-width: 768px) {
+  .sessions-cards-grid,
+  .students-cards-grid,
+  .invoices-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .detail-card-content {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .detail-card {
+    padding: 15px;
+  }
+}
+ 
+/* Toggle button styles */
+.btn-outline-dark {
+  border: 2px solid #000000;
+  color: #000000;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+ 
+.btn-outline-dark:hover {
+  background: #000000;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+ 
+/* Loading states for cards */
+.card-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+ 
+.card-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #28a745;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+ 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+ 
+/* Pagination styling */
+.pagination {
+  margin: 0;
+}
+
+.pagination .page-link {
+  color: #000000;
+  border: 1px solid #000000;
+  background-color: #ffffff;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: #ffffff;
+}
+
+.pagination .page-item.disabled .page-link {
+  color: #6c757d;
+  border-color: #dee2e6;
+  background-color: #ffffff;
+  cursor: not-allowed;
+}
+
+.pagination .page-item.disabled .page-link:hover {
+  background-color: #ffffff;
+  border-color: #dee2e6;
+  color: #6c757d;
+  transform: none;
+}
+
+/* Form select styling for page size */
+.form-select-sm {
+  border: 1px solid #000000;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.form-select-sm:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* Pagination info text */
+.text-muted {
+  font-size: 0.875rem;
+}
+ 
+/* Pagination container styling */
+#sessionsPagination,
+#studentsPagination,
+#invoicesPagination,
+#sessionsCardsPagination,
+#studentsCardsPagination,
+#invoicesCardsPagination {
+  display: block !important;
+  margin-top: 20px;
+  padding: 15px 0;
+  border-top: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+ 
+/* Ensure pagination is always visible */
+.pagination-container {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+ 
+/* Table pagination specific styling */
+.table-responsive + div[id*="Pagination"] {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+ 
+/* Card pagination specific styling */
+.sessions-cards-grid + div[id*="Pagination"],
+.students-cards-grid + div[id*="Pagination"],
+.invoices-cards-grid + div[id*="Pagination"] {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+</style>
+
+<body class="g-sidenav-show rtl  bg-gray-100">
+    <%- include("./partials/aside.ejs") %>
+
+    <!-- Main content -->
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+   
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-3 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid pt-1 px-3">
+        <h4>Teacher Report</h4>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    
+    <div class="container-fluid py-2">
+      
+      <!-- Filter Form -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card mb-4">
+            <div class="card-header pb-0 p-3">
+              <div class="row">
+                <div class="col-6 d-flex align-items-center">
+                  <h5 class="mb-0">Generate Teacher Report</h5>
+                </div>
+                <div class="col-6 text-end">
+                  <button type="button" class="btn green-btn mb-0" id="generateReportBtn">
+                    <i class="material-symbols-rounded text-sm">analytics</i>&nbsp;&nbsp;Generate Report
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-3">
+              <div class="row">
+                <div class="col-md-4">
+                  <label for="teacherSelect" class="form-label">Select Teacher</label>
+                  <select class="form-control border border-2 p-2" id="teacherSelect">
+                    <option value="">Choose a teacher...</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="startDate" class="form-label">Start Date</label>
+                  <input type="date" class="form-control border border-2 p-2" id="startDate">
+                </div>
+                <div class="col-md-4">
+                  <label for="endDate" class="form-label">End Date</label>
+                  <input type="date" class="form-control border border-2 p-2" id="endDate">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Teacher Information Card -->
+      <div class="row" id="teacherInfoSection" style="display: none;">
+        <div class="col-12">
+          <div class="enhanced-card">
+            <h5><i class="material-symbols-rounded me-2">person</i>Teacher Information</h5>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="info-row">
+                  <span class="info-label">Teacher Name:</span>
+                  <span class="info-value" id="teacherName">--</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-row">
+                  <span class="info-label">Report Period:</span>
+                  <span class="info-value" id="reportPeriod">--</span>
+                </div>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-12">
+                <div class="summary-highlight">
+                  <h6><i class="material-symbols-rounded me-2">insights</i>Performance Summary</h6>
+                  <p>This report provides comprehensive analytics for the selected teacher including session details, student performance, and financial metrics.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div id="statsSection" style="display: none;">
+        <div class="stats-grid">
+          <div class="stats-card primary">
+            <h4 id="totalSessions">--</h4>
+            <p>Total Sessions <i class="material-symbols-rounded info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Total number of attendance sessions conducted by this teacher">info</i></p>
+            <div class="progress-indicator">
+              <div class="progress-bar" style="width: 85%"></div>
+            </div>
+          </div>
+          <div class="stats-card success">
+            <h4 id="totalStudents">--</h4>
+            <p>Total Students <i class="material-symbols-rounded info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Total number of students who attended sessions with this teacher">info</i></p>
+            <div class="progress-indicator">
+              <div class="progress-bar" style="width: 92%"></div>
+            </div>
+          </div>
+          <div class="stats-card info">
+            <h4 id="totalAmount">--</h4>
+            <p>Total Amount <i class="material-symbols-rounded info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Total amount collected from all students in all sessions">info</i></p>
+            <div class="progress-indicator">
+              <div class="progress-bar" style="width: 78%"></div>
+            </div>
+          </div>
+          <div class="stats-card warning">
+            <h4 id="totalCenterFees">--</h4>
+            <p>Center Fees <i class="material-symbols-rounded info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Total center fees collected (center's share from student payments)">info</i></p>
+            <div class="progress-indicator">
+              <div class="progress-bar" style="width: 65%"></div>
+            </div>
+          </div>
+          <div class="stats-card secondary">
+            <h4 id="totalInvoices">--</h4>
+            <p>Total Invoices <i class="material-symbols-rounded info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Total amount of invoices created for this teacher's sessions">info</i></p>
+            <div class="progress-indicator">
+              <div class="progress-bar" style="width: 70%"></div>
+            </div>
+          </div>
+          <div class="stats-card danger">
+            <h4 id="totalNetProfit">--</h4>
+            <p>Net Profit <i class="material-symbols-rounded info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Net profit after deducting center fees, teacher fees, and invoices">info</i></p>
+            <div class="progress-indicator">
+              <div class="progress-bar" style="width: 88%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Average Statistics -->
+      <div id="avgStatsSection" style="display: none;">
+        <div class="avg-stats-grid">
+          <div class="stats-card primary">
+            <h4 id="avgStudentsPerSession">--</h4>
+            <p>Avg Students/Session <i class="material-symbols-rounded info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Average number of students per session">info</i></p>
+            <div class="progress-indicator">
+              <div class="progress-bar" style="width: 75%"></div>
+            </div>
+          </div>
+          <div class="stats-card success">
+            <h4 id="avgAmountPerSession">--</h4>
+            <p>Avg Amount/Session <i class="material-symbols-rounded info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Average amount collected per session">info</i></p>
+            <div class="progress-indicator">
+              <div class="progress-bar" style="width: 82%"></div>
+            </div>
+          </div>
+          <div class="stats-card info">
+            <h4 id="avgCenterFeesPerSession">--</h4>
+            <p>Avg Center Fees/Session <i class="material-symbols-rounded info-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="Average center fees collected per session">info</i></p>
+            <div class="progress-indicator">
+              <div class="progress-bar" style="width: 68%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sessions Cards Section -->
+      <div id="sessionsSection" style="display: none;">
+        <div class="col-12">
+          <div class="enhanced-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5><i class="material-symbols-rounded me-2">schedule</i>Sessions Details</h5>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-dark" id="toggleSessionsView">
+                  <i class="material-symbols-rounded text-sm">view_module</i>&nbsp;&nbsp;Toggle View
+                </button>
+                <button type="button" class="btn green-btn" id="downloadExcelBtn">
+                  <i class="material-symbols-rounded text-sm">download</i>&nbsp;&nbsp;Download Excel
+                </button>
+              </div>
+            </div>
+            <!-- Sessions Cards View -->
+            <div id="sessionsCardsView" class="sessions-cards-grid">
+              <!-- Session cards will be populated here -->
+            </div>
+            <!-- Sessions Cards Pagination -->
+            <div id="sessionsCardsPagination"></div>
+            
+            <!-- Sessions Table View (Hidden by default) -->
+            <div id="sessionsTableView" class="table-responsive" style="display: none;">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0" id="sessionsTable">
+                  <thead>
+                    <tr>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Date</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Course</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Students</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Total Amount</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Center Fees</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Invoices</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Net Profit</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sessionsTBody">
+                    <!-- Sessions will be populated here -->
+                  </tbody>
+                </table>
+              </div>
+              <!-- Sessions Pagination -->
+              <div id="sessionsPagination"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr id="separator1" style="display: none;">
+
+      <!-- Students Cards Section -->
+      <div id="studentsSection" style="display: none;">
+        <div class="col-12">
+          <div class="enhanced-card">
+            <h5><i class="material-symbols-rounded me-2">school</i>Students Details</h5>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <button type="button" class="btn btn-outline-dark" id="toggleStudentsView">
+                  <i class="material-symbols-rounded text-sm">view_module</i>&nbsp;&nbsp;Toggle View
+                </button>
+              </div>
+            </div>
+            
+            <!-- Students Cards View -->
+            <div id="studentsCardsView" class="students-cards-grid">
+              <!-- Student cards will be populated here -->
+            </div>
+            <!-- Students Cards Pagination -->
+            <div id="studentsCardsPagination"></div>
+            
+            <!-- Students Table View (Hidden by default) -->
+            <div id="studentsTableView" class="table-responsive" style="display: none;">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0" id="studentsTable">
+                  <thead>
+                    <tr>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Session Date</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Student Name</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Student Code</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Amount Paid</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Center Fees</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Added By</th>
+                    </tr>
+                  </thead>
+                  <tbody id="studentsTBody">
+                    <!-- Students will be populated here -->
+                  </tbody>
+                </table>
+              </div>
+              <!-- Students Pagination -->
+              <div id="studentsPagination"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr id="separator2" style="display: none;">
+
+      <!-- Invoices Cards Section -->
+      <div id="invoicesSection" style="display: none;">
+        <div class="col-12">
+          <div class="enhanced-card">
+            <h5><i class="material-symbols-rounded me-2">receipt</i>Invoices Details</h5>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <button type="button" class="btn btn-outline-dark" id="toggleInvoicesView">
+                  <i class="material-symbols-rounded text-sm">view_module</i>&nbsp;&nbsp;Toggle View
+                </button>
+              </div>
+            </div>
+            
+            <!-- Invoices Cards View -->
+            <div id="invoicesCardsView" class="invoices-cards-grid">
+              <!-- Invoice cards will be populated here -->
+            </div>
+            <!-- Invoices Cards Pagination -->
+            <div id="invoicesCardsPagination"></div>
+            
+            <!-- Invoices Table View (Hidden by default) -->
+            <div id="invoicesTableView" class="table-responsive" style="display: none;">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0" id="invoicesTable">
+                  <thead>
+                    <tr>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Session Date</th>
+                                             <th class="text-center text-uppercase text-dark font-weight-bolder">Invoice Details</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Amount</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Time</th>
+                      <th class="text-center text-uppercase text-dark font-weight-bolder">Added By</th>
+                    </tr>
+                  </thead>
+                  <tbody id="invoicesTBody">
+                    <!-- Invoices will be populated here -->
+                  </tbody>
+                </table>
+              </div>
+              <!-- Invoices Pagination -->
+              <div id="invoicesPagination"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="spinner" class="spinner mx-auto d-none"></div>
+
+    </div>
+  </main>
+
+  <!--   Core JS Files   -->
+  <script src="/js/adminJS/teacherReport.js"></script>
+  <script src="../assets/js/core/popper.min.js"></script>
+  <script src="../assets/js/core/bootstrap.min.js"></script>
+  <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+  <!-- Github buttons -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="../assets/js/material-dashboard.min.js?v=3.2.0"></script>
+</body>
+
+</html>

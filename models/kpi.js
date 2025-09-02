@@ -14,7 +14,13 @@ const kpiSchema = new Schema(
         },
         kpiNote: {
         type: String,
+        required: false,
+        default: '',
+        },
+        kpi: {
+        type: Number,
         required: true,
+        default: 0,
         },
     },
     { timestamps: true }

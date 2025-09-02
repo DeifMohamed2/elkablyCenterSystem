@@ -255,6 +255,17 @@ hr {
       </div>
       <div class="row">
         <div class="col-12">
+          <div class="alert alert-light border-info alert-dismissible fade show" id="paymentInfoAlert" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; margin-bottom: 0.5rem; opacity: 0.9;">
+            <i class="material-symbols-rounded me-1" style="font-size: 0.9rem; color: #17a2b8;">info</i>
+            <span style="color: #6c757d;">
+              <strong>ملاحظة:</strong> الطلاب المسجلين بالكورس (Per Course) سيدفعون 0 ج.م لكل جلسة، بينما الطلاب المسجلين بالجلسة (Per Session) سيدفعون المبلغ المحدد لكل جلسة.
+            </span>
+            <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.7rem;"></button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
           <div class="card my-4">
                <div class="card-header pb-0 p-3">
             
@@ -310,7 +321,7 @@ hr {
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7"></th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7"></th>
                       <!-- <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">____</th> -->
-                      <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-9">اسم الموظف</th>
+                      <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">اسم الموظف</th>
 
                       
                       <th class="text-secondary opacity-7"></th>
@@ -320,6 +331,71 @@ hr {
                  
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Notifications Section -->
+      <div class="row mt-4 d-none">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header pb-0">
+              <div class="d-flex justify-content-between align-items-center">
+                <h6>إرسال إشعارات سريعة</h6>
+                             <a href="/employee/notifications" class="btn btn-primary btn-sm">
+               <i class="material-symbols-rounded text-sm me-1">notifications</i>
+               إدارة المتبقي
+             </a>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="form-control-label">نوع الإشعار</label>
+                    <select class="form-control" id="quickNotificationType">
+                      <option value="balance">تذكير بالمبلغ المتبقي</option>
+                      <option value="installment">تذكير بالقسط التالي</option>
+                      <option value="custom">رسالة مخصصة</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="form-control-label">الفلتر</label>
+                    <select class="form-control" id="quickNotificationFilter">
+                      <option value="all">جميع الطلاب</option>
+                      <option value="withBalances">طلاب بمبالغ متبقية</option>
+                      <option value="perCourse">طلاب Per Course</option>
+                      <option value="perSession">طلاب Per Session</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="form-control-label">الإجراء</label>
+                    <button class="btn btn-success w-100" id="sendQuickNotificationsBtn">
+                      <i class="material-symbols-rounded text-sm me-1">send</i>
+                      إرسال إشعارات سريعة
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-12">
+                  <div class="form-group">
+                    <label class="form-control-label">الرسالة</label>
+                    <textarea class="form-control" id="quickNotificationMessage" rows="3" placeholder="اكتب رسالتك هنا... يمكنك استخدام المتغيرات: {studentName}, {teacherName}, {courseName}, {amountRemaining}, {totalCourseCost}"></textarea>
+                    <small class="form-text text-muted">سيتم إرسال هذه الرسالة لجميع الطلاب المحددين في الفلتر أعلاه</small>
+                  </div>
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-12">
+                  <span class="text-sm text-muted" id="quickNotificationStatus"></span>
+                </div>
               </div>
             </div>
           </div>
@@ -400,6 +476,21 @@ hr {
             document.getElementById('changeCourseButton').classList.add('d-none');
           }
           
+          // Handle payment info alert dismissal
+          document.addEventListener('DOMContentLoaded', function() {
+            const paymentInfoAlert = document.getElementById('paymentInfoAlert');
+            
+            // Check if user has previously dismissed the alert
+            if (localStorage.getItem('paymentInfoDismissed') === 'true') {
+              paymentInfoAlert.style.display = 'none';
+            }
+            
+            // Handle alert dismissal
+            paymentInfoAlert.addEventListener('closed.bs.alert', function() {
+              localStorage.setItem('paymentInfoDismissed', 'true');
+            });
+          });
+          
           // Fixed amount checkbox handler
           document.addEventListener('DOMContentLoaded', function() {
             const fixedAmountCheck = document.getElementById('fixedAmountCheck');
@@ -473,13 +564,13 @@ const devices = {
       " BgNVBAYTAlVTMQswCQYDVQQIDAJOWTESMBAGA1UEBwwJQ2FuYXN0b3RhMRswGQYD \n " +
       " VQQKDBJRWiBJbmR1c3RyaWVzLCBMTEMxGzAZBgNVBAsMElFaIEluZHVzdHJpZXMs \n " +
       " IExMQzEcMBoGCSqGSIb3DQEJARYNc3VwcG9ydEBxei5pbzEaMBgGA1UEAwwRUVog \n " +
-      " VHJheSBEZW1vIENlcnQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDY \n " +
-      " Uvccrj30U6GPDs4PLlbmAWLkv9HfCDFD9iKZja6eTy5oypEPyOJvWKyTqZ1aw0C/ \n " +
-      " DV/Hg1WHEezjA4Du6soEqFy9p2Vc9oERhthEe89sXK1ejbwvJLg4kD9f8IK4QD8w \n " +
-      " ty9jB0ZXnwQF+OVIOoMc/D5vMQBCRPlnICiqWvZ2fFSo+iI5wAQVzczbndqt2g8D \n " +
-      " +i3fHoco4k1ZB8AE0O51BUiGn7/phqT/QtDT6xMKZKinMCLoCm3hORsEEPnz5rfz \n " +
-      " YdwkJvNvA1mwPwmTkmAa9p+NR5kfdMfWsTCWllU18Y7LuCSNCZunExhGFrnKXdFO \n " +
-      " bVnBklKEyYokZRXb/i2LAgMBAAGjRTBDMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD \n " +
+      " VHJheSBEZW1vIENlcnQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCZ \n " +
+      " p5pxA81QovasY8y5UgdKZpF7/iSs4AgsBpwSU5WlsOUzwnT3/f3GLutTyAe1bAP2 \n " +
+      " HpogYMy0yqdap3r+Oslz9hJSAAOIIsoumnkKHbt8PlTd2PZhmvsBVZQLUhIYkGl+ \n " +
+      " 39SvPLJGj65AtXAgvM99B13tQZ+NAYgijlrTQ1IviBlajlVi1eZ1zMsY9nyX7rxM \n " +
+      " XMGxNr8YWlqG1nO2Irwe1M37Wu9WGdgmZVw81/PZLGkBYBn/7DOhClkyr5uS8+wS \n " +
+      " TDlzOlc7BzR10RgAOUtgdw8O1MNPDW3ltwIZaZsPG/rVrAuxSb7MZOM+7g2AmXAA \n " +
+      " P71ZPY8CBkkjPMYAQ6sdAgMBAAGjRTBDMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD \n " +
       " VR0PAQH/BAQDAgEGMB0GA1UdDgQWBBTrbYd52HiCYTyoJqTGa2EjXBdlBjANBgkq \n " +
       " hkiG9w0BAQsFAAOCAQEAXOhtrRQgG63C4w4W6vbN8J8zI5fUksLIZpMMq3wYTbKn \n " +
       " Ftv7xtdA9m2kqUvlBtqJDgmRKh2Cg1aanlIgBgzap+LxLpjzHJvmksd68KajalEw \n " +

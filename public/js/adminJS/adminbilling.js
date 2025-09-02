@@ -57,7 +57,9 @@ async function addNewBill(event) {
       billName: formData.get('billName'),
       billAmount: formData.get('billAmount'),
       billNote: formData.get('billNote'),
-      billPhoto: photoUrl, // Include photo URL or empty if not uploaded
+      billCategory: formData.get('billCategory'),
+      employeeId: formData.get('employeeId'),
+      billPhoto: photoUrl,
     };
 
     const response = await fetch('/admin/Admin-add-bill', {
@@ -96,20 +98,62 @@ async function addNewBill(event) {
 
 addNewBillForm.addEventListener('submit', addNewBill);
 
+// Handle category change to show/hide employee selection
+document.getElementById('billCategory').addEventListener('change', function() {
+  const employeeSelection = document.getElementById('employeeSelection');
+  if (this.value === 'salaries') {
+    employeeSelection.style.display = 'block';
+    loadEmployees();
+  } else {
+    employeeSelection.style.display = 'none';
+  }
+});
+
+// Load employees for salary selection
+async function loadEmployees() {
+  try {
+    const response = await fetch('/admin/all-employee');
+    if (response.ok) {
+      const employees = await response.json();
+      const employeeSelect = document.getElementById('employeeId');
+      employeeSelect.innerHTML = '<option value="">Select Employee</option>';
+      
+      employees.forEach(employee => {
+        const option = document.createElement('option');
+        option.value = employee._id;
+        option.textContent = employee.employeeName;
+        employeeSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading employees:', error);
+  }
+}
+
 
 
 // Get ALL Billings
 
 function populateBills (bills){
+    const categoryNames = {
+      salaries: 'Salaries',
+      canteen_in: 'Canteen Income',
+      canteen_out: 'Canteen Expenses',
+      government_fees: 'Government Fees',
+      electric_invoices: 'Electric Invoices',
+      equipments: 'Equipments',
+      other: 'Other'
+    };
+
     bills.forEach((bill) => {
       const billItem = document.createElement('li');
       billItem.className = 'list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg';
-
 
       billItem.innerHTML = `
         <div class="d-flex flex-column">
           <h6 class="mb-3 text-sm">تاريخ : ${new Date(bill.createdAt).toLocaleDateString()} ${new Date(bill.createdAt).toLocaleTimeString()}</h6>
           <span class="mb-2 text-dark SpanTitle">اسم المنتج : <span class="text-dark font-weight-bold me-sm-2">${bill.billName}</span></span>
+          <span class="mb-2 text-dark SpanTitle">الفئة : <span class="text-dark font-weight-bold me-sm-2">${categoryNames[bill.billCategory] || 'غير محدد'}</span></span>
           <span class="mb-2 text-dark SpanTitle">سعر الشراء : <span class="text-dark font-weight-bold me-sm-2">${bill.billAmount}EGP</span></span>
           <span class="text-dark SpanTitle">ملاحظات : <span class="text-dark font-weight-bold me-sm-2">${bill.billNote}</span></span>
           <span><button class="billingPhotoBtn" data-photo-url="${bill.billPhoto}"> ${bill.billPhoto ? 'مشاهده الصوره':'لا يوجد صوره'} </button></span>

@@ -56,6 +56,7 @@ async function addNewBill(event) {
     const data = {
       billName: formData.get('billName'),
       billAmount: formData.get('billAmount'),
+      billCategory: formData.get('billCategory'),
       billNote: formData.get('billNote'),
       billPhoto: photoUrl, // Include photo URL or empty if not uploaded
     };
@@ -106,10 +107,18 @@ function populateBills (bills){
       billItem.className = 'list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg';
 
 
+      const categoryNames = {
+        canteen_out: 'مصروفات الكافتيريا',
+        government_fees: 'الرسوم الحكومية',
+        equipments: 'المعدات والأجهزة',
+        other: 'أخرى'
+      };
+
       billItem.innerHTML = `
         <div class="d-flex flex-column">
           <h6 class="mb-3 text-sm">تاريخ : ${new Date(bill.createdAt).toLocaleDateString()} ${new Date(bill.createdAt).toLocaleTimeString()}</h6>
           <span class="mb-2 text-dark SpanTitle">اسم المنتج : <span class="text-dark font-weight-bold me-sm-2">${bill.billName}</span></span>
+          <span class="mb-2 text-dark SpanTitle">فئة الفاتورة : <span class="text-dark font-weight-bold me-sm-2">${categoryNames[bill.billCategory] || 'غير محدد'}</span></span>
           <span class="mb-2 text-dark SpanTitle">سعر الشراء : <span class="text-dark font-weight-bold me-sm-2">${bill.billAmount}EGP</span></span>
           <span class="text-dark SpanTitle">ملاحظات : <span class="text-dark font-weight-bold me-sm-2">${bill.billNote}</span></span>
           <span><button class="billingPhotoBtn" data-photo-url="${bill.billPhoto}"> ${bill.billPhoto ? 'مشاهده الصوره':'لا يوجد صوره'} </button></span>

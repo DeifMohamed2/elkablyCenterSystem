@@ -102,11 +102,21 @@
                     <div class="input-group mb-3 border border-2 rounded">
                       <input type="number" class="form-control p-2 fs-5 text-center" placeholder="سعر الشراء" id="billAmount" name="billAmount" required>
                     </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="input-group mb-3 border border-2 rounded">
+                      <select class="form-control p-2 fs-5 text-center" id="billCategory" name="billCategory" required>
+                        <option value="">اختر فئة الفاتورة</option>
+                        <option value="canteen_out">مصروفات الكافتيريا</option>
+                        <option value="equipments">المعدات والأجهزة</option>
+                        <option value="electric_invoices">فواتير الكهرباء</option>
+                        <option value="other">أخرى</option>
+                      </select>
                     </div>
-                  <div class="col-md-5">
+                  </div>
+                  <div class="col-md-3">
                     <div class="input-group mb-3 border border-2 rounded">
                       <textarea class="form-control p-2 fs-5 " placeholder=" ملاحظات او تفاصيل (اختياري)"  id="billNote" name="billNote" ></textarea>
-
                     </div>
                   </div>
 

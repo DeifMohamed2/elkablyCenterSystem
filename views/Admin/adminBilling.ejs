@@ -101,11 +101,34 @@
                     <div class="input-group mb-3 border border-2 rounded">
                       <input type="number" class="form-control p-2 fs-5 text-center" placeholder="سعر الشراء" id="billAmount" name="billAmount" required>
                     </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="input-group mb-3 border border-2 rounded">
+                      <select class="form-control p-2 fs-5 text-center" id="billCategory" name="billCategory" required>
+                        <option value="">Select Bill Category</option>
+                        <option value="salaries">Salaries</option>
+                        <option value="canteen_in">Canteen Income</option>
+                        <option value="canteen_out">Canteen Expenses</option>
+                        <option value="government_fees">Government Fees</option>
+                        <option value="electric_invoices">Electric Invoices</option>
+                        <option value="equipments">Equipments</option>
+                        <option value="other">Other</option>
+                      </select>
                     </div>
-                  <div class="col-md-5">
+                  </div>
+                  <div class="col-md-3">
                     <div class="input-group mb-3 border border-2 rounded">
                       <textarea class="form-control p-2 fs-5 " placeholder=" ملاحظات او تفاصيل (اختياري)"  id="billNote" name="billNote" ></textarea>
+                    </div>
+                  </div>
 
+                  <!-- Employee selection for salaries - separate row -->
+                  <div class="col-md-6" id="employeeSelection" style="display: none;">
+                    <div class="input-group mb-3 border border-2 rounded">
+                      <label class="form-label me-2">Select Employee for Salary:</label>
+                      <select class="form-control p-2 fs-5 text-center" id="employeeId" name="employeeId">
+                        <option value="">Select Employee</option>
+                      </select>
                     </div>
                   </div>
 

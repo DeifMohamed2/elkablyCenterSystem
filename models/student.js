@@ -56,6 +56,20 @@ const studentSchema = new Schema(
             amountPay: { type: Number, required: true },
             registerPrice: { type: Number, required: true },
             amountRemaining: { type: Number, required: true },
+            totalCourseCost: { type: Number, required: true }, // Total cost of the course
+            installments: [
+              {
+                amount: { type: Number, required: true },
+                date: { type: Date, default: Date.now },
+                employee: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'Employee',
+                  required: true,
+                },
+                notes: { type: String, default: '' },
+              },
+            ],
+            isCompleted: { type: Boolean, default: false }, // Course completion status
           },
         ],
       },

@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Table loading elements
   const attendanceTableLoading = document.getElementById('attendanceTableLoading');
   const coursesTableLoading = document.getElementById('coursesTableLoading');
+  const installmentsTableLoading = document.getElementById('installmentsTableLoading');
   
   // Filter elements
   const teacherFilter = document.getElementById('teacherFilter');
@@ -33,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const noAttendanceMessage = document.getElementById('noAttendanceMessage');
   const noPaymentsMessage = document.getElementById('noPaymentsMessage');
   const noCoursesMessage = document.getElementById('noCoursesMessage');
+  const noInstallmentsMessage = document.getElementById('noInstallmentsMessage');
   
   // Current student ID being viewed
   let currentStudentId = null;
@@ -215,6 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show table loading indicators
     attendanceTableLoading.style.display = 'flex';
     coursesTableLoading.style.display = 'flex';
+    installmentsTableLoading.style.display = 'flex';
     
     // Build query string based on whether we're applying filters
     let queryString = '';
@@ -313,6 +316,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Populate courses table
         populateCoursesTable(data.enrolledCourses);
         
+        // Load installment history
+        loadInstallmentHistory(studentId);
+        
         // Hide spinner and reset buttons
         spinner.classList.add('d-none');
         message.textContent = '';
@@ -326,6 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Hide table loading indicators
         attendanceTableLoading.style.display = 'none';
         coursesTableLoading.style.display = 'none';
+        installmentsTableLoading.style.display = 'none';
         
         // Reset button states
         applyFiltersBtn.disabled = false;
@@ -586,4 +593,103 @@ document.addEventListener('DOMContentLoaded', function() {
       coursesTableLoading.style.display = 'none';
     }, 300); // Small delay for smoother transition
   }
+ 
+ // Load installment history for a student
+ function loadInstallmentHistory(studentId) {
+   fetch(`/employee/installment-history/${studentId}`)
+     .then(response => response.json())
+     .then(data => {
+       if (data.installmentHistory) {
+         populateInstallmentsTable(data.installmentHistory);
+       }
+     })
+     .catch(error => {
+       console.error('Error loading installment history:', error);
+       // Hide loading indicator on error
+       installmentsTableLoading.style.display = 'none';
+     });
+ }
+ 
+ // Populate installments table
+ function populateInstallmentsTable(installmentHistory) {
+   const tableBody = document.getElementById('installmentsTableBody');
+   const noInstallmentsMsg = document.getElementById('noInstallmentsMessage');
+   
+   tableBody.innerHTML = '';
+   
+   if (!installmentHistory || installmentHistory.length === 0) {
+     installmentsTableLoading.style.display = 'none';
+     noInstallmentsMsg.style.display = 'block';
+     return;
+   }
+   
+   noInstallmentsMsg.style.display = 'none';
+   
+   // Format currency using English numerals
+   const formatter = new Intl.NumberFormat('en-US', {
+     style: 'decimal',
+     minimumFractionDigits: 0,
+     maximumFractionDigits: 0
+   });
+   
+   installmentHistory.forEach((installment, index) => {
+     const row = document.createElement('tr');
+     
+     // Add alternating row colors
+     const rowClass = index % 2 === 0 ? 'bg-light' : '';
+     row.className = rowClass;
+     
+     // Format date using English numerals
+     const installmentDate = new Date(installment.date);
+     const formattedDate = installmentDate.toLocaleDateString('en-US', {
+       year: 'numeric',
+       month: '2-digit',
+       day: '2-digit'
+     });
+     
+     // Format amount
+     const formattedAmount = formatter.format(installment.amount);
+     
+     row.innerHTML = `
+       <td class="text-center">${index + 1}</td>
+       <td class="text-center">
+         <div class="d-flex justify-content-center align-items-center">
+           <i class="fas fa-calendar-day opacity-10 text-dark me-2" style="font-size: 1rem;"></i>
+           <span>${formattedDate}</span>
+         </div>
+       </td>
+       <td class="text-center">
+         <span class="badge badge-sm bg-gradient-info me-1"></span>
+         ${installment.courseName}
+       </td>
+       <td class="text-center">
+         <div class="d-flex justify-content-center align-items-center">
+           <i class="fas fa-user-tie opacity-10 text-dark me-2" style="font-size: 1rem;"></i>
+           <span>${installment.teacherName}</span>
+         </div>
+       </td>
+       <td class="text-center">
+         <span class="text-success font-weight-bold">${formattedAmount}</span> EGP
+       </td>
+       <td class="text-center">
+         <div class="d-flex justify-content-center align-items-center">
+           <div class="avatar avatar-xs me-2 bg-gradient-success">
+             <span class="text-xs text-white">${installment.employeeName ? installment.employeeName.charAt(0) : '?'}</span>
+           </div>
+           <span>${installment.employeeName || 'غير محدد'}</span>
+         </div>
+       </td>
+       <td class="text-center">
+         <span class="text-muted">${installment.notes || '-'}</span>
+       </td>
+     `;
+     
+     tableBody.appendChild(row);
+   });
+   
+   // Hide loading indicator after table is populated
+   setTimeout(() => {
+     installmentsTableLoading.style.display = 'none';
+   }, 300); // Small delay for smoother transition
+ }
 });

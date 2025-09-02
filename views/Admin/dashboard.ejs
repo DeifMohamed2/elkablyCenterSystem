@@ -3,10 +3,19 @@
 
   <%- include("./partials/head.ejs") %>
 
-
 <body class="g-sidenav-show rtl bg-gray-100">
  
     <%- include("./partials/aside.ejs") %>
+
+    <!-- Preloader -->
+    <!-- <div id="preloader" class="position-fixed w-100 h-100 bg-white d-flex justify-content-center align-items-center" style="z-index: 9999;">
+      <div class="text-center">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 text-primary font-weight-bold">جاري تحميل البيانات...</p>
+      </div>
+    </div> -->
 
   <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg overflow-x-hidden">
     <!-- Navbar -->
@@ -15,24 +24,18 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 ">
             <li class="breadcrumb-item text-sm ps-2"><a class="opacity-5 text-dark" href="javascript:;">لوحات القيادة</a></li>
-            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">RTL</li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">لوحة التحكم</li>
           </ol>
-          <h6 class="font-weight-bolder mb-0">RTL</h6>
+          <h6 class="font-weight-bolder mb-0">لوحة التحكم الإدارية</h6>
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 px-0" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
             <div class="input-group input-group-outline">
-              <label class="form-label">أكتب هنا...</label>
+              <label class="form-label">البحث...</label>
               <input type="text" class="form-control">
             </div>
           </div>
           <ul class="navbar-nav d-flex align-items-center me-auto ms-0 justify-content-end">
-            <li class="nav-item d-flex align-items-center">
-              <a class="btn btn-outline-primary btn-sm mb-0 ms-3" target="_blank" href="https://www.creative-tim.com/builder?ref=navbar-material-dashboard">منشئ مضمنة</a>
-            </li>
-            <li class="mt-1">
-              <a class="github-button" href="https://github.com/creativetimofficial/material-dashboard" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star creativetimofficial/material-dashboard on GitHub">Star</a>
-            </li>
             <li class="nav-item d-xl-none pe-3 d-flex align-items-center">
               <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
                 <div class="sidenav-toggler-inner">
@@ -44,181 +47,174 @@
             </li>
             <li class="nav-item px-3 d-flex align-items-center">
               <a href="javascript:;" class="nav-link text-body p-0">
-                <i class="material-symbols-rounded fixed-plugin-button-nav">settings</i>
+                <i class="material-symbols-rounded">settings</i>
               </a>
-            </li>
-            <li class="nav-item dropdown ps-2 d-flex align-items-center">
-              <a href="javascript:;" class="nav-link text-body p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="material-symbols-rounded">notifications</i>
-              </a>
-              <ul class="dropdown-menu  px-2 py-3 me-sm-n4" aria-labelledby="dropdownMenuButton">
-                <li class="mb-2">
-                  <a class="dropdown-item border-radius-md" href="javascript:;">
-                    <div class="d-flex py-1">
-                      <div class="my-auto">
-                        <img src="../assets/img/team-2.jpg" class="avatar avatar-sm  ms-3 ">
-                      </div>
-                      <div class="d-flex flex-column justify-content-center">
-                        <h6 class="text-sm font-weight-normal mb-1">
-                          <span class="font-weight-bold">New message</span> from Laur
-                        </h6>
-                        <p class="text-xs text-secondary mb-0">
-                          <i class="fa fa-clock me-1"></i>
-                          13 minutes ago
-                        </p>
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li class="mb-2">
-                  <a class="dropdown-item border-radius-md" href="javascript:;">
-                    <div class="d-flex py-1">
-                      <div class="my-auto">
-                        <img src="../assets/img/small-logos/logo-spotify.svg" class="avatar avatar-sm bg-gradient-dark  ms-3 ">
-                      </div>
-                      <div class="d-flex flex-column justify-content-center">
-                        <h6 class="text-sm font-weight-normal mb-1">
-                          <span class="font-weight-bold">New album</span> by Travis Scott
-                        </h6>
-                        <p class="text-xs text-secondary mb-0">
-                          <i class="fa fa-clock me-1"></i>
-                          1 day
-                        </p>
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <a class="dropdown-item border-radius-md" href="javascript:;">
-                    <div class="d-flex py-1">
-                      <div class="avatar avatar-sm bg-gradient-secondary  ms-3  my-auto">
-                        <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                          <title>credit-card</title>
-                          <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g transform="translate(-2169.000000, -745.000000)" fill="#FFFFFF" fill-rule="nonzero">
-                              <g transform="translate(1716.000000, 291.000000)">
-                                <g transform="translate(453.000000, 454.000000)">
-                                  <path class="color-background" d="M43,10.7482083 L43,3.58333333 C43,1.60354167 41.3964583,0 39.4166667,0 L3.58333333,0 C1.60354167,0 0,1.60354167 0,3.58333333 L0,10.7482083 L43,10.7482083 Z" opacity="0.593633743"></path>
-                                  <path class="color-background" d="M0,16.125 L0,32.25 C0,34.2297917 1.60354167,35.8333333 3.58333333,35.8333333 L39.4166667,35.8333333 C41.3964583,35.8333333 43,34.2297917 43,32.25 L43,16.125 L0,16.125 Z M19.7083333,26.875 L7.16666667,26.875 L7.16666667,23.2916667 L19.7083333,23.2916667 L19.7083333,26.875 Z M35.8333333,26.875 L28.6666667,26.875 L28.6666667,23.2916667 L35.8333333,23.2916667 L35.8333333,26.875 Z"></path>
-                                </g>
-                              </g>
-                            </g>
-                          </g>
-                        </svg>
-                      </div>
-                      <div class="d-flex flex-column justify-content-center">
-                        <h6 class="text-sm font-weight-normal mb-1">
-                          Payment successfully completed
-                        </h6>
-                        <p class="text-xs text-secondary mb-0">
-                          <i class="fa fa-clock me-1"></i>
-                          2 days
-                        </p>
-                      </div>
-                    </div>
-                  </a>
-                </li>
-              </ul>
             </li>
             <li class="nav-item d-flex align-items-center">
-              <a href="../pages/sign-in.html" class="nav-link text-body font-weight-bold px-0">
-                <i class="material-symbols-rounded">account_circle</i>
+              <a href="/logout" class="nav-link text-body font-weight-bold px-0">
+                <i class="material-symbols-rounded">logout</i>
               </a>
             </li>
           </ul>
-        </div>
-      </div>
+                      </div>
+                      </div>
     </nav>
     <!-- End Navbar -->
+    
     <div class="container-fluid py-2">
+      <!-- Filter Controls -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-md-3">
+                  <label class="form-label">الفترة الزمنية</label>
+                  <select class="form-select" id="periodFilter">
+                    <option value="today" selected>اليوم</option>
+                    <option value="week">هذا الأسبوع</option>
+                    <option value="month">هذا الشهر</option>
+                    <option value="year">هذا العام</option>
+                    <option value="custom">مخصص</option>
+                  </select>
+                    </div>
+                <div class="col-md-3" id="customDateRange" style="display: none;">
+                  <label class="form-label">من تاريخ</label>
+                  <input type="date" class="form-control" id="startDate">
+                      </div>
+                <div class="col-md-3" id="customDateRange2" style="display: none;">
+                  <label class="form-label">إلى تاريخ</label>
+                  <input type="date" class="form-control" id="endDate">
+                      </div>
+                <div class="col-md-3">
+                  <button class="btn btn-primary mt-4" id="updateBtn" onclick="updateDashboard()">
+                    <i class="material-symbols-rounded" id="updateIcon">refresh</i>
+                    <span id="updateText">تحديث البيانات</span>
+                  </button>
+                    </div>
+                      </div>
+                      </div>
+                    </div>
+        </div>
+      </div>
+
+      <!-- Main Analytics Cards -->
       <div class="row">
         <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
           <div class="card">
             <div class="card-header d-flex justify-content-between p-3 pt-2">
-              <div class="icon icon-md icon-shape bg-gradient-dark shadow-dark text-center border-radius-lg">
-                <i class="material-symbols-rounded opacity-10">weekend</i>
+              <div class="icon icon-md icon-shape bg-gradient-success shadow-success text-center border-radius-lg">
+                <i class="material-symbols-rounded opacity-10">trending_up</i>
               </div>
               <div class="text-start pt-1">
-                <p class="text-sm mb-0 text-capitalize">أموال اليوم</p>
-                <h4 class="mb-0">$53k</h4>
+                <p class="text-sm mb-0 text-capitalize">Center Revenue</p>
+                <h4 class="mb-0" id="totalRevenue">0</h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">
             <div class="card-footer p-3">
-              <p class="mb-0 text-start"><span class="text-success text-sm font-weight-bolder ms-1">+55% </span>من الأسبوع الماضي</p>
+              <p class="mb-0 text-start"><span class="text-success text-sm font-weight-bolder ms-1">Center Fees </span>from Attendance</p>
             </div>
           </div>
         </div>
         <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
           <div class="card">
             <div class="card-header d-flex justify-content-between p-3 pt-2">
-              <div class="icon icon-md icon-shape bg-gradient-dark shadow-dark text-center border-radius-lg">
-                <i class="material-symbols-rounded opacity-10">leaderboard</i>
+              <div class="icon icon-md icon-shape bg-gradient-danger shadow-danger text-center border-radius-lg">
+                <i class="material-symbols-rounded opacity-10">receipt_long</i>
               </div>
               <div class="text-start pt-1">
-                <p class="text-sm mb-0 text-capitalize">مستخدمو اليوم</p>
-                <h4 class="mb-0">2,300</h4>
+                <p class="text-sm mb-0 text-capitalize">Center Expenses</p>
+                <h4 class="mb-0" id="totalExpenses">0</h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">
             <div class="card-footer p-3">
-              <p class="mb-0 text-start"><span class="text-success text-sm font-weight-bolder ms-1">+33% </span>من الأسبوع الماضي</p>
+              <p class="mb-0 text-start"><span class="text-danger text-sm font-weight-bolder ms-1">Center Bills </span>and Expenses</p>
             </div>
           </div>
         </div>
         <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
           <div class="card">
             <div class="card-header d-flex justify-content-between p-3 pt-2">
-              <div class="icon icon-md icon-shape bg-gradient-dark shadow-dark text-center border-radius-lg">
+              <div class="icon icon-md icon-shape bg-gradient-warning shadow-warning text-center border-radius-lg">
                 <i class="material-symbols-rounded opacity-10">store</i>
               </div>
               <div class="text-start pt-1">
-                <p class="text-sm mb-0 text-capitalize">عملاء جدد</p>
-                <h4 class="mb-0">
-                  <span class="text-danger text-sm font-weight-bolder ms-1">-2%</span>
-                  +3,462
-                </h4>
+                <p class="text-sm mb-0 text-capitalize">Canteen Revenue</p>
+                <h4 class="mb-0" id="totalCanteenIn">0</h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">
             <div class="card-footer p-3">
-              <p class="mb-0 text-start"><span class="text-success text-sm font-weight-bolder ms-1">+5% </span>من الشهر الماضي</p>
+              <p class="mb-0 text-start"><span class="text-warning text-sm font-weight-bolder ms-1">Revenue </span>from Canteen</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between p-3 pt-2">
+              <div class="icon icon-md icon-shape bg-gradient-secondary shadow-secondary text-center border-radius-lg">
+                <i class="material-symbols-rounded opacity-10">star</i>
+              </div>
+              <div class="text-start pt-1">
+                <p class="text-sm mb-0 text-capitalize">Employee Bonuses</p>
+                <h4 class="mb-0" id="totalEmployeeKPIs">0</h4>
+              </div>
+            </div>
+            <hr class="dark horizontal my-0">
+            <div class="card-footer p-3">
+              <p class="mb-0 text-start"><span class="text-secondary text-sm font-weight-bolder ms-1">Bonuses </span>for Employees</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between p-3 pt-2">
+              <div class="icon icon-md icon-shape bg-gradient-info shadow-info text-center border-radius-lg">
+                <i class="material-symbols-rounded opacity-10">account_balance_wallet</i>
+      </div>
+              <div class="text-start pt-1">
+                <p class="text-sm mb-0 text-capitalize">Center Net Profit</p>
+                <h4 class="mb-0" id="netProfit">0</h4>
+              </div>
+            </div>
+            <hr class="dark horizontal my-0">
+            <div class="card-footer p-3">
+              <p class="mb-0 text-start"><span class="text-info text-sm font-weight-bolder ms-1">Revenue - Expenses</span></p>
             </div>
           </div>
         </div>
         <div class="col-lg-3 col-sm-6">
           <div class="card">
             <div class="card-header d-flex justify-content-between p-3 pt-2">
-              <div class="icon icon-md icon-shape bg-gradient-dark shadow-dark text-center border-radius-lg">
-                <i class="material-symbols-rounded opacity-10">weekend</i>
+              <div class="icon icon-md icon-shape bg-gradient-warning shadow-warning text-center border-radius-lg">
+                <i class="material-symbols-rounded opacity-10">people</i>
               </div>
               <div class="text-start pt-1">
-                <p class="text-sm mb-0 text-capitalize">مبيعات</p>
-                <h4 class="mb-0">$103,430</h4>
+                <p class="text-sm mb-0 text-capitalize">Total Students</p>
+                <h4 class="mb-0" id="totalStudents">0</h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">
             <div class="card-footer p-3">
-              <p class="mb-0 text-start"><span class="text-success text-sm font-weight-bolder ms-1">+7% </span>مقارنة بيوم أمس</p>
+              <p class="mb-0 text-start"><span class="text-warning text-sm font-weight-bolder ms-1">Students Registered </span>in Period</p>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Charts Row -->
       <div class="row mt-4">
-        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+        <div class="col-lg-8 col-md-6 mt-4 mb-4">
           <div class="card">
             <div class="card-body">
-              <h6 class="mb-0 ">مشاهدات الموقع</h6>
-              <p class="text-sm ">آخر أداء للحملة</p>
+              <h6 class="mb-0">Monthly Revenue and Expense Analysis</h6>
+              <p class="text-sm">Last 12 Months</p>
               <div class="pe-2">
                 <div class="chart">
-                  <canvas id="chart-bars" class="chart-canvas" height="170"></canvas>
+                  <canvas id="monthlyChart" class="chart-canvas" height="300"></canvas>
                 </div>
-              </div>
-              <hr class="dark horizontal">
-              <div class="d-flex ">
-                <i class="material-symbols-rounded text-sm my-auto ms-1">schedule</i>
-                <p class="mb-0 text-sm">لحملة أرسلت قبل يومين </p>
               </div>
             </div>
           </div>
@@ -226,388 +222,239 @@
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
           <div class="card">
             <div class="card-body">
-              <h6 class="mb-0 ">المبيعات اليومية</h6>
-              <p class="text-sm ">(<span class="font-weight-bolder text-success">+15%</span>) زيادة في مبيعات اليوم</p>
+              <h6 class="mb-0">Expense Distribution</h6>
+              <p class="text-sm">By Categories</p>
               <div class="pe-2">
                 <div class="chart">
-                  <canvas id="chart-line" class="chart-canvas" height="170"></canvas>
+                  <canvas id="expenseChart" class="chart-canvas" height="300"></canvas>
                 </div>
               </div>
-              <hr class="dark horizontal">
-              <div class="d-flex ">
-                <i class="material-symbols-rounded text-sm my-auto ms-1">schedule</i>
-                <p class="mb-0 text-sm">لحملة أرسلت قبل يومين </p>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-lg-4 mt-4 mb-3">
-          <div class="card">
-            <div class="card-body">
-              <h6 class="mb-0 ">المهام المكتملة</h6>
-              <p class="text-sm ">آخر أداء للحملة</p>
-              <div class="pe-2">
-                <div class="chart">
-                  <canvas id="chart-line-tasks" class="chart-canvas" height="170"></canvas>
-                </div>
-              </div>
-              <hr class="dark horizontal">
-              <div class="d-flex ">
-                <i class="material-symbols-rounded text-sm my-auto ms-1">schedule</i>
-                <p class="mb-0 text-sm">تم تحديثه للتو</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row my-4">
-        <div class="col-lg-8 col-md-6 mb-md-0 mb-4">
+
+      <!-- Teacher Performance and Expense Breakdown -->
+      <div class="row mt-4">
+        <div class="col-lg-8 col-md-6 mt-4 mb-4">
           <div class="card">
             <div class="card-header pb-0">
-              <div class="row mb-3">
-                <div class="col-6">
-                  <h6>المشاريع</h6>
+              <h6>Teacher Ranking by Revenue</h6>
                   <p class="text-sm">
-                    <i class="fa fa-check text-info" aria-hidden="true"></i>
-                    <span class="font-weight-bold ms-1">30 انتهى</span> هذا الشهر
+                <i class="fa fa-trophy text-warning" aria-hidden="true"></i>
+                <span class="font-weight-bold">Top Teachers Contributing to Center Revenue</span>
+              </p>
+              <p class="text-xs text-secondary mt-1">
+                <i class="fa fa-info-circle text-info" aria-hidden="true"></i>
+                <strong>Teacher Net Profit = Total Paid - Center Fees - Teacher Invoices</strong>
                   </p>
                 </div>
-                <div class="col-6 my-auto text-start">
-                  <div class="dropdown float-start ps-4">
-                    <a class="cursor-pointer" id="dropdownTable" data-bs-toggle="dropdown" aria-expanded="false">
-                      <i class="fa fa-ellipsis-v text-secondary"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-n4" aria-labelledby="dropdownTable">
-                      <li><a class="dropdown-item border-radius-md" href="javascript:;">عمل</a></li>
-                      <li><a class="dropdown-item border-radius-md" href="javascript:;">عمل آخر</a></li>
-                      <li><a class="dropdown-item border-radius-md" href="javascript:;">شيء آخر هنا</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="card-body p-0 pb-2">
+            <div class="card-body p-3">
               <div class="table-responsive">
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">المشروع</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">أعضاء</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ميزانية</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">إكمال</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Rank</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Teacher</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Center Fees</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Teacher Invoices</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Teacher Net Profit</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Center Fees %</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="../assets/img/small-logos/logo-xd.svg" class="avatar avatar-sm ms-3">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Material XD الإصدار</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="avatar-group mt-2">
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">
-                            <img alt="Image placeholder" src="../assets/img/team-1.jpg">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">
-                            <img alt="Image placeholder" src="../assets/img/team-2.jpg">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Alexander Smith">
-                            <img alt="Image placeholder" src="../assets/img/team-3.jpg">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">
-                            <img alt="Image placeholder" src="../assets/img/team-4.jpg">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> $14,000 </span>
-                      </td>
-                      <td class="align-middle">
-                        <div class="progress-wrapper w-75 mx-auto">
-                          <div class="progress-info">
-                            <div class="progress-percentage">
-                              <span class="text-xs font-weight-bold">60%</span>
-                            </div>
-                          </div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-info w-60" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="../assets/img/small-logos/logo-atlassian.svg" class="avatar avatar-sm ms-3">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">أضف مسار التقدم إلى التطبيق الداخلي</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="avatar-group mt-2">
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">
-                            <img alt="Image placeholder" src="../assets/img/team-2.jpg">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">
-                            <img alt="Image placeholder" src="../assets/img/team-4.jpg">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> $3,000 </span>
-                      </td>
-                      <td class="align-middle">
-                        <div class="progress-wrapper w-75 mx-auto">
-                          <div class="progress-info">
-                            <div class="progress-percentage">
-                              <span class="text-xs font-weight-bold">10%</span>
-                            </div>
-                          </div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-info w-10" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="../assets/img/small-logos/logo-slack.svg" class="avatar avatar-sm ms-3">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">إصلاح أخطاء النظام الأساسي</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="avatar-group mt-2">
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">
-                            <img alt="Image placeholder" src="../assets/img/team-3.jpg">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">
-                            <img alt="Image placeholder" src="../assets/img/team-1.jpg">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> غير مضبوط </span>
-                      </td>
-                      <td class="align-middle">
-                        <div class="progress-wrapper w-75 mx-auto">
-                          <div class="progress-info">
-                            <div class="progress-percentage">
-                              <span class="text-xs font-weight-bold">100%</span>
-                            </div>
-                          </div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-success w-100" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="../assets/img/small-logos/logo-spotify.svg" class="avatar avatar-sm ms-3">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">إطلاق تطبيق الهاتف المحمول الخاص بنا</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="avatar-group mt-2">
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">
-                            <img alt="Image placeholder" src="../assets/img/team-4.jpg">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">
-                            <img alt="Image placeholder" src="../assets/img/team-3.jpg">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Alexander Smith">
-                            <img alt="Image placeholder" src="../assets/img/team-4.jpg">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">
-                            <img alt="Image placeholder" src="../assets/img/team-1.jpg">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> $20,500 </span>
-                      </td>
-                      <td class="align-middle">
-                        <div class="progress-wrapper w-75 mx-auto">
-                          <div class="progress-info">
-                            <div class="progress-percentage">
-                              <span class="text-xs font-weight-bold">100%</span>
-                            </div>
-                          </div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-success w-100" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="../assets/img/small-logos/logo-jira.svg" class="avatar avatar-sm ms-3">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">أضف صفحة التسعير الجديدة</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="avatar-group mt-2">
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">
-                            <img alt="Image placeholder" src="../assets/img/team-4.jpg">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> $500 </span>
-                      </td>
-                      <td class="align-middle">
-                        <div class="progress-wrapper w-75 mx-auto">
-                          <div class="progress-info">
-                            <div class="progress-percentage">
-                              <span class="text-xs font-weight-bold">25%</span>
-                            </div>
-                          </div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-info w-25" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="25"></div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="../assets/img/small-logos/logo-invision.svg" class="avatar avatar-sm ms-3">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">إعادة تصميم متجر جديد على الإنترنت</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="avatar-group mt-2">
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">
-                            <img alt="Image placeholder" src="../assets/img/team-1.jpg">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">
-                            <img alt="Image placeholder" src="../assets/img/team-4.jpg">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> $2,000 </span>
-                      </td>
-                      <td class="align-middle">
-                        <div class="progress-wrapper w-75 mx-auto">
-                          <div class="progress-info">
-                            <div class="progress-percentage">
-                              <span class="text-xs font-weight-bold">40%</span>
-                            </div>
-                          </div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-info w-40" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="40"></div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
+                  <tbody id="teacherPerformance">
+                    <!-- Teacher performance data will be loaded here -->
                   </tbody>
                 </table>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-6">
-          <div class="card h-100">
+        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+          <div class="card">
             <div class="card-header pb-0">
-              <h6>نظرة عامة على الطلبات</h6>
+              <h6>Center Expense Breakdown</h6>
               <p class="text-sm">
-                <i class="fa fa-arrow-up text-success" aria-hidden="true"></i>
-                <span class="font-weight-bold">24%</span> هذا الشهر
+                <i class="fa fa-chart-pie text-info" aria-hidden="true"></i>
+                <span class="font-weight-bold">Expense Distribution by Category with Dates</span>
               </p>
             </div>
             <div class="card-body p-3">
-              <div class="timeline timeline-one-side">
-                <div class="timeline-block mb-3">
-                  <span class="timeline-step">
-                    <i class="material-symbols-rounded text-success text-gradient">notifications</i>
-                  </span>
-                  <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">$2400, تغييرات في التصميم</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">22 DEC 7:20 PM</p>
-                  </div>
+              <div class="table-responsive">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Category</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Amount</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Percentage</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="expenseBreakdown">
+                    <!-- Expense breakdown will be loaded here -->
+                  </tbody>
+                </table>
+                          </div>
+                          </div>
+                        </div>
+                        </div>
+                            </div>
+
+      <!-- Revenue Distribution Chart -->
+      <div class="row mt-4">
+        <div class="col-lg-6 col-md-6 mt-4 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="mb-0">Center Revenue Distribution</h6>
+              <p class="text-sm">Percentage Contribution of Each Teacher and Source to Center Revenue</p>
+              <div class="pe-2">
+                <div class="chart">
+                  <canvas id="revenueDistributionChart" class="chart-canvas" height="300"></canvas>
                 </div>
-                <div class="timeline-block mb-3">
-                  <span class="timeline-step">
-                    <i class="material-symbols-rounded text-danger text-gradient">code</i>
-                  </span>
-                  <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">طلب جديد #1832412</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 11 PM</p>
-                  </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        <div class="col-lg-6 col-md-6 mt-4 mb-4">
+          <div class="card">
+            <div class="card-header pb-0">
+              <h6>Revenue Distribution Details</h6>
+                  <p class="text-sm">
+                <i class="fa fa-chart-pie text-success" aria-hidden="true"></i>
+                <span class="font-weight-bold">Percentage Contribution of Each Source to Center Revenue</span>
+                  </p>
                 </div>
-                <div class="timeline-block mb-3">
-                  <span class="timeline-step">
-                    <i class="material-symbols-rounded text-info text-gradient">shopping_cart</i>
-                  </span>
-                  <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">مدفوعات الخادم لشهر أبريل</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 9:34 PM</p>
-                  </div>
-                </div>
-                <div class="timeline-block mb-3">
-                  <span class="timeline-step">
-                    <i class="material-symbols-rounded text-warning text-gradient">credit_card</i>
-                  </span>
-                  <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">تمت إضافة بطاقة جديدة للطلب #4395133</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">20 DEC 2:20 AM</p>
-                  </div>
-                </div>
-                <div class="timeline-block mb-3">
-                  <span class="timeline-step">
-                    <i class="material-symbols-rounded text-primary text-gradient">key</i>
-                  </span>
-                  <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">فتح الحزم من أجل التطوير</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">18 DEC 4:54 AM</p>
-                  </div>
-                </div>
-                <div class="timeline-block">
-                  <span class="timeline-step">
-                    <i class="material-symbols-rounded text-dark text-gradient">payments</i>
-                  </span>
-                  <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">طلب جديد #9583120</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">17 DEC</p>
+            <div class="card-body p-3">
+              <div class="table-responsive">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Source</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Amount</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Percentage</th>
+                    </tr>
+                  </thead>
+                  <tbody id="revenueBreakdown">
+                    <!-- Revenue breakdown will be loaded here -->
+                  </tbody>
+                </table>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
       </div>
-   
-    </div>
+
+      <!-- Employee Performance Table -->
+      <div class="row mt-4 d-none">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header pb-0">
+              <h6>Employee Performance</h6>
+              <p class="text-sm">
+                <i class="fa fa-users text-info" aria-hidden="true"></i>
+                <span class="font-weight-bold">Employee Performance Summary with Bonuses and Registered Students</span>
+              </p>
+            </div>
+            <div class="card-body p-3">
+              <div class="table-responsive">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Employee</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Base Salary</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total Bonuses</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total Salaries</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Registered Students</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total Revenue</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="employeePerformance">
+                    <!-- Employee performance data will be loaded here -->
+                  </tbody>
+                </table>
+                          </div>
+                          </div>
+                        </div>
+                        </div>
+                            </div>
+
+      <!-- Summary Cards -->
+      <div class="row mt-4">
+        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between p-3 pt-2">
+              <div class="icon icon-md icon-shape bg-gradient-primary shadow-primary text-center border-radius-lg">
+                <i class="material-symbols-rounded opacity-10">account_balance</i>
+                          </div>
+              <div class="text-start pt-1">
+                <p class="text-sm mb-0 text-capitalize">Total Teacher Invoices</p>
+                <h4 class="mb-0" id="totalTeacherInvoices">0</h4>
+                          </div>
+                        </div>
+            <hr class="dark horizontal my-0">
+            <div class="card-footer p-3">
+              <p class="mb-0 text-start"><span class="text-primary text-sm font-weight-bolder ms-1">Teacher Invoices </span>Separated from Center</p>
+                          </div>
+                          </div>
+                        </div>
+        <div class="col-lg-8 col-md-6 mt-4 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="mb-0">Weekly Analysis</h6>
+              <p class="text-sm">Weekly Revenue and Expense Analysis</p>
+              <div class="pe-2">
+                <div class="chart">
+                  <canvas id="weeklyChart" class="chart-canvas" height="200"></canvas>
+                        </div>
+                            </div>
+                          </div>
+                          </div>
+                        </div>
+                          </div>
+                        </div>
   </main>
+
+  <style>
+    .font-weight-bold {
+      font-weight: 700 !important;
+    }
+    
+    .table th {
+      font-weight: 700 !important;
+      font-size: 0.75rem !important;
+    }
+    
+    .table td {
+      font-size: 0.875rem !important;
+    }
+    
+    .card h4 {
+      font-weight: 700 !important;
+      font-size: 1.5rem !important;
+    }
+    
+    .progress {
+      height: 6px !important;
+    }
+    
+    .badge {
+      font-weight: 600 !important;
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .alert {
+      margin-bottom: 1rem;
+    }
+    
+    .alert-dismissible .btn-close {
+      padding: 0.75rem 1rem;
+    }
+  </style>
 
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>
@@ -615,239 +462,647 @@
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/chartjs.min.js"></script>
+  
   <script>
-    var ctx = document.getElementById("chart-bars").getContext("2d");
+    // Global variables for charts
+    let monthlyChart, expenseChart, weeklyChart, revenueDistributionChart;
+    let currentAnalytics = null;
 
-    new Chart(ctx, {
-      type: "bar",
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+      showPreloader();
+      updateDashboard();
+      setupEventListeners();
+    });
+
+    function showPreloader() {
+      const preloader = document.getElementById('preloader');
+      if (preloader) {
+        preloader.style.display = 'flex';
+      }
+    }
+
+    function hidePreloader() {
+      const preloader = document.getElementById('preloader');
+      if (preloader) {
+        preloader.style.display = 'none';
+      }
+    }
+
+    function setupEventListeners() {
+      document.getElementById('periodFilter').addEventListener('change', function() {
+        const isCustom = this.value === 'custom';
+        document.getElementById('customDateRange').style.display = isCustom ? 'block' : 'none';
+        document.getElementById('customDateRange2').style.display = isCustom ? 'block' : 'none';
+      });
+    }
+
+    async function updateDashboard() {
+      try {
+        showPreloader();
+        setUpdateButtonLoading(true);
+        
+        // Remove any existing error messages
+        const existingErrors = document.querySelectorAll('.alert-danger');
+        existingErrors.forEach(error => error.remove());
+        
+        const period = document.getElementById('periodFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let url = `/admin/dashboard-data?period=${period}`;
+        if (period === 'custom' && startDate && endDate) {
+          url += `&startDate=${startDate}&endDate=${endDate}`;
+        }
+
+        // Add timeout to fetch request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 seconds timeout
+
+        const response = await fetch(url, {
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          if (response.status === 408) {
+            throw new Error('Request timeout - data loading took too long. Please try again.');
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        }
+        
+        const analytics = await response.json();
+        
+        if (analytics && typeof analytics === 'object') {
+          currentAnalytics = analytics;
+          updateDashboardUI(analytics);
+          updateCharts(analytics);
+        } else {
+          console.error('Invalid analytics data received:', analytics);
+          throw new Error('Invalid data received from server');
+        }
+      } catch (error) {
+        console.error('Error updating dashboard:', error);
+        
+        // Show specific error message to user
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+        errorDiv.innerHTML = `
+          <strong>Error!</strong> ${error.message || 'Error loading dashboard data. Please try again.'}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const container = document.querySelector('.container-fluid');
+        if (container) {
+          container.insertBefore(errorDiv, container.firstChild);
+        }
+        
+        // Auto-remove error after 10 seconds
+        setTimeout(() => {
+          if (errorDiv.parentNode) {
+            errorDiv.remove();
+          }
+        }, 10000);
+      } finally {
+        hidePreloader();
+        setUpdateButtonLoading(false);
+      }
+    }
+
+    function setUpdateButtonLoading(isLoading) {
+      const updateBtn = document.getElementById('updateBtn');
+      const updateIcon = document.getElementById('updateIcon');
+      const updateText = document.getElementById('updateText');
+      
+      if (isLoading) {
+        updateBtn.disabled = true;
+        updateIcon.textContent = 'sync';
+        updateIcon.style.animation = 'spin 1s linear infinite';
+        updateText.textContent = 'جاري التحميل...';
+      } else {
+        updateBtn.disabled = false;
+        updateIcon.textContent = 'refresh';
+        updateIcon.style.animation = '';
+        updateText.textContent = 'تحديث البيانات';
+      }
+    }
+
+    function updateDashboardUI(analytics) {
+      // Update main cards
+      document.getElementById('totalRevenue').textContent = formatCurrency(analytics.totalCenterRevenue);
+      document.getElementById('totalExpenses').textContent = formatCurrency(analytics.totalExpenses);
+      document.getElementById('netProfit').textContent = formatCurrency(analytics.netProfit);
+      document.getElementById('totalStudents').textContent = formatNumber(analytics.totalStudents);
+      document.getElementById('totalTeacherInvoices').textContent = formatCurrency(analytics.totalTeacherInvoices);
+      document.getElementById('totalCanteenIn').textContent = formatCurrency(analytics.totalCanteenIn);
+      document.getElementById('totalEmployeeKPIs').textContent = formatCurrency(analytics.totalEmployeeKPIs);
+
+      // Update teacher performance
+      updateTeacherPerformance(analytics.teacherPerformance);
+
+      // Update expense breakdown
+      updateExpenseBreakdown(analytics.expenseDetails, analytics.totalExpenses);
+
+      // Update revenue breakdown
+      updateRevenueBreakdown(analytics.teacherPerformance, analytics.totalCanteenIn, analytics.totalCenterRevenue);
+
+      // Update employee performance
+      updateEmployeePerformance(analytics.employeePerformance);
+    }
+
+    function updateTeacherPerformance(teachers) {
+      const container = document.getElementById('teacherPerformance');
+      container.innerHTML = '';
+
+      teachers.slice(0, 10).forEach((teacher, index) => {
+        const row = document.createElement('tr');
+        
+        // Determine badge color based on ranking
+        let badgeClass = 'bg-gradient-secondary';
+        if (index === 0) badgeClass = 'bg-gradient-warning'; // Gold for 1st
+        else if (index === 1) badgeClass = 'bg-gradient-secondary'; // Silver for 2nd
+        else if (index === 2) badgeClass = 'bg-gradient-info'; // Bronze for 3rd
+
+        row.innerHTML = `
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-center">
+                <span class="badge badge-sm ${badgeClass}">${index + 1}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+            <div class="d-flex px-2 py-1">
+              <div class="d-flex flex-column justify-content-center">
+                <h6 class="mb-0 text-sm font-weight-bold">${teacher.teacherName}</h6>
+                <p class="text-xs text-secondary mb-0">${formatNumber(teacher.studentCount)} students</p>
+              </div>
+                        </div>
+                      </td>
+                      <td class="align-middle text-center text-sm">
+            <span class="text-xs font-weight-bold text-success">${formatCurrency(teacher.totalFees)}</span>
+                      </td>
+          <td class="align-middle text-center text-sm">
+            <span class="text-xs font-weight-bold text-danger">${formatCurrency(teacher.teacherInvoices)}</span>
+          </td>
+          <td class="align-middle text-center text-sm">
+            <span class="text-xs font-weight-bold text-info">${formatCurrency(teacher.netRevenue)}</span>
+          </td>
+          <td class="align-middle text-center">
+            <div class="d-flex align-items-center justify-content-center">
+              <span class="me-2 text-xs font-weight-bold">${teacher.percentage}%</span>
+              <div class="progress" style="width: 60px;">
+                <div class="progress-bar bg-gradient-info" role="progressbar" 
+                     style="width: ${Math.min(teacher.percentage, 100)}%" 
+                     aria-valuenow="${teacher.percentage}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+        `;
+        
+        container.appendChild(row);
+      });
+    }
+
+    function updateExpenseBreakdown(expenseDetails, totalExpenses) {
+      const container = document.getElementById('expenseBreakdown');
+      container.innerHTML = '';
+
+      const categoryNames = {
+        salaries: 'Salaries',
+        canteen_out: 'Canteen Expenses',
+        government_fees: 'Government Fees',
+        electric_invoices: 'Electric Invoices',
+        other: 'Other'
+      };
+
+      // Group expenses by category and calculate totals
+      const categoryTotals = {};
+      expenseDetails.forEach(expense => {
+        if (!categoryTotals[expense.category]) {
+          categoryTotals[expense.category] = {
+            total: 0,
+            details: []
+          };
+        }
+        categoryTotals[expense.category].total += expense.amount;
+        categoryTotals[expense.category].details.push(expense);
+      });
+
+      // Display each category with its details
+      Object.entries(categoryTotals).forEach(([category, data]) => {
+        if (data.total > 0) {
+          const percentage = totalExpenses > 0 ? (data.total / totalExpenses * 100).toFixed(1) : 0;
+          
+          // Create main category row
+          const mainRow = document.createElement('tr');
+          mainRow.innerHTML = `
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-center">
+                  <h6 class="mb-0 text-sm font-weight-bold">${categoryNames[category]}</h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+              <p class="text-xs font-weight-bold mb-0">${formatCurrency(data.total)}</p>
+                      </td>
+                      <td class="align-middle text-center text-sm">
+              <span class="badge badge-sm bg-gradient-success">${percentage}%</span>
+                      </td>
+            <td class="align-middle text-center text-sm">
+              <span class="text-xs text-secondary">Total</span>
+                      </td>
+          `;
+          container.appendChild(mainRow);
+
+          // Create detail rows for each bill
+          data.details.forEach(expense => {
+            const detailRow = document.createElement('tr');
+            detailRow.innerHTML = `
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-center">
+                    <p class="text-xs text-secondary mb-0">└─ ${expense.billName}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                <p class="text-xs text-secondary mb-0">${formatCurrency(expense.amount)}</p>
+                      </td>
+                      <td class="align-middle text-center text-sm">
+                <span class="text-xs text-secondary">-</span>
+                      </td>
+              <td class="align-middle text-center text-sm">
+                <span class="text-xs text-secondary">${new Date(expense.date).toLocaleDateString('en-US')}</span>
+                      </td>
+            `;
+            container.appendChild(detailRow);
+          });
+        }
+      });
+    }
+
+    function updateRevenueBreakdown(teachers, totalCanteenIn, totalCenterRevenue) {
+      const container = document.getElementById('revenueBreakdown');
+      container.innerHTML = '';
+
+      // Calculate total revenue from all sources
+      const totalRevenueFromTeachers = teachers.reduce((sum, teacher) => sum + teacher.totalFees, 0);
+      const totalRevenue = totalRevenueFromTeachers + totalCanteenIn;
+
+      // Add canteen revenue row
+      if (totalCanteenIn > 0) {
+        const canteenRow = document.createElement('tr');
+        const canteenPercentage = totalRevenue > 0 ? (totalCanteenIn / totalRevenue * 100).toFixed(1) : 0;
+        canteenRow.innerHTML = `
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-center">
+                <h6 class="mb-0 text-sm font-weight-bold">Canteen Revenue</h6>
+                          </div>
+                        </div>
+                      </td>
+          <td class="align-middle text-center text-sm">
+            <span class="text-xs font-weight-bold text-success">${formatCurrency(totalCanteenIn)}</span>
+                      </td>
+                      <td class="align-middle text-center text-sm">
+            <span class="badge badge-sm bg-gradient-success">${canteenPercentage}%</span>
+                      </td>
+        `;
+        container.appendChild(canteenRow);
+      }
+
+      // Add teacher revenue rows
+      teachers.forEach((teacher, index) => {
+        const row = document.createElement('tr');
+        const percentage = totalRevenue > 0 ? (teacher.totalFees / totalRevenue * 100).toFixed(1) : 0;
+        
+        // Determine badge color based on ranking
+        let badgeClass = 'bg-gradient-secondary';
+        if (index === 0) badgeClass = 'bg-gradient-warning'; // Gold for 1st
+        else if (index === 1) badgeClass = 'bg-gradient-secondary'; // Silver for 2nd
+        else if (index === 2) badgeClass = 'bg-gradient-info'; // Bronze for 3rd
+
+        row.innerHTML = `
+          <td>
+            <div class="d-flex px-2 py-1">
+              <div class="d-flex flex-column justify-content-center">
+                <h6 class="mb-0 text-sm font-weight-bold">${teacher.teacherName}</h6>
+                <p class="text-xs text-secondary mb-0">${formatNumber(teacher.studentCount)} students</p>
+                          </div>
+                        </div>
+                      </td>
+          <td class="align-middle text-center text-sm">
+            <span class="text-xs font-weight-bold text-info">${formatCurrency(teacher.totalFees)}</span>
+          </td>
+          <td class="align-middle text-center text-sm">
+            <span class="badge badge-sm ${badgeClass}">${percentage}%</span>
+          </td>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function updateCharts(analytics) {
+      updateMonthlyChart(analytics.monthlyData);
+      updateExpenseChart(analytics.expenseCategories);
+      updateWeeklyChart(analytics.weeklyData);
+      updateRevenueDistributionChart(analytics.teacherPerformance, analytics.totalCanteenIn, analytics.totalCenterRevenue);
+    }
+
+    function updateMonthlyChart(monthlyData) {
+      const ctx = document.getElementById('monthlyChart').getContext('2d');
+      
+      if (monthlyChart) {
+        monthlyChart.destroy();
+      }
+
+              monthlyChart = new Chart(ctx, {
+          type: 'line',
       data: {
-        labels: ["M", "T", "W", "T", "F", "S", "S"],
+            labels: monthlyData.map(item => item.month),
         datasets: [{
-          label: "Views",
+              label: 'Revenue',
+              data: monthlyData.map(item => item.revenue),
+              borderColor: '#2dce89',
+              backgroundColor: 'rgba(45, 206, 137, 0.1)',
           tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "#43A047",
-          data: [50, 45, 22, 28, 50, 60, 76],
-          barThickness: 'flex'
-        }, ],
+              fill: true
+            }, {
+              label: 'Expenses',
+              data: monthlyData.map(item => item.expenses),
+              borderColor: '#f5365c',
+              backgroundColor: 'rgba(245, 54, 92, 0.1)',
+              tension: 0.4,
+              fill: true
+            }, {
+              label: 'Net Profit',
+              data: monthlyData.map(item => item.profit),
+              borderColor: '#11cdef',
+              backgroundColor: 'rgba(17, 205, 239, 0.1)',
+          tension: 0.4,
+              fill: true
+            }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            display: false,
+                position: 'top',
           }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
         },
         scales: {
           y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: '#e5e5e5'
-            },
-            ticks: {
-              suggestedMin: 0,
-              suggestedMax: 500,
               beginAtZero: true,
-              padding: 10,
-              font: {
-                size: 14,
-                lineHeight: 2
-              },
-              color: "#737373"
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
             ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 14,
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-
-    var ctx2 = document.getElementById("chart-line").getContext("2d");
-
-    new Chart(ctx2, {
-      type: "line",
-      data: {
-        labels: ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
-        datasets: [{
-          label: "Sales",
-          tension: 0,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointBackgroundColor: "#43A047",
-          pointBorderColor: "transparent",
-          borderColor: "#43A047",
-          backgroundColor: "transparent",
-          fill: true,
-          data: [120, 230, 130, 440, 250, 360, 270, 180, 90, 300, 310, 220],
-          maxBarThickness: 6
-
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            callbacks: {
-              title: function(context) {
-                const fullMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                return fullMonths[context[0].dataIndex];
+                  callback: function(value) {
+                    return formatCurrency(value);
+                  }
+                }
               }
             }
           }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [4, 4],
-              color: '#e5e5e5'
-            },
-            ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 12,
-                lineHeight: 2
-              },
-            }
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 12,
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
+        });
+    }
 
-    var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
+    function updateExpenseChart(expenseCategories) {
+      const ctx = document.getElementById('expenseChart').getContext('2d');
+      
+      if (expenseChart) {
+        expenseChart.destroy();
+      }
 
-    new Chart(ctx3, {
-      type: "line",
+      const labels = [];
+      const data = [];
+      const colors = ['#2dce89', '#f5365c', '#11cdef', '#fb6340', '#5603ad'];
+
+      Object.entries(expenseCategories).forEach(([category, amount], index) => {
+        if (amount > 0) {
+          const categoryNames = {
+            salaries: 'Salaries',
+            canteen_out: 'Canteen Expenses',
+            government_fees: 'Government Fees',
+            electric_invoices: 'Electric Invoices',
+            other: 'Other'
+          };
+          
+          labels.push(categoryNames[category]);
+          data.push(amount);
+        }
+      });
+
+      expenseChart = new Chart(ctx, {
+        type: 'doughnut',
       data: {
-        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+          labels: labels,
         datasets: [{
-          label: "Tasks",
-          tension: 0,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointBackgroundColor: "#43A047",
-          pointBorderColor: "transparent",
-          borderColor: "#43A047",
-          backgroundColor: "transparent",
-          fill: true,
-          data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-          maxBarThickness: 6
-
-        }],
+            data: data,
+            backgroundColor: colors.slice(0, data.length),
+            borderWidth: 0
+          }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            display: false,
+              position: 'bottom',
+          },
+          tooltip: {
+            callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((context.parsed / total) * 100).toFixed(1);
+                  return `${context.label}: ${formatCurrency(context.parsed)} (${percentage}%)`;
+                }
+              }
+            }
           }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
+        }
+      });
+    }
+
+    function updateWeeklyChart(weeklyData) {
+      const ctx = document.getElementById('weeklyChart').getContext('2d');
+      
+      if (weeklyChart) {
+        weeklyChart.destroy();
+      }
+
+      weeklyChart = new Chart(ctx, {
+        type: 'bar',
+      data: {
+          labels: weeklyData.map(item => item.week),
+        datasets: [{
+            label: 'Revenue',
+            data: weeklyData.map(item => item.revenue),
+            backgroundColor: '#2dce89',
+            borderColor: '#2dce89',
+            borderWidth: 1
+          }, {
+            label: 'Expenses',
+            data: weeklyData.map(item => item.expenses),
+            backgroundColor: '#f5365c',
+            borderColor: '#f5365c',
+            borderWidth: 1
+          }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+              position: 'top',
+          }
         },
         scales: {
           y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [4, 4],
-              color: '#e5e5e5'
-            },
+              beginAtZero: true,
             ticks: {
-              display: true,
-              padding: 10,
-              color: '#737373',
-              font: {
-                size: 14,
-                lineHeight: 2
-              },
+                callback: function(value) {
+                  return formatCurrency(value);
+                }
+              }
             }
+          }
+        }
+      });
+    }
+
+    function updateRevenueDistributionChart(teachers, totalCanteenIn, totalCenterRevenue) {
+      const ctx = document.getElementById('revenueDistributionChart').getContext('2d');
+      
+      if (revenueDistributionChart) {
+        revenueDistributionChart.destroy();
+      }
+
+      const labels = [];
+      const data = [];
+      const colors = ['#2dce89', '#f5365c', '#11cdef', '#fb6340', '#5603ad', '#8965e0', '#f3a4b5', '#fd7e14', '#20c997', '#6f42c1'];
+
+      // Add canteen revenue if it exists
+      if (totalCanteenIn > 0) {
+        labels.push('Canteen Revenue');
+        data.push(totalCanteenIn);
+      }
+
+      // Add teacher revenue distribution
+      teachers.forEach((teacher, index) => {
+        if (teacher.totalFees > 0) {
+          labels.push(teacher.teacherName);
+          data.push(teacher.totalFees);
+        }
+      });
+
+      // Only create chart if there's data
+      if (data.length > 0) {
+        revenueDistributionChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: data,
+              backgroundColor: colors.slice(0, data.length),
+              borderWidth: 0
+            }]
           },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [4, 4]
-            },
-            ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 14,
-                lineHeight: 2
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  padding: 20,
+                  usePointStyle: true
+                }
               },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                    return `${context.label}: ${formatCurrency(context.parsed)} (${percentage}%)`;
+                  }
+                }
+              }
             }
-          },
-        },
-      },
-    });
+          }
+        });
+      }
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'EGP',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+
+    function formatNumber(number) {
+      return new Intl.NumberFormat('en-US').format(number);
+    }
+
+    function updateEmployeePerformance(employees) {
+      const container = document.getElementById('employeePerformance');
+      container.innerHTML = '';
+
+      employees.forEach((employee, index) => {
+        const row = document.createElement('tr');
+        
+        // Determine badge color based on KPI count
+        let badgeClass = 'bg-gradient-secondary';
+        if (employee.kpiCount > 5) badgeClass = 'bg-gradient-success';
+        else if (employee.kpiCount > 2) badgeClass = 'bg-gradient-warning';
+
+        row.innerHTML = `
+          <td>
+            <div class="d-flex px-2 py-1">
+              <div class="d-flex flex-column justify-content-center">
+                <h6 class="mb-0 text-sm font-weight-bold">${employee.employeeName}</h6>
+                <p class="text-xs text-secondary mb-0">${employee.employeePhoneNumber}</p>
+              </div>
+            </div>
+          </td>
+          <td class="align-middle text-center text-sm">
+            <span class="text-xs font-weight-bold text-info">${formatCurrency(employee.baseSalary)}</span>
+          </td>
+          <td class="align-middle text-center text-sm">
+            <span class="text-xs font-weight-bold text-success">${formatCurrency(employee.totalKPIs)}</span>
+            <span class="badge badge-sm ${badgeClass} ms-1">${employee.kpiCount}</span>
+          </td>
+          <td class="align-middle text-center text-sm">
+            <span class="text-xs font-weight-bold text-primary">${formatCurrency(employee.totalSalary)}</span>
+          </td>
+          <td class="align-middle text-center text-sm">
+            <span class="text-xs font-weight-bold text-warning">${formatNumber(employee.totalStudents)}</span>
+          </td>
+          <td class="align-middle text-center text-sm">
+            <span class="text-xs font-weight-bold text-dark">${formatCurrency(employee.totalRevenue)}</span>
+          </td>
+          <td class="align-middle text-center">
+            <a href="/admin/employee-log?id=${employee._id}" class="btn btn-info btn-sm">
+              <i class="material-symbols-rounded">visibility</i>
+              Details
+            </a>
+          </td>
+        `;
+        
+        container.appendChild(row);
+      });
+    }
+
+    // Auto-refresh every 5 minutes
+    setInterval(updateDashboard, 5 * 60 * 1000);
   </script>
+  
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -857,8 +1112,6 @@
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
   </script>
-  <!-- Github buttons -->
-  <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/material-dashboard.min.js?v=3.2.0"></script>
 </body>

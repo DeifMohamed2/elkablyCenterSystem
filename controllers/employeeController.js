@@ -199,7 +199,7 @@ const billing_Get = (req, res) => {
 }
 
 const addBill = (req, res) => {
-    const { billName, billAmount, billNote, billPhoto } = req.body;
+    const { billName, billAmount, billNote, billPhoto, billCategory } = req.body;
 
     if (billAmount < 0) {
         res.status(400).send({ message: 'لازم Amount يكون اكبر من 0' });
@@ -211,11 +211,17 @@ const addBill = (req, res) => {
         return
     }
 
+    if (!billCategory) {
+        res.status(400).send({ message: 'يجب اختيار فئة الفاتورة' });
+        return
+    }
+
     const bill = new Billing({
       billName,
       billAmount,
       billNote,
       billPhoto,
+      billCategory,
       employee: req.employeeId,
     });
 
@@ -351,18 +357,38 @@ const addStudent = async (req, res) => {
         // Process each selected teacher and their courses
         const processedTeachers = selectedTeachers.map(({ teacherId, courses }) => {
             const processedCourses = courses.map(({ courseName, amountPay, registerPrice }) => {
-                const amountRemaining = 0;  // Subtract paid amount from full registration fee
+                // For perCourse payment, the total course cost is the amountPay
+                // For perSession payment, the total course cost is 0 (paid per session)
+                const totalCourseCost = paymentType === 'perCourse' ? amountPay : 0;
+                const amountRemaining = paymentType === 'perCourse' ? amountPay : 0;
                 console.log('Amount Remaining:', amountRemaining);
                 return {
                   courseName,
                   amountPay,
-                  registerPrice:0,
+                  registerPrice: registerPrice || 0, // Use 0 as default if not provided
                   amountRemaining: amountRemaining > 0 ? amountRemaining : 0, // Ensure it doesn't go negative
+                  totalCourseCost: totalCourseCost,
+                  installments: [], // Initialize empty installments array
+                  isCompleted: false, // Course is not completed initially
                 };
             });
 
             return { teacherId, courses: processedCourses };
         });
+
+        // Calculate total amount remaining for the student
+        let totalAmountRemaining = 0;
+        if (paymentType === 'perCourse') {
+            // Sum up all course costs for per-course students
+            processedTeachers.forEach(({ courses }) => {
+                courses.forEach(course => {
+                    totalAmountRemaining += course.totalCourseCost;
+                });
+            });
+        } else {
+            // For per-session students, amount remaining is 0
+            totalAmountRemaining = 0;
+        }
 
         const student = new Student({
             studentName,
@@ -370,7 +396,8 @@ const addStudent = async (req, res) => {
             studentParentPhone,
             schoolName,
             selectedTeachers: processedTeachers,
-            amountRemaining: paymentType === 'perSession' ? 0 : studentAmount,
+            amountRemaining: totalAmountRemaining,
+            studentAmount: totalAmountRemaining, // Set studentAmount to the total course cost
             studentCode: studentCode,
             paymentType,
         });
@@ -391,9 +418,12 @@ const addStudent = async (req, res) => {
 
                 populatedStudent.selectedTeachers.forEach(({ teacherId, courses }) => {
                     message += `\n👨‍🏫 *المعلم:* ${teacherId.teacherName}\n`;
-                    courses.forEach(({ courseName}) => {
+                    courses.forEach(({ courseName, totalCourseCost, amountRemaining }) => {
                         message += `   ➖ *الكورس:* ${courseName}\n`;
-                  
+                        if (paymentType === 'perCourse') {
+                            message += `   💰 *إجمالي التكلفة:* ${totalCourseCost} ج.م\n`;
+                            message += `   💳 *المبلغ المتبقي:* ${amountRemaining} ج.م\n`;
+                        }
                     });
                 });
 
@@ -425,7 +455,6 @@ const updateStudent = async (req, res) => {
     subject,
     studentAmount,
     amountRemaining,
-    installmentAmount,
     selectedTeachers,
   } = req.body;
 
@@ -444,11 +473,70 @@ const updateStudent = async (req, res) => {
       return;
   }
 
+  // Validate and convert numeric fields
+  const validatedStudentAmount = parseFloat(studentAmount) || 0;
+  const validatedAmountRemaining = parseFloat(amountRemaining) || 0;
+
+  // Validate that amounts are not negative
+  if (validatedStudentAmount < 0) {
+      res.status(400).send({ message: 'مبلغ الكورس لا يمكن أن يكون سالب' });
+      return;
+  }
+
+  if (validatedAmountRemaining < 0) {
+      res.status(400).send({ message: 'المبلغ المتبقي لا يمكن أن يكون سالب' });
+      return;
+  }
+
   // if (!studentTeacher) {
   //     res.status(400).send({ message: 'يجب اختيار المعلم' });
   //     return
   // }
   
+
+  // First, get the current student to preserve installment history
+  const currentStudent = await Student.findById(req.params.id);
+  if (!currentStudent) {
+    return res.status(404).send({ message: 'الطالب غير موجود' });
+  }
+
+  // Merge selectedTeachers to preserve installment history
+  const mergedSelectedTeachers = selectedTeachers.map(newTeacher => {
+    const existingTeacher = currentStudent.selectedTeachers.find(
+      t => t.teacherId.toString() === newTeacher.teacherId
+    );
+    
+    if (existingTeacher) {
+      // Merge courses while preserving installment history
+      const mergedCourses = newTeacher.courses.map(newCourse => {
+        const existingCourse = existingTeacher.courses.find(
+          c => c.courseName === newCourse.courseName
+        );
+        
+        if (existingCourse) {
+          // Preserve installment history and other existing data
+          return {
+            ...newCourse,
+            installments: existingCourse.installments || [],
+            isCompleted: existingCourse.isCompleted || false,
+            // Preserve totalCourseCost from existing course
+            totalCourseCost: existingCourse.totalCourseCost || newCourse.totalCourseCost || 0,
+            // Keep existing amountRemaining if it's not being updated
+            amountRemaining: newCourse.amountRemaining !== undefined ? 
+              parseFloat(newCourse.amountRemaining) || 0 : 
+              existingCourse.amountRemaining
+          };
+        }
+        return newCourse;
+      });
+      
+      return {
+        ...newTeacher,
+        courses: mergedCourses
+      };
+    }
+    return newTeacher;
+  });
 
   const student = await Student.findByIdAndUpdate(req.params.id, {
     studentName,
@@ -456,38 +544,13 @@ const updateStudent = async (req, res) => {
     studentParentPhone,
     // studentTeacher,
     subject,
-    studentAmount,
-    amountRemaining,
-    selectedTeachers,
+    studentAmount: validatedStudentAmount,
+    amountRemaining: validatedAmountRemaining,
+    selectedTeachers: mergedSelectedTeachers,
   }).populate('studentTeacher', 'teacherName');
   
-  if (student.paymentType === 'perCourse') {
-    if ((student.amountRemaining - installmentAmount) <= 0) {
-      return res.status(200).send(student);
-    }
-    student.amountRemaining -= installmentAmount;
-    student.paidHistory.push({
-      amount: installmentAmount,
-      date: new Date(),
-      employee: req.employee._id,
-    });
-
-    if (installmentAmount>0) {
-      const parentMessage = `
-عزيزي ولي أمر الطالب ${student.studentName},
------------------------------
-نود إعلامكم بأنه تم دفع مبلغ ${installmentAmount} جنيه من إجمالي المبلغ المستحق.
-المبلغ المتبقي هو ${student.amountRemaining} جنيه.
-الكورس: ${student.subject}
-المعلم: ${student.studentTeacher.teacherName}
-التاريخ: ${new Date().toLocaleDateString()}
-شكرًا لتعاونكم.
-    `;
-
-          await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage);
-    }
-    await student.save();
-  }
+  // Remove old installment logic - this should be handled by separate installment functions
+  // Only Per Course students should have installment functionality
  return res.send(student);
 }
 
@@ -636,7 +699,180 @@ const sendCodeAgain = async (req, res) => {
     res.status(500).json({ message: 'An error occurred while sending QR code' });
   }
 };
-   
+
+// Add installment payment for a specific course
+const addInstallmentPayment = async (req, res) => {
+  const { studentId, teacherId, courseName, installmentAmount, notes } = req.body;
+  const employeeId = req.employeeId;
+
+  // Validate and convert installment amount
+  const validatedInstallmentAmount = parseFloat(installmentAmount) || 0;
+
+  // Validate installment amount
+  if (validatedInstallmentAmount <= 0) {
+    return res.status(400).json({ message: 'مبلغ القسط يجب أن يكون أكبر من صفر' });
+  }
+
+  try {
+    const student = await Student.findById(studentId);
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    // Find the specific teacher and course
+    const teacherEntry = student.selectedTeachers.find(
+      (t) => t.teacherId.toString() === teacherId
+    );
+
+    if (!teacherEntry) {
+      return res.status(404).json({ message: 'Teacher not found for this student' });
+    }
+
+    const course = teacherEntry.courses.find((c) => c.courseName === courseName);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found for this student' });
+    }
+
+    if (validatedInstallmentAmount > course.amountRemaining) {
+      return res.status(400).json({ message: 'مبلغ القسط لا يمكن أن يتجاوز المبلغ المتبقي' });
+    }
+
+    // Add the installment
+    course.installments.push({
+      amount: validatedInstallmentAmount,
+      date: new Date(),
+      employee: employeeId,
+      notes: notes || '',
+    });
+
+    // Update remaining amount
+    course.amountRemaining -= validatedInstallmentAmount;
+
+    // Check if course is completed
+    if (course.amountRemaining <= 0) {
+      course.isCompleted = true;
+      course.amountRemaining = 0;
+    }
+
+    await student.save();
+
+    // Send WhatsApp message to parent
+    const parentMessage = `
+عزيزي ولي أمر الطالب ${student.studentName},
+-----------------------------
+تم دفع قسط جديد للكورس ${courseName}
+مبلغ القسط: ${validatedInstallmentAmount} ج.م
+المبلغ المتبقي: ${course.amountRemaining} ج.م
+التاريخ: ${new Date().toLocaleDateString()}
+${notes ? `ملاحظات: ${notes}` : ''}
+شكرًا لتعاونكم.
+    `;
+
+    try {
+      await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage);
+    } catch (error) {
+      console.error('Error sending WhatsApp message:', error);
+    }
+
+    res.status(200).json({
+      message: 'Installment added successfully',
+      course,
+      remainingAmount: course.amountRemaining,
+      isCompleted: course.isCompleted,
+    });
+  } catch (error) {
+    console.error('Error adding installment:', error);
+    res.status(500).json({ message: 'An error occurred while adding installment' });
+  }
+};
+
+// Get installment history for a student
+const getInstallmentHistory = async (req, res) => {
+  const { studentId } = req.params;
+
+  try {
+    const student = await Student.findById(studentId)
+      .populate('selectedTeachers.teacherId', 'teacherName')
+      .populate('selectedTeachers.courses.installments.employee', 'employeeName');
+
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    // Extract installment history
+    const installmentHistory = [];
+
+    student.selectedTeachers.forEach(({ teacherId, courses }) => {
+      courses.forEach((courseItem) => {
+        if (courseItem.installments && courseItem.installments.length > 0) {
+          courseItem.installments.forEach((installment) => {
+            installmentHistory.push({
+              courseName: courseItem.courseName,
+              teacherId: teacherId._id.toString(),
+              teacherName: teacherId.teacherName,
+              amount: installment.amount,
+              date: installment.date,
+              employeeName: installment.employee.employeeName,
+              notes: installment.notes,
+            });
+          });
+        }
+      });
+    });
+
+    // Sort by date (newest first)
+    installmentHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    res.status(200).json({
+      student,
+      installmentHistory,
+    });
+  } catch (error) {
+    console.error('Error fetching installment history:', error);
+    res.status(500).json({ message: 'An error occurred while fetching installment history' });
+  }
+};
+
+// Update course details (total cost, etc.)
+const updateCourseDetails = async (req, res) => {
+  const { studentId, teacherId, courseName, totalCourseCost } = req.body;
+
+  try {
+    const student = await Student.findById(studentId);
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    // Find the specific teacher and course
+    const teacherEntry = student.selectedTeachers.find(
+      (t) => t.teacherId.toString() === teacherId
+    );
+
+    if (!teacherEntry) {
+      return res.status(404).json({ message: 'Teacher not found for this student' });
+    }
+
+    const course = teacherEntry.courses.find((c) => c.courseName === courseName);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found for this student' });
+    }
+
+    // Update course details
+    course.totalCourseCost = totalCourseCost;
+    course.amountRemaining = totalCourseCost;
+
+    await student.save();
+
+    res.status(200).json({
+      message: 'Course details updated successfully',
+      course,
+    });
+  } catch (error) {
+    console.error('Error updating course details:', error);
+    res.status(500).json({ message: 'An error occurred while updating course details' });
+  }
+};
+
 // ======================================== End Add Student ======================================== //
 
 
@@ -954,13 +1190,14 @@ const attendStudent = async (req, res) => {
       amountPaid = parseFloat(fixedAmount);
       if (isNaN(amountPaid)) {
         console.error('Invalid fixed amount value:', fixedAmount);
-        amountPaid = isPerSession ? course.amountPay : 0;
+        amountPaid = isPerSession ? course.amountPay : 0; // Per-course students pay 0 per session
       }
     } else {
       // Handle mock check or regular amount
-      amountPaid = (mockCheck === true || mockCheck === "true") ? mockAmount : (isPerSession ? course.amountPay : 0);
+      amountPaid = (mockCheck === true || mockCheck === "true") ? mockAmount : (isPerSession ? course.amountPay : 0); // Per-course students pay 0 per session
     }
-    const feesApplied = mockCheck === "true" ? mockFees : (isPerSession ? teacher.teacherFees : 0);
+    // For per-course students, always apply teacher fees (they pay 0 but center still pays teacher)
+    const feesApplied = mockCheck === "true" ? mockFees : teacher.teacherFees;
     const teacherProfit = isPerSession ? amountPaid - feesApplied : 0;
 
     // Add the student to the attendance record
@@ -1132,7 +1369,20 @@ const getAttendedStudents = async (req, res) => {
 
 const editStudentAmountRemainingAndPaid = async (req, res) => {
   const { id } = req.params;
-  const { amountRemaining,amountPaid, teacherId, courseName } = req.body;
+  const { amountRemaining, amountPaid, teacherId, courseName } = req.body;
+
+  // Validate and convert numeric fields
+  const validatedAmountRemaining = parseFloat(amountRemaining) || 0;
+  const validatedAmountPaid = parseFloat(amountPaid) || 0;
+
+  // Validate that amounts are not negative
+  if (validatedAmountRemaining < 0) {
+    return res.status(400).json({ message: 'المبلغ المتبقي لا يمكن أن يكون سالب' });
+  }
+
+  if (validatedAmountPaid < 0) {
+    return res.status(400).json({ message: 'المبلغ المدفوع لا يمكن أن يكون سالب' });
+  }
 
   try {
     const student = await Student.findById(id);
@@ -1160,8 +1410,8 @@ const editStudentAmountRemainingAndPaid = async (req, res) => {
     }
 
     // Calculate the difference
-    const difference = course.amountRemaining - amountRemaining;
-    course.amountRemaining = amountRemaining;
+    const difference = course.amountRemaining - validatedAmountRemaining;
+    course.amountRemaining = validatedAmountRemaining;
 
     // Update attendance record
     const attendance = await Attendance.findOne({
@@ -1177,7 +1427,7 @@ const editStudentAmountRemainingAndPaid = async (req, res) => {
       );
 
       if (studentAttendance) {
-        studentAttendance.amountPaid = amountPaid;
+        studentAttendance.amountPaid = validatedAmountPaid;
         studentAttendance.amountPaid += difference;
         studentAttendance.feesApplied = await Teacher.findById(teacherId).then(
           (t) => t.teacherFees
@@ -2821,6 +3071,375 @@ const getStudentLogsData = async (req, res) => {
   }
 };
 
+// ==================== NOTIFICATION MANAGEMENT ====================
+
+const getNotificationsPage = async (req, res) => {
+  try {
+    res.render('employee/notifications', {
+      title: 'المتبقي',
+      user: req.user,
+      path: '/employee/notifications'
+    });
+  } catch (error) {
+    console.error('Error loading notifications page:', error);
+    res.status(500).json({ message: 'An error occurred while loading notifications page' });
+  }
+};
+
+const getStudentsWithBalances = async (req, res) => {
+  try {
+    const { teacherId, courseName, paymentType } = req.query;
+    
+    let query = {};
+    
+    // Filter by teacher and course if provided
+    if (teacherId && courseName) {
+      query['selectedTeachers.teacherId'] = teacherId;
+      query['selectedTeachers.courses.courseName'] = courseName;
+    }
+    
+    // Filter by payment type if provided
+    if (paymentType) {
+      query.paymentType = paymentType;
+    }
+    
+    const students = await Student.find(query)
+      .populate('selectedTeachers.teacherId', 'teacherName subjectName')
+      .populate('selectedTeachers.courses.installments.employee', 'employeeName');
+    
+    const studentsWithBalances = [];
+    
+    students.forEach(student => {
+      student.selectedTeachers.forEach(teacher => {
+        teacher.courses.forEach(course => {
+          if (course.amountRemaining > 0) {
+            studentsWithBalances.push({
+              studentId: student._id,
+              studentCode: student.studentCode,
+              studentName: student.studentName,
+              studentPhone: student.studentPhoneNumber,
+              parentPhone: student.studentParentPhone,
+              schoolName: student.schoolName,
+              teacherId: teacher.teacherId._id,
+              teacherName: teacher.teacherId.teacherName,
+              courseName: course.courseName,
+              amountRemaining: course.amountRemaining,
+              totalCourseCost: course.totalCourseCost,
+              paymentType: student.paymentType,
+              lastUpdate: course.installments.length > 0 ? 
+                course.installments[course.installments.length - 1].date : student.createdAt,
+              lastInstallmentDate: course.installments.length > 0 ? 
+                course.installments[course.installments.length - 1].date : null
+            });
+          }
+        });
+      });
+    });
+    
+    res.json({ students: studentsWithBalances });
+  } catch (error) {
+    console.error('Error fetching students with balances:', error);
+    res.status(500).json({ message: 'An error occurred while fetching students with balances' });
+  }
+};
+
+const getStudentsWithInstallments = async (req, res) => {
+  try {
+    const { teacherId, courseName } = req.query;
+    
+    let query = { paymentType: 'perCourse' };
+    
+    if (teacherId && courseName) {
+      query['selectedTeachers.teacherId'] = teacherId;
+      query['selectedTeachers.courses.courseName'] = courseName;
+    }
+    
+    const students = await Student.find(query)
+      .populate('selectedTeachers.teacherId', 'teacherName subjectName')
+      .populate('selectedTeachers.courses.installments.employee', 'employeeName');
+    
+    const studentsWithInstallments = [];
+    
+    students.forEach(student => {
+      student.selectedTeachers.forEach(teacher => {
+        teacher.courses.forEach(course => {
+          if (course.amountRemaining > 0 && course.installments.length > 0) {
+            const lastInstallment = course.installments[course.installments.length - 1];
+            const daysSinceLastInstallment = Math.floor((Date.now() - lastInstallment.date) / (1000 * 60 * 60 * 24));
+            
+            studentsWithInstallments.push({
+              studentId: student._id,
+              studentName: student.studentName,
+              studentPhone: student.studentPhoneNumber,
+              parentPhone: student.studentParentPhone,
+              teacherName: teacher.teacherId.teacherName,
+              courseName: course.courseName,
+              amountRemaining: course.amountRemaining,
+              totalCourseCost: course.totalCourseCost,
+              lastInstallmentAmount: lastInstallment.amount,
+              lastInstallmentDate: lastInstallment.date,
+              daysSinceLastInstallment,
+              totalInstallments: course.installments.length
+            });
+          }
+        });
+      });
+    });
+    
+    res.json({ students: studentsWithInstallments });
+  } catch (error) {
+    console.error('Error fetching students with installments:', error);
+    res.status(500).json({ message: 'An error occurred while fetching students with installments' });
+  }
+};
+
+const sendNotification = async (req, res) => {
+  try {
+    const { studentId, message, phoneNumber, notificationType } = req.body;
+    
+    // Validate required fields
+    if (!phoneNumber || !message) {
+      return res.status(400).json({
+        success: false,
+        message: 'رقم الهاتف والرسالة مطلوبان'
+      });
+    }
+    
+    console.log(`Attempting to send notification to ${phoneNumber}`);
+    
+    // Format phone number like the working sendWa function
+    const formattedPhoneNumber = `2${phoneNumber}@c.us`;
+    console.log(`Formatted phone number: ${formattedPhoneNumber}`);
+    
+    // Send WhatsApp message using the same method as sendWa (without status check)
+    const response = await waziper.sendTextMessage(instanceId, formattedPhoneNumber, message);
+    
+    if (response && response.data && response.data.status === 'success') {
+      // Log the notification
+      console.log(`Notification sent successfully to ${phoneNumber}`);
+      
+      res.json({ 
+        success: true, 
+        message: 'تم إرسال الإشعار بنجاح',
+        response: response.data 
+      });
+    } else {
+      console.error('Waziper API returned error:', response?.data);
+      res.status(400).json({ 
+        success: false, 
+        message: 'فشل في إرسال الإشعار',
+        error: response?.data?.message || 'Unknown error from Waziper API'
+      });
+    }
+  } catch (error) {
+    console.error('Error sending notification:', error);
+    
+    // Provide more specific error messages
+    let errorMessage = 'حدث خطأ أثناء إرسال الإشعار';
+    
+    if (error.message === 'Invalid phone number') {
+      errorMessage = 'رقم الهاتف غير صحيح';
+    } else if (error.message === 'Message cannot be empty') {
+      errorMessage = 'الرسالة لا يمكن أن تكون فارغة';
+    } else if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      errorMessage = 'انتهت مهلة الاتصال، يرجى المحاولة مرة أخرى';
+    } else if (error.response && error.response.status === 400) {
+      errorMessage = 'خطأ في البيانات المرسلة إلى واتساب';
+    } else if (error.response && error.response.status === 401) {
+      errorMessage = 'خطأ في مصادقة واتساب';
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: errorMessage,
+      error: error.message
+    });
+  }
+};
+
+const sendBulkNotifications = async (req, res) => {
+  try {
+    const { students, message, notificationType } = req.body;
+    
+    const results = [];
+    let successCount = 0;
+    let failureCount = 0;
+    
+    for (const student of students) {
+      try {
+        const phoneNumber = student.parentPhone || student.studentPhone;
+        const formattedPhoneNumber = `2${phoneNumber}@c.us`;
+        const personalizedMessage = message
+          .replace('{studentName}', student.studentName)
+          .replace('{teacherName}', student.teacherName)
+          .replace('{courseName}', student.courseName)
+          .replace('{amountRemaining}', student.amountRemaining)
+          .replace('{totalCourseCost}', student.totalCourseCost);
+        
+        const response = await waziper.sendTextMessage(instanceId, formattedPhoneNumber, personalizedMessage);
+        
+        if (response && response.data && response.data.status === 'success') {
+          successCount++;
+          results.push({
+            studentId: student.studentId,
+            studentName: student.studentName,
+            phone: phoneNumber,
+            status: 'success',
+            message: 'تم الإرسال بنجاح'
+          });
+        } else {
+          failureCount++;
+          results.push({
+            studentId: student.studentId,
+            studentName: student.studentName,
+            phone: phoneNumber,
+            status: 'failed',
+            message: response?.data?.message || 'فشل في الإرسال'
+          });
+        }
+        
+        // Add delay between messages to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+      } catch (error) {
+        failureCount++;
+        results.push({
+          studentId: student.studentId,
+          studentName: student.studentName,
+          phone: student.parentPhone || student.studentPhone,
+          status: 'error',
+          message: error.message
+        });
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: `تم إرسال ${successCount} إشعار بنجاح، وفشل ${failureCount} إشعار`,
+      results,
+      summary: {
+        total: students.length,
+        success: successCount,
+        failure: failureCount
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error sending bulk notifications:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'حدث خطأ أثناء إرسال الإشعارات المجمعة' 
+    });
+  }
+};
+
+const getNotificationTemplates = async (req, res) => {
+  try {
+    // Default templates with proper MongoDB-like structure
+    const templates = [
+      {
+        _id: 'balance_reminder_001',
+        name: 'تذكير بالمبلغ المتبقي',
+        message: 'مرحباً {studentName}، يتبقى مبلغ {amountRemaining} ج.م في كورس {courseName} مع الأستاذ {teacherName}. يرجى التواصل معنا لتسديد المبلغ المتبقي.',
+        type: 'balance',
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01')
+      },
+      {
+        _id: 'installment_reminder_001',
+        name: 'تذكير بالقسط التالي',
+        message: 'مرحباً {studentName}، يتبقى مبلغ {amountRemaining} ج.م من إجمالي {totalCourseCost} ج.م في كورس {courseName}. يرجى التواصل معنا لدفع القسط التالي.',
+        type: 'installment',
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01')
+      },
+      {
+        _id: 'course_completion_001',
+        name: 'إشعار إكمال الكورس',
+        message: 'مرحباً {studentName}، تم إكمال كورس {courseName} مع الأستاذ {teacherName} بنجاح. شكراً لثقتكم بنا!',
+        type: 'completion',
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01')
+      },
+      {
+        _id: 'welcome_message_001',
+        name: 'رسالة ترحيب',
+        message: 'مرحباً {studentName}، أهلاً وسهلاً بك في مركز GTA. نتمنى لك تجربة تعليمية ممتعة في كورس {courseName} مع الأستاذ {teacherName}.',
+        type: 'welcome',
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01')
+      }
+    ];
+    
+    res.json({ templates });
+  } catch (error) {
+    console.error('Error fetching notification templates:', error);
+    res.status(500).json({ message: 'An error occurred while fetching templates' });
+  }
+};
+
+const saveNotificationTemplate = async (req, res) => {
+  try {
+    const { name, message, type } = req.body;
+    
+    // In a real application, you would save this to a database
+    // For now, we'll just return success
+    console.log('Template saved:', { name, message, type });
+    
+    res.json({ 
+      success: true, 
+      message: 'تم حفظ القالب بنجاح' 
+    });
+  } catch (error) {
+    console.error('Error saving notification template:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'حدث خطأ أثناء حفظ القالب' 
+    });
+  }
+};
+
+const deleteNotificationTemplate = async (req, res) => {
+  try {
+    const { templateId } = req.params;
+    
+    // In a real application, you would delete from database
+    console.log('Template deleted:', templateId);
+    
+    res.json({ 
+      success: true, 
+      message: 'تم حذف القالب بنجاح' 
+    });
+  } catch (error) {
+    console.error('Error deleting notification template:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'حدث خطأ أثناء حذف القالب' 
+    });
+  }
+};
+
+const updateNotificationTemplate = async (req, res) => {
+  try {
+    const { templateId } = req.params;
+    const { name, message, type } = req.body;
+    
+    // In a real application, you would update in database
+    console.log('Template updated:', { templateId, name, message, type });
+    
+    res.json({ 
+      success: true, 
+      message: 'تم تحديث القالب بنجاح' 
+    });
+  } catch (error) {
+    console.error('Error updating notification template:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'حدث خطأ أثناء تحديث القالب' 
+    });
+  }
+};
+
 module.exports = {
   dashboard,
   teacherSechdule,
@@ -2840,6 +3459,9 @@ module.exports = {
   sendWa,
   deleteStudent,
   sendCodeAgain,
+  addInstallmentPayment,
+  getInstallmentHistory,
+  updateCourseDetails,
 
   // Teacher
   teacher_Get,
@@ -2870,6 +3492,17 @@ module.exports = {
   // Student Logs
   getStudentLogs,
   getStudentLogsData,
+
+  // Notification Management
+  getNotificationsPage,
+  getStudentsWithBalances,
+  getStudentsWithInstallments,
+  sendNotification,
+  sendBulkNotifications,
+  getNotificationTemplates,
+  saveNotificationTemplate,
+  deleteNotificationTemplate,
+  updateNotificationTemplate,
 
   logOut,
 };

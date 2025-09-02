@@ -55,9 +55,45 @@ filterBillsForm.addEventListener('submit', async (event) => {
 });
 
 // Function to Update Stats Blocks
+function formatCurrency(val) {
+  return `${(val || 0).toLocaleString('en-US')} EGP`;
+}
+
 function updateStats(type, data) {
   document.getElementById(`${type}-count`).textContent = data.count || '--';
-  document.getElementById(`${type}-total`).textContent = `${data.total || 0} EGP`;
+  const totalEl = document.getElementById(`${type}-total`);
+  if (totalEl) totalEl.textContent = formatCurrency(data.total);
+  const incomeEl = document.getElementById(`${type}-income`);
+  if (incomeEl) incomeEl.textContent = formatCurrency(data.income);
+  const expensesEl = document.getElementById(`${type}-expenses`);
+  if (expensesEl) expensesEl.textContent = formatCurrency(data.expenses);
+  const netEl = document.getElementById(`${type}-net`);
+  if (netEl) netEl.textContent = formatCurrency(Math.abs(data.net || 0));
+
+  // Badge and card color
+  const badge = document.getElementById(`${type}-badge`);
+  const card = document.getElementById(`${type}-card`);
+  if (badge && card) {
+    // reset
+    badge.classList.remove('bg-success', 'bg-danger', 'bg-secondary');
+    card.classList.remove('border-success', 'border-danger');
+
+    if ((data.net || 0) > 0) {
+      badge.textContent = 'Surplus';
+      badge.classList.add('bg-success');
+      card.classList.add('border-success');
+      card.style.borderWidth = '2px';
+    } else if ((data.net || 0) < 0) {
+      badge.textContent = 'Deficit';
+      badge.classList.add('bg-danger');
+      card.classList.add('border-danger');
+      card.style.borderWidth = '2px';
+    } else {
+      badge.textContent = 'Balanced';
+      badge.classList.add('bg-secondary');
+      card.style.borderWidth = '1px';
+    }
+  }
 }
 
 // Function to Populate Bills List
@@ -66,12 +102,23 @@ function populateBills(bills) {
     const billItem = document.createElement('li');
     billItem.className = 'list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg';
 
+    const categoryNames = {
+      salaries: 'الرواتب',
+      canteen_in: 'مقصف (داخل)',
+      canteen_out: 'مقصف (خارج)',
+      government_fees: 'رسوم حكومية',
+      electric_invoices: 'فواتير الكهرباء',
+      equipments: 'المعدات والأجهزة',
+      other: 'أخرى'
+    };
+
     billItem.innerHTML = `
       <div class="d-flex flex-column">
         <h6 class="mb-3 text-sm">تاريخ : ${new Date(bill.createdAt).toLocaleDateString()} ${new Date(bill.createdAt).toLocaleTimeString()}</h6>
         <span class="mb-2 text-dark SpanTitle">اسم الموظف : <span class="text-dark font-weight-bold me-sm-2">${bill['employee'].employeeName}</span></span>
         <span class="mb-2 text-dark SpanTitle">اسم المنتج : <span class="text-dark font-weight-bold me-sm-2">${bill.billName}</span></span>
-        <span class="mb-2 text-dark SpanTitle">سعر الشراء : <span class="text-dark font-weight-bold me-sm-2" dir='ltr'>${bill.billAmount} EGP</span></span>
+        <span class="mb-2 text-dark SpanTitle">فئة الفاتورة : <span class="text-dark font-weight-bold me-sm-2">${categoryNames[bill.billCategory] || 'غير محدد'}</span></span>
+        <span class="mb-2 text-dark SpanTitle">سعر الشراء : <span class="text-dark font-weight-bold me-sm-2" dir='ltr'>${formatCurrency(bill.billAmount)}</span></span>
         <span class="text-dark SpanTitle">ملاحظات : <span class="text-dark font-weight-bold me-sm-2">${bill.billNote}</span></span>
         <span><button class="billingPhotoBtn" data-photo-url="${bill.billPhoto}"> ${bill.billPhoto ? 'مشاهده الصوره' : 'لا يوجد صوره'} </button></span>
       </div>

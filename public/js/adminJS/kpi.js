@@ -21,6 +21,7 @@ async function addNewKpi(event) {
     const data = {
         employee: formData.get('employee'),
         kpiName: formData.get('kpiName'),
+        kpiAmount: formData.get('kpiAmount'),
         kpiNote: formData.get('kpiNote'),
     };
     
@@ -65,8 +66,11 @@ function populateKPIs(KPIs) {
           <span class="mb-2 text-dark SpanTitle"> الاسم   : <span class="text-dark font-weight-bold me-sm-2">${
             KPI.kpiName}
           </span></span>
+          <span class="text-dark SpanTitle">المبلغ : <span class="text-dark font-weight-bold me-sm-2">${
+            KPI.kpi ? KPI.kpi.toLocaleString('en-US') + ' EGP' : '0 EGP'}
+          </span></span>
           <span class="text-dark SpanTitle">ملاحظات : <span class="text-dark font-weight-bold me-sm-2">${
-            KPI.kpiNote}
+            KPI.kpiNote || 'لا توجد ملاحظات'}
           </span></span>
 
           <span class="text-dark SpanTitle">الموظف : <span class="text-dark font-weight-bold me-sm-2">

@@ -387,6 +387,9 @@ hr {
                   <li class="nav-item" role="presentation">
                     <button class="nav-link" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button" role="tab" aria-controls="courses" aria-selected="false">الكورسات المسجلة</button>
                   </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="installments-tab" data-bs-toggle="tab" data-bs-target="#installments" type="button" role="tab" aria-controls="installments" aria-selected="false">سجل الأقساط</button>
+                  </li>
                 </ul>
               </div>
               <hr>
@@ -446,6 +449,36 @@ hr {
                       <div class="alert alert-info text-center mt-3" role="alert" id="noCoursesMessage" style="display: none;">
                         <i class="fas fa-info-circle me-2"></i>
                         لا توجد كورسات مسجلة للطالب
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Installments Tab -->
+                  <div class="tab-pane fade" id="installments" role="tabpanel" aria-labelledby="installments-tab">
+                    <div class="table-responsive p-0 table-loading">
+                      <div class="table-loading-overlay" id="installmentsTableLoading" style="display: none;">
+                        <div class="table-spinner"></div>
+                        <p class="mt-2 text-dark">جاري تحميل البيانات...</p>
+                      </div>
+                      <table class="table align-items-center mb-0" id="installmentsTable">
+                        <thead>
+                          <tr>
+                            <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7 border-bottom">#</th>
+                            <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7 border-bottom">التاريخ</th>
+                            <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7 border-bottom">الكورس</th>
+                            <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7 border-bottom">المعلم</th>
+                            <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7 border-bottom">مبلغ القسط</th>
+                            <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7 border-bottom">تم الدفع بواسطة</th>
+                            <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7 border-bottom">ملاحظات</th>
+                          </tr>
+                        </thead>
+                        <tbody id="installmentsTableBody">
+                          <!-- Installment records will be added here dynamically -->
+                        </tbody>
+                      </table>
+                      <div class="alert alert-info text-center mt-3" role="alert" id="noInstallmentsMessage" style="display: none;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        لا توجد أقساط مدفوعة للطالب
                       </div>
                     </div>
                   </div>

@@ -296,17 +296,27 @@ const addStudentsToTable = (students, teacherId, courseName) => {
          ?.courses.find((c) => c.courseName === courseName);
 
        const tr = document.createElement('tr');
+      // Add payment type indicator
+      const paymentType = student.student.paymentType;
+      const paymentTypeBadge = paymentType === 'perCourse' ? 
+        '<span class="badge bg-warning text-dark">Per Course</span>' : 
+        '<span class="badge bg-info text-white">Per Session</span>';
+      
       tr.innerHTML = `
             <td class="text-center">${student.student.studentName}</td>
             <td class="text-center">${student.student.studentCode}</td>
             <td class="text-center">${student.student.studentPhoneNumber}</td>
             <td class="text-center">${student.student.studentParentPhone}</td>
             <td class="text-center">
+              <div class="d-flex flex-column align-items-center">
+                ${paymentTypeBadge}
+                <br>
               <input type="text" class="amountPaid" 
                    value="${student.amountPaid}"
                    data-student-id="${student.student._id}"
                    data-teacher-id="${teacherId}"
                    data-course-name="${courseName}">
+              </div>
             </td>
             <td class="text-center">
               <input type="text" class="amountRemaining" 
@@ -669,3 +679,194 @@ function tableToExcel() {
 
 // Add event listener to download Excel button
 document.getElementById('AssistantExcelBtn').addEventListener('click', tableToExcel);
+
+// Quick Notifications Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const quickNotificationType = document.getElementById('quickNotificationType');
+  const quickNotificationFilter = document.getElementById('quickNotificationFilter');
+  const quickNotificationMessage = document.getElementById('quickNotificationMessage');
+  const sendQuickNotificationsBtn = document.getElementById('sendQuickNotificationsBtn');
+  const quickNotificationStatus = document.getElementById('quickNotificationStatus');
+
+  // Update message when type changes
+  quickNotificationType?.addEventListener('change', function() {
+    updateQuickNotificationMessage();
+  });
+
+  // Update message when filter changes
+  quickNotificationFilter?.addEventListener('change', function() {
+    updateQuickNotificationMessage();
+  });
+
+  // Send quick notifications
+  sendQuickNotificationsBtn?.addEventListener('click', function() {
+    sendQuickNotifications();
+  });
+
+  function updateQuickNotificationMessage() {
+    const type = quickNotificationType?.value;
+    const filter = quickNotificationFilter?.value;
+    
+    let defaultMessage = '';
+    
+    if (type === 'balance') {
+      defaultMessage = 'مرحباً {studentName}، يتبقى مبلغ {amountRemaining} ج.م في كورس {courseName} مع الأستاذ {teacherName}. يرجى التواصل معنا لتسديد المبلغ المتبقي.';
+    } else if (type === 'installment') {
+      defaultMessage = 'مرحباً {studentName}، يتبقى مبلغ {amountRemaining} ج.م من إجمالي {totalCourseCost} ج.م في كورس {courseName}. يرجى التواصل معنا لدفع القسط التالي.';
+    }
+    
+    if (defaultMessage && quickNotificationMessage) {
+      quickNotificationMessage.value = defaultMessage;
+    }
+  }
+
+  async function sendQuickNotifications() {
+    const type = quickNotificationType?.value;
+    const filter = quickNotificationFilter?.value;
+    const message = quickNotificationMessage?.value;
+
+    if (!message || !message.trim()) {
+      showQuickNotificationToast('يرجى كتابة الرسالة', 'error');
+      return;
+    }
+
+    // Get students based on filter
+    let students = [];
+    
+    try {
+      let endpoint = '';
+      switch (filter) {
+        case 'withBalances':
+          endpoint = '/employee/api/students-with-balances';
+          break;
+        case 'perCourse':
+          endpoint = '/employee/api/students-with-balances?paymentType=perCourse';
+          break;
+        case 'perSession':
+          endpoint = '/employee/api/students-with-balances?paymentType=perSession';
+          break;
+        case 'all':
+        default:
+          endpoint = '/employee/api/students-with-balances';
+          break;
+      }
+
+      const response = await fetch(endpoint);
+      const data = await response.json();
+      
+      if (response.ok) {
+        students = data.students;
+      } else {
+        throw new Error(data.message || 'Failed to fetch students');
+      }
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      showQuickNotificationToast('فشل في جلب بيانات الطلاب', 'error');
+      return;
+    }
+
+    if (students.length === 0) {
+      showQuickNotificationToast('لا يوجد طلاب للرسالة المحددة', 'warning');
+      return;
+    }
+
+    // Confirm sending
+    const confirmed = await showQuickNotificationConfirmation(
+      `هل أنت متأكد من إرسال ${students.length} إشعار؟`,
+      'إرسال الإشعارات السريعة'
+    );
+
+    if (!confirmed) return;
+
+    // Show loading
+    sendQuickNotificationsBtn.disabled = true;
+    sendQuickNotificationsBtn.innerHTML = '<i class="material-symbols-rounded text-sm me-1">hourglass_empty</i>جاري الإرسال...';
+    quickNotificationStatus.textContent = 'جاري الإرسال...';
+
+    try {
+      const response = await fetch('/employee/send-bulk-notifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          students: students,
+          message: message,
+          notificationType: type
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        showQuickNotificationToast(data.message, 'success');
+        quickNotificationStatus.textContent = data.message;
+        quickNotificationMessage.value = '';
+      } else {
+        throw new Error(data.message || 'Failed to send notifications');
+      }
+    } catch (error) {
+      console.error('Error sending quick notifications:', error);
+      showQuickNotificationToast('فشل في إرسال الإشعارات', 'error');
+      quickNotificationStatus.textContent = 'فشل في الإرسال';
+    } finally {
+      // Reset button
+      sendQuickNotificationsBtn.disabled = false;
+      sendQuickNotificationsBtn.innerHTML = '<i class="material-symbols-rounded text-sm me-1">send</i>إرسال إشعارات سريعة';
+    }
+  }
+
+  function showQuickNotificationToast(message, type = 'info') {
+    if (type === 'success') {
+      Swal.fire({
+        icon: 'success',
+        title: 'نجح',
+        text: message,
+        timer: 3000,
+        showConfirmButton: false
+      });
+    } else if (type === 'error') {
+      Swal.fire({
+        icon: 'error',
+        title: 'خطأ',
+        text: message,
+        timer: 3000,
+        showConfirmButton: false
+      });
+    } else if (type === 'warning') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'تحذير',
+        text: message,
+        timer: 3000,
+        showConfirmButton: false
+      });
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'معلومات',
+        text: message,
+        timer: 3000,
+        showConfirmButton: false
+      });
+    }
+  }
+
+  async function showQuickNotificationConfirmation(message, title = 'تأكيد') {
+    const result = await Swal.fire({
+      title: title,
+      text: message,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'نعم',
+      cancelButtonText: 'إلغاء'
+    });
+    
+    return result.isConfirmed;
+  }
+
+  // Initialize default message
+  updateQuickNotificationMessage();
+});

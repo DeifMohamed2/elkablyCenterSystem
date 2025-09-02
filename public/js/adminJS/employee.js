@@ -64,54 +64,45 @@ const getEmployees = async () => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td class="align-middle text-center">
-          <h1 class="text-sm" >${employee.employeeName}</h1>
-         </td>
-        <td class="align-middle text-center">${
-          employee.employeePhoneNumber
-        }</td>
+          <h6 class="text-sm font-weight-bold">${employee.employeeName}</h6>
+        </td>
+        <td class="align-middle text-center">${employee.employeePhoneNumber}</td>
         <td class="align-middle text-center">${employee.employeePassword}</td>
-        <td class="align-middle text-center">${employee.employeeSalary}</td>
+        <td class="align-middle text-center">${formatCurrency(employee.employeeSalary)}</td>
         <td class="align-middle text-center">
-          <span class="KPIColor">${employee.totalKPIs || 0}</span> 
-          <input type="number" class="form-control kpi-input" placeholder="Add Bouns" style="display: inline-block; width: 110px; margin-left: 10px; border:1px solid #000" />
+          <div class="btn-group" role="group">
+            <a href="/admin/employee-log?id=${employee._id}" class="btn btn-info btn-sm me-2">
+              <i class="material-symbols-rounded">visibility</i>
+              Employee Log
+            </a>
+            <button class="btn btn-warning btn-sm edit-employee-btn" data-id="${employee._id}" 
+              data-bs-toggle="modal" data-bs-target="#editEmployeeModal">
+              <i class="material-symbols-rounded">edit</i>
+              Edit
+            </button>
+          </div>
         </td>
-        <td class="align-middle text-center">
-          <span class="LossColor">${employee.totalLosses || 0}</span>
-          
-          <input type="number" class="form-control loss-input" placeholder="Add Loss" style="display: inline-block; width: 100px; margin-left: 10px; border:1px solid #000" />
-        </td>
-        <td class="align-middle text-center">${
-          employee.totalSalary || calculateTotalSalary(employee)
-        }</td>
-        <td class="align-middle text-center ">
-          <button class="save-changes mt-2" data-id="${
-            employee._id
-          }">Save Changes</button>
-        </td>
-
-        <td class="align-middle text-center">
-          <button class="btn btn-warning edit-employee-btn mt-2" data-id="${employee._id}" 
-          data-bs-toggle="modal" data-bs-target="#editEmployeeModal">Edit</button>
-        </td>
-
       `;
       employeeTable.appendChild(tr);
     });
 
-    // Attach event listener for Save Changes buttons
+    // Attach event listener for Edit buttons
     document
-      .querySelectorAll('.save-changes')
+      .querySelectorAll('.edit-employee-btn')
       .forEach((btn) =>
-        btn.addEventListener('click', (e) => saveChanges(e.target.dataset.id))
+        btn.addEventListener('click', (e) => openEditModal(e.target.dataset.id))
       );
 
 
-      document.addEventListener('click', (event) => {
-        if (event.target.classList.contains('edit-employee-btn')) {
-          const employeeId = event.target.dataset.id;
-          openEditModal(employeeId);
-        }
-      });
+    // Add currency formatting function
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'EGP',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
 
   } catch (error) {
     console.error('Error fetching employees:', error);
