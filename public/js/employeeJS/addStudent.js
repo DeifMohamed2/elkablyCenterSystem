@@ -214,6 +214,12 @@ const studentTable = document.getElementById('studentTable');
 // Function to add students to the tbody
 const addStudentToTable = (student) => {
   const tr = document.createElement('tr');
+  
+  // Add blocked class if student is blocked
+  if (student.isBlocked) {
+    tr.classList.add('blocked-student');
+  }
+  
   tr.innerHTML = `
     <td class="text-center">${++sequenceOfStudets}</td>
     <td class="text-center">${student.studentName}</td>
@@ -259,6 +265,15 @@ const addStudentToTable = (student) => {
         student._id
       }">Send Code</button>
     </td>
+
+    <td class="align-middle text-center">
+      ${student.isBlocked ? 
+        `<button class="unblock-student-btn mt-2" data-id="${student._id}" 
+         data-bs-toggle="modal" data-bs-target="#unblockStudentModal">Unblock</button>` : 
+        `<button class="block-student-btn mt-2" data-id="${student._id}" 
+         data-bs-toggle="modal" data-bs-target="#blockStudentModal">Block</button>`
+      }
+    </td>
     `;
 
   studentTableBody.appendChild(tr);
@@ -284,6 +299,18 @@ const addStudentToTable = (student) => {
   tr.querySelector('.send-code-btn').addEventListener('click', () => {
     sendCodeAgain(student._id);
   });
+
+  // Attach event listener for the block/unblock button
+  const blockUnblockBtn = tr.querySelector('.block-student-btn, .unblock-student-btn');
+  if (blockUnblockBtn) {
+    blockUnblockBtn.addEventListener('click', () => {
+      if (student.isBlocked) {
+        openUnblockModal(student._id);
+      } else {
+        openBlockModal(student._id);
+      }
+    });
+  }
 };
 
 // Function to clear tbody before adding new rows
@@ -1265,3 +1292,111 @@ function addNewInstallment(teacherId, courseName, studentId) {
     input.disabled = false;
   });
 }
+
+// Block/Unblock Student Functions
+function openBlockModal(studentId) {
+  document.getElementById('blockStudentId').value = studentId;
+  document.getElementById('blockReason').value = '';
+}
+
+function openUnblockModal(studentId) {
+  document.getElementById('unblockStudentId').value = studentId;
+}
+
+// Block student
+async function blockStudent() {
+  const studentId = document.getElementById('blockStudentId').value;
+  const reason = document.getElementById('blockReason').value.trim();
+  
+  if (!reason) {
+    showToast('يرجى إدخال سبب الحظر', 'error');
+    return;
+  }
+  
+  const confirmBtn = document.getElementById('confirmBlockBtn');
+  const originalText = confirmBtn.textContent;
+  confirmBtn.textContent = 'جاري الحظر...';
+  confirmBtn.disabled = true;
+  
+  try {
+    const response = await fetch(`/employee/block-student/${studentId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ reason })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showToast('تم حظر الطالب بنجاح', 'success');
+      // Close modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('blockStudentModal'));
+      modal.hide();
+      // Refresh student table
+      getStudents();
+    } else {
+      showToast(data.message || 'حدث خطأ أثناء حظر الطالب', 'error');
+    }
+  } catch (error) {
+    console.error('Error blocking student:', error);
+    showToast('حدث خطأ أثناء حظر الطالب', 'error');
+  } finally {
+    confirmBtn.textContent = originalText;
+    confirmBtn.disabled = false;
+  }
+}
+
+// Unblock student
+async function unblockStudent() {
+  const studentId = document.getElementById('unblockStudentId').value;
+  
+  const confirmBtn = document.getElementById('confirmUnblockBtn');
+  const originalText = confirmBtn.textContent;
+  confirmBtn.textContent = 'جاري إلغاء الحظر...';
+  confirmBtn.disabled = true;
+  
+  try {
+    const response = await fetch(`/employee/unblock-student/${studentId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showToast('تم إلغاء حظر الطالب بنجاح', 'success');
+      // Close modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('unblockStudentModal'));
+      modal.hide();
+      // Refresh student table
+      getStudents();
+    } else {
+      showToast(data.message || 'حدث خطأ أثناء إلغاء حظر الطالب', 'error');
+    }
+  } catch (error) {
+    console.error('Error unblocking student:', error);
+    showToast('حدث خطأ أثناء إلغاء حظر الطالب', 'error');
+  } finally {
+    confirmBtn.textContent = originalText;
+    confirmBtn.disabled = false;
+  }
+}
+
+// Add event listeners for block/unblock buttons
+document.addEventListener('DOMContentLoaded', function() {
+  // Block student button
+  const confirmBlockBtn = document.getElementById('confirmBlockBtn');
+  if (confirmBlockBtn) {
+    confirmBlockBtn.addEventListener('click', blockStudent);
+  }
+  
+  // Unblock student button
+  const confirmUnblockBtn = document.getElementById('confirmUnblockBtn');
+  if (confirmUnblockBtn) {
+    confirmUnblockBtn.addEventListener('click', unblockStudent);
+  }
+});

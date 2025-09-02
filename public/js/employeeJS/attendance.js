@@ -80,9 +80,25 @@ async function attendStudent(event) {
     
         } else {
         spinner.classList.add('d-none');
-      attendStudentForm.reset();
-        message.textContent = responseData.message;
-         searchStudent.focus();
+        attendStudentForm.reset();
+        
+        // Check if student is blocked
+        if (response.status === 403 && responseData.message === 'هذا الطالب محظور من المركز') {
+          Swal.fire({
+            icon: 'error',
+            title: 'طالب محظور',
+            html: `
+              <p><strong>${responseData.message}</strong></p>
+              <p><strong>سبب الحظر:</strong> ${responseData.blockReason || 'غير محدد'}</p>
+              <p><strong>تاريخ الحظر:</strong> ${responseData.blockedAt ? new Date(responseData.blockedAt).toLocaleDateString() : 'غير محدد'}</p>
+            `,
+            confirmButtonText: 'حسناً'
+          });
+        } else {
+          message.textContent = responseData.message;
+        }
+        
+        searchStudent.focus();
          
         }
     } catch (error) {

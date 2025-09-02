@@ -1146,6 +1146,15 @@ const attendStudent = async (req, res) => {
       return res.status(404).json({ message: 'هذا الطالب غير موجود' });
     }
 
+    // Check if student is blocked
+    if (student.isBlocked) {
+      return res.status(403).json({ 
+        message: 'هذا الطالب محظور من المركز',
+        blockReason: student.blockReason,
+        blockedAt: student.blockedAt
+      });
+    }
+
     // Check if the student is enrolled with the specified teacher and course
     const selectedTeacherEntry = student.selectedTeachers.find(
       (t) => t.teacherId._id.toString() === teacherId
@@ -2106,6 +2115,12 @@ const downloadAttendanceExcelByDate = async (req, res) => {
           type: 'pattern',
           pattern: 'solid',
           fgColor: { argb: 'FF5733' },
+        },
+        border: {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
         },
       },
     };
@@ -3476,6 +3491,104 @@ const updateNotificationTemplate = async (req, res) => {
   }
 };
 
+const blockStudent = async (req, res) => {
+  const { studentId } = req.params;
+  const { reason } = req.body;
+  const employeeId = req.employeeId;
+
+  try {
+    const student = await Student.findById(studentId);
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    if (student.isBlocked) {
+      return res.status(400).json({ message: 'Student is already blocked' });
+    }
+
+    // Update student to blocked status
+    student.isBlocked = true;
+    student.blockReason = reason;
+    student.blockedBy = employeeId;
+    student.blockedAt = new Date();
+
+    await student.save();
+
+    // Send WhatsApp message to parent
+    const parentMessage = `
+عزيزي ولي أمر الطالب ${student.studentName},
+-----------------------------
+نود إعلامكم بأن الطالب تم ايقافه من السنتر مؤقتاً.
+السبب: ${reason}
+التاريخ: ${new Date().toLocaleDateString()}
+يرجى التواصل مع إدارة السنتر لحل المشكلة.
+شكراً لتفهمكم.
+`;
+
+    try {
+      await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage);
+    } catch (error) {
+      console.error('Error sending WhatsApp message:', error);
+    }
+
+    res.status(200).json({ 
+      message: 'Student blocked successfully',
+      student
+    });
+  } catch (error) {
+    console.error('Error blocking student:', error);
+    res.status(500).json({ message: 'An error occurred while blocking student' });
+  }
+};
+
+const unblockStudent = async (req, res) => {
+  const { studentId } = req.params;
+  const employeeId = req.employeeId;
+
+  try {
+    const student = await Student.findById(studentId);
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    if (!student.isBlocked) {
+      return res.status(400).json({ message: 'Student is not blocked' });
+    }
+
+    // Update student to unblocked status
+    student.isBlocked = false;
+    student.blockReason = '';
+    student.blockedBy = null;
+    student.blockedAt = null;
+
+    await student.save();
+
+    // Send WhatsApp message to parent
+    const parentMessage = `
+عزيزي ولي أمر الطالب ${student.studentName},
+-----------------------------
+نود إعلامكم بأن الطالب تم إلغاء حظره من السنتر.
+يمكن للطالب الآن العودة للحضور بشكل طبيعي.
+التاريخ: ${new Date().toLocaleDateString()}
+شكراً لتعاونكم.
+`;
+
+    try {
+      await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage);
+    } catch (error) {
+      console.error('Error sending WhatsApp message:', error);
+    }
+
+    res.status(200).json({ 
+      message: 'Student unblocked successfully',
+      student
+    });
+  } catch (error) {
+    console.error('Error unblocking student:', error);
+    res.status(500).json({ message: 'An error occurred while unblocking student' });
+  }
+};
+
 module.exports = {
   dashboard,
   teacherSechdule,
@@ -3541,6 +3654,8 @@ module.exports = {
   updateNotificationTemplate,
 
   logOut,
+  blockStudent,
+  unblockStudent,
 };
 
 

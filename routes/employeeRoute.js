@@ -70,6 +70,10 @@ router.delete('/delete-student/:id', authMiddleware, employeeController.deleteSt
 
 router.post('/send-code-again/:id', authMiddleware, employeeController.sendCodeAgain);
 
+// Student Blocking Management
+router.post('/block-student/:studentId', authMiddleware, employeeController.blockStudent);
+router.post('/unblock-student/:studentId', authMiddleware, employeeController.unblockStudent);
+
 // Installment Management
 router.post('/add-installment', authMiddleware, employeeController.addInstallmentPayment);
 router.get('/installment-history/:studentId', authMiddleware, employeeController.getInstallmentHistory);

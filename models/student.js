@@ -120,6 +120,24 @@ const studentSchema = new Schema(
         message: 'Student code must be G followed by 4 digits (e.g., G1234)'
       }
     },
+    // Blocking functionality
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+    blockReason: {
+      type: String,
+      default: '',
+    },
+    blockedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'Employee',
+      default: null,
+    },
+    blockedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );
