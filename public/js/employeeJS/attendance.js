@@ -309,8 +309,7 @@ const addStudentsToTable = (students, teacherId, courseName) => {
             <td class="text-center">${student.student.studentParentPhone}</td>
             <td class="text-center">
               <div class="d-flex flex-column align-items-center">
-                ${paymentTypeBadge}
-                <br>
+                ${paymentType === 'perCourse' ? `${paymentTypeBadge}<br>` : ''}
               <input type="text" class="amountPaid" 
                    value="${student.amountPaid}"
                    data-student-id="${student.student._id}"

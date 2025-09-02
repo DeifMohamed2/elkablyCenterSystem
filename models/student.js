@@ -56,7 +56,11 @@ const studentSchema = new Schema(
             amountPay: { type: Number, required: true },
             registerPrice: { type: Number, required: true },
             amountRemaining: { type: Number, required: true },
-            totalCourseCost: { type: Number, required: true }, // Total cost of the course
+            totalCourseCost: { 
+              type: Number, 
+              required: true,
+              default: 0 // Add default value to prevent validation errors
+            }, // Total cost of the course
             installments: [
               {
                 amount: { type: Number, required: true },

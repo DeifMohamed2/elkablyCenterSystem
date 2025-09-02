@@ -527,7 +527,13 @@ const updateStudent = async (req, res) => {
               existingCourse.amountRemaining
           };
         }
-        return newCourse;
+        // For new courses, ensure totalCourseCost is set
+        return {
+          ...newCourse,
+          totalCourseCost: newCourse.totalCourseCost || newCourse.amountPay || 0,
+          installments: [],
+          isCompleted: false
+        };
       });
       
       return {
@@ -537,6 +543,9 @@ const updateStudent = async (req, res) => {
     }
     return newTeacher;
   });
+
+  // Debug: Log the merged teachers to check totalCourseCost
+  console.log('Merged selectedTeachers:', JSON.stringify(mergedSelectedTeachers, null, 2));
 
   const student = await Student.findByIdAndUpdate(req.params.id, {
     studentName,
@@ -548,6 +557,20 @@ const updateStudent = async (req, res) => {
     amountRemaining: validatedAmountRemaining,
     selectedTeachers: mergedSelectedTeachers,
   }).populate('studentTeacher', 'teacherName');
+  
+  // Final check: Ensure all courses have totalCourseCost set
+  if (student) {
+    student.selectedTeachers.forEach(teacher => {
+      teacher.courses.forEach(course => {
+        if (!course.totalCourseCost || course.totalCourseCost === undefined || course.totalCourseCost === null) {
+          console.log('Fixing missing totalCourseCost in updateStudent for course:', course.courseName);
+          // Try to get totalCourseCost from various sources
+          course.totalCourseCost = course.totalCourseCost || course.amountPay || course.registerPrice || 0;
+        }
+      });
+    });
+    await student.save();
+  }
   
   // Remove old installment logic - this should be handled by separate installment functions
   // Only Per Course students should have installment functionality
@@ -1449,6 +1472,19 @@ const editStudentAmountRemainingAndPaid = async (req, res) => {
         await attendance.save();
       }
     }
+
+    // Ensure all courses have totalCourseCost set before saving
+    student.selectedTeachers.forEach(teacher => {
+      teacher.courses.forEach(course => {
+        if (!course.totalCourseCost || course.totalCourseCost === undefined || course.totalCourseCost === null) {
+          console.log('Fixing missing totalCourseCost for course:', course.courseName);
+          // Try to get totalCourseCost from various sources
+          course.totalCourseCost = course.totalCourseCost || course.amountPay || course.registerPrice || 0;
+        }
+      });
+    });
+
+    console.log('Student before save:', JSON.stringify(student.selectedTeachers, null, 2));
 
     await student.save();
     res.status(200).json({ message: 'Amount updated successfully', student });
