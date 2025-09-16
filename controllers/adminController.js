@@ -4,12 +4,13 @@ const Billing = require('../models/billing');
 const KPI = require('../models/kpi');
 const Attendance = require('../models/attendance');
 const Student = require('../models/student');
+const SuperViser = require('../models/superViser');
+const Admin = require('../models/admin');
 const excelJS = require('exceljs');
 const schedule = require('node-schedule');
 const path = require('path');
-const waapi = require('@api/waapi');
-const waapiAPI = process.env.WAAPIAPI;
-waapi.auth(waapiAPI);
+const waziper = require('../utils/waziper');
+const instanceId = '68536629B61C9';
 
 // Helper function to get date range based on period
 const getDateRange = (period, customStart = null, customEnd = null) => {
@@ -672,28 +673,129 @@ const getEmployeeLog = async (req, res) => {
 
 const updateEmployee = async (req, res) => {
   const { id } = req.params;
-  const { employeeName, employeePhoneNumber, employeeSalary } = req.body;
+  const { employeeName, employeePhoneNumber, employeeSalary, employeePassword } = req.body;
 
   try {
     const employee = await Employee.findById(id);
     if (!employee) return res.status(404).send({ error: 'Employee not found' });
 
-    // Calculate the difference in salary
-    const salaryDifference = employeeSalary - employee.employeeSalary;
+    // Validate and apply updates
+    if (typeof employeeName === 'string' && employeeName.trim().length > 0) {
+      employee.employeeName = employeeName;
+    }
+    if (typeof employeePhoneNumber === 'string' && employeePhoneNumber.trim().length > 0) {
+      employee.employeePhoneNumber = employeePhoneNumber;
+    }
 
-    // Update employee details
-    employee.employeeName = employeeName;
-    employee.employeePhoneNumber = employeePhoneNumber;
-    employee.employeeSalary = employeeSalary;
+    // Salary can be optional; only update if a valid number is provided
+    if (employeeSalary !== undefined) {
+      const base = Number(employeeSalary);
+      if (!Number.isFinite(base) || base < 0) {
+        return res.status(400).send({ error: 'Salary must be a valid number >= 0' });
+      }
+      employee.employeeSalary = base;
+    }
 
-    // Update totalSalary by adding the difference
-    employee.totalSalary = (employee.totalSalary || 0) + salaryDifference;
+    if (employeePassword && employeePassword.length < 6) {
+      return res.status(400).send({ error: 'الباسورد لازم يكون اكتر من 6 ارقام' });
+    }
+
+    if (employeePassword) {
+      employee.employeePassword = employeePassword;
+    }
+
+    // Recompute total salary based on base, KPIs and losses
+    employee.totalSalary = (Number(employee.employeeSalary) || 0) + (employee.totalKPIs || 0) - (employee.totalLosses || 0);
 
     await employee.save();
     res.status(200).send(employee);
   } catch (error) {
     console.error(error);
     res.status(500).send({ error: 'Error updating employee' });
+  }
+};
+
+const addSuperViser = async (req, res) => {
+  try {
+    const { name, phoneNumber, password } = req.body;
+    if (!name || !phoneNumber || !password) {
+      return res.status(400).send({ message: 'name, phoneNumber, password are required' });
+    }
+    if (password.length < 6) {
+      return res.status(400).send({ message: 'الباسورد لازم يكون اكتر من 6 ارقام' });
+    }
+    const sv = new SuperViser({ name, phoneNumber, password, role: 'Supervisor' });
+    await sv.save();
+    res.status(201).send(sv);
+  } catch (error) {
+    console.error(error);
+    res.status(400).send({ message: 'رقم الهاتف موجود مسبقا او يوجد مشكله فنيه اخري' });
+  }
+};
+
+const getSuperVisers = async (req, res) => {
+  try {
+    const supervisors = await SuperViser.find();
+    res.status(200).json(supervisors);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error fetching supervisors' });
+  }
+};
+
+const getSuperViser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const sv = await SuperViser.findById(id);
+    if (!sv) return res.status(404).send({ error: 'Supervisor not found' });
+    res.status(200).json(sv);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error fetching supervisor' });
+  }
+};
+
+const updateSuperViser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, phoneNumber, password } = req.body;
+    const sv = await SuperViser.findById(id);
+    if (!sv) return res.status(404).send({ error: 'Supervisor not found' });
+    if (typeof name === 'string' && name.trim()) sv.name = name;
+    if (typeof phoneNumber === 'string' && phoneNumber.trim()) sv.phoneNumber = phoneNumber;
+    if (password) {
+      if (password.length < 6) return res.status(400).send({ error: 'الباسورد لازم يكون اكتر من 6 ارقام' });
+      sv.password = password;
+    }
+    await sv.save();
+    res.status(200).json(sv);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error updating supervisor' });
+  }
+};
+
+const deleteSuperViser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const sv = await SuperViser.findByIdAndDelete(id);
+    if (!sv) return res.status(404).send({ error: 'Supervisor not found' });
+    res.status(200).send({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error deleting supervisor' });
+  }
+};
+
+const deleteEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const employee = await Employee.findByIdAndDelete(id);
+    if (!employee) return res.status(404).send({ error: 'Employee not found' });
+    res.status(200).send({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error deleting employee' });
   }
 };
 
@@ -1543,6 +1645,67 @@ const collectCenterFees = async (req, res) => {
 
 // ================================= END Center Fees Collection ================================ //
 
+// ================================= Admin Change Password (OTP) ================================ //
+
+const changeAdminPassword_Get = async (req, res) => {
+  res.render('Admin/changePassword', {
+    title: 'Change Admin Password',
+    path: '/admin/change-password',
+  });
+};
+
+const requestAdminOtp = async (req, res) => {
+  try {
+    const { phoneNumber, currentPassword } = req.body;
+    if (!phoneNumber || !currentPassword) {
+      return res.status(400).json({ error: 'Phone and current password are required' });
+    }
+    const admin = await Admin.findOne({ phoneNumber, password: currentPassword });
+    if (!admin) {
+      return res.status(404).json({ error: 'Invalid phone or password' });
+    }
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
+    req.session.adminOtp = { phoneNumber, code, expiresAt };
+
+    // Send OTP via WhatsApp using waziper client (same as employeeController)
+    try {
+      await waziper.sendTextMessage(instanceId, `2${phoneNumber}@c.us`, `Your OTP code is ${code}. It expires in 5 minutes.`);
+    } catch (e) {
+      console.error('WA send error:', e.message || e);
+      // proceed even if WA send fails for testing
+    }
+
+    res.json({ success: true, expiresAt });
+  } catch (error) {
+    console.error('requestAdminOtp error:', error);
+    res.status(500).json({ error: 'Failed to send OTP' });
+  }
+};
+
+const verifyAdminOtpAndChange = async (req, res) => {
+  try {
+    const { otp, newPassword } = req.body;
+    const sessionOtp = req.session.adminOtp;
+    if (!sessionOtp) return res.status(400).json({ error: 'No OTP requested' });
+    if (!otp || !newPassword) return res.status(400).json({ error: 'OTP and new password are required' });
+    if (Date.now() > sessionOtp.expiresAt) return res.status(400).json({ error: 'OTP expired' });
+    if (otp !== sessionOtp.code) return res.status(400).json({ error: 'Invalid OTP' });
+    if (newPassword.length < 6) return res.status(400).json({ error: 'الباسورد لازم يكون اكتر من 6 ارقام' });
+
+    const admin = await Admin.findOne({ phoneNumber: sessionOtp.phoneNumber });
+    if (!admin) return res.status(404).json({ error: 'Admin not found' });
+    admin.password = newPassword;
+    await admin.save();
+    req.session.adminOtp = null;
+    res.json({ success: true });
+  } catch (error) {
+    console.error('verifyAdminOtp error:', error);
+    res.status(500).json({ error: 'Failed to change password' });
+  }
+};
+
+
 // ================================= Attendance Details ================================ //
 
 const attendanceDetails_Get = async (req, res) => {
@@ -2103,4 +2266,13 @@ module.exports = {
   teacherReport_Get,
   getTeacherReportData,
   downloadTeacherExcel,
+  deleteEmployee,
+  addSuperViser,
+  getSuperVisers,
+  getSuperViser,
+  updateSuperViser,
+  deleteSuperViser,
+  changeAdminPassword_Get,
+  requestAdminOtp,
+  verifyAdminOtpAndChange,
 };

@@ -1,5 +1,6 @@
 const Admin = require('../models/admin');
 const Employee = require('../models/employee');
+const SuperViser = require('../models/superViser');
 const jwt = require('jsonwebtoken');
 const waziper = require('../utils/waziper');
 
@@ -29,19 +30,27 @@ const singIn = async (req, res) => {
         res.cookie('token', token, { httpOnly: true });
         res.send(admin);
     }else{
-        const employee = await Employee.findOne({
+        // Try Employee first
+        let user = await Employee.findOne({
           employeePhoneNumber: phoneNumber,
           employeePassword: password,
         });
-        console.log(employee);
-        if (!employee) {
-            res.status(404).send({message :'Employee not found'});
-            return;
+        if (user) {
+          const token = jwt.sign({ employeeId: user._id }, jwtSecret);
+          res.cookie('token', token, { httpOnly: true });
+          return res.send(user);
         }
-        const token = jwt.sign({ employeeId: employee._id }, jwtSecret);
-        res.cookie('token', token, { httpOnly: true });
-        res.send(employee);
-      
+        // Try Supervisor account
+        const supervisor = await SuperViser.findOne({
+          phoneNumber,
+          password,
+        });
+        if (supervisor) {
+          const token = jwt.sign({ supervisorId: supervisor._id }, jwtSecret);
+          res.cookie('token', token, { httpOnly: true });
+          return res.send(supervisor);
+        }
+        return res.status(404).send({message :'Employee not found'});
     }
     
 

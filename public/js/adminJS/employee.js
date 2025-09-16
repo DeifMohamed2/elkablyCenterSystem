@@ -46,6 +46,16 @@ addNewEmployeeBtn.addEventListener('click', async (event) => {
 
 
 
+// Currency formatter available globally
+function formatCurrency(amount) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'EGP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
 // Get ALL Employees
 
 const employeeTable = document.getElementById('employeeTable');
@@ -67,7 +77,7 @@ const getEmployees = async () => {
           <h6 class="text-sm font-weight-bold">${employee.employeeName}</h6>
         </td>
         <td class="align-middle text-center">${employee.employeePhoneNumber}</td>
-        <td class="align-middle text-center">${employee.employeePassword}</td>
+        <td class="align-middle text-center"><span class="pw" data-pw="${employee.employeePassword}">********</span> <button class="btn btn-link btn-sm toggle-pw" data-id="${employee._id}">Show</button></td>
         <td class="align-middle text-center">${formatCurrency(employee.employeeSalary)}</td>
         <td class="align-middle text-center">
           <div class="btn-group" role="group">
@@ -80,6 +90,10 @@ const getEmployees = async () => {
               <i class="material-symbols-rounded">edit</i>
               Edit
             </button>
+            <button class="btn btn-danger btn-sm delete-employee-btn" data-id="${employee._id}">
+              <i class="material-symbols-rounded">delete</i>
+              Delete
+            </button>
           </div>
         </td>
       `;
@@ -90,19 +104,37 @@ const getEmployees = async () => {
     document
       .querySelectorAll('.edit-employee-btn')
       .forEach((btn) =>
-        btn.addEventListener('click', (e) => openEditModal(e.target.dataset.id))
+        btn.addEventListener('click', (e) => openEditModal(e.currentTarget.dataset.id))
       );
 
+    document
+      .querySelectorAll('.delete-employee-btn')
+      .forEach((btn) =>
+        btn.addEventListener('click', async (e) => {
+          const id = e.currentTarget.dataset.id;
+          if (!confirm('Delete this employee?')) return;
+          try {
+            const resp = await fetch(`/admin/delete-employee/${id}`, { method: 'DELETE' });
+            if (!resp.ok) throw new Error('Delete failed');
+            e.currentTarget.closest('tr').remove();
+          } catch (err) {
+            alert('Failed to delete employee');
+          }
+        })
+      );
 
-    // Add currency formatting function
-    function formatCurrency(amount) {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(amount);
-    }
+    document.querySelectorAll('.toggle-pw').forEach((btn)=>{
+      btn.addEventListener('click', (e)=>{
+        const row = e.currentTarget.closest('tr');
+        const span = row.querySelector('.pw');
+        const isHidden = span.textContent === '********';
+        span.textContent = isHidden ? span.dataset.pw : '********';
+        e.currentTarget.textContent = isHidden ? 'Hide' : 'Show';
+      });
+    });
+
+
+    // formatCurrency now defined globally
 
   } catch (error) {
     console.error('Error fetching employees:', error);
@@ -184,6 +216,7 @@ saveEditEmployeeBtn.addEventListener('click', async () => {
   const employeeName = document.getElementById('editEmployeeName').value;
   const employeePhoneNumber = document.getElementById('editEmployeePhone').value;
   const employeeSalary = document.getElementById('editEmployeeSalary').value;
+  const employeePassword = document.getElementById('editEmployeePassword')?.value;
 
   try {
     const response = await fetch(`/admin/get-employee/${id}`, {
@@ -194,12 +227,15 @@ saveEditEmployeeBtn.addEventListener('click', async () => {
       body: JSON.stringify({
         employeeName,
         employeePhoneNumber,
-        employeeSalary: parseFloat(employeeSalary),
+        // Only send salary if provided
+        ...(employeeSalary !== '' ? { employeeSalary: parseFloat(employeeSalary) } : {}),
+        ...(employeePassword ? { employeePassword } : {}),
       }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to update employee');
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || err.message || 'Failed to update employee');
     }
 
     const updatedEmployee = await response.json();
@@ -208,17 +244,125 @@ saveEditEmployeeBtn.addEventListener('click', async () => {
     const row = document.querySelector(`button[data-id="${id}"]`).closest('tr');
     row.cells[0].textContent = updatedEmployee.employeeName;
     row.cells[1].textContent = updatedEmployee.employeePhoneNumber;
-    row.cells[2].textContent = updatedEmployee.employeeSalary;
+    row.cells[2].textContent = formatCurrency(updatedEmployee.employeeSalary);
 
     // Close the modal
     // editEmployeeModal.hide();
     alert('Employee updated successfully!');
   } catch (error) {
     console.error('Error updating employee:', error);
-    alert('Failed to save changes. Please try again.');
+    alert(error.message || 'Failed to save changes. Please try again.');
   }
 });
 
 
 
 getEmployees();
+
+// Show/Hide password toggles
+document.addEventListener('DOMContentLoaded', ()=>{
+  const addPw = document.getElementById('employeePassword');
+  const toggleAdd = document.getElementById('toggleAddPw');
+  if (addPw && toggleAdd){
+    toggleAdd.addEventListener('click', ()=>{
+      const isPw = addPw.type === 'password';
+      addPw.type = isPw ? 'text' : 'password';
+      toggleAdd.innerHTML = isPw ? '<i class="material-symbols-rounded">visibility_off</i>' : '<i class="material-symbols-rounded">visibility</i>';
+    });
+  }
+
+  const editPw = document.getElementById('editEmployeePassword');
+  const toggleEdit = document.getElementById('toggleEditPw');
+  if (editPw && toggleEdit){
+    toggleEdit.addEventListener('click', ()=>{
+      const isPw = editPw.type === 'password';
+      editPw.type = isPw ? 'text' : 'password';
+      toggleEdit.innerHTML = isPw ? '<i class="material-symbols-rounded">visibility_off</i>' : '<i class="material-symbols-rounded">visibility</i>';
+    });
+  }
+});
+
+// Supervisors CRUD
+const supervisorTable = document.getElementById('supervisorTable');
+async function loadSupervisors(){
+  if (!supervisorTable) return;
+  supervisorTable.querySelector('tbody').innerHTML = '';
+  const res = await fetch('/admin/all-supervisors');
+  if (!res.ok) return;
+  const supervisors = await res.json();
+  supervisors.forEach((sv)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="align-middle text-center"><h6 class="text-sm font-weight-bold">${sv.name}</h6></td>
+      <td class="align-middle text-center">${sv.phoneNumber}</td>
+      <td class="align-middle text-center"><span class="pw" data-pw="${sv.password}">********</span> <button class="btn btn-link btn-sm toggle-sv-pw" data-id="${sv._id}">Show</button></td>
+      <td class="align-middle text-center">
+        <div class="btn-group" role="group">
+          <button class="btn btn-warning btn-sm edit-supervisor-btn" data-id="${sv._id}"><i class="material-symbols-rounded">edit</i>Edit</button>
+          <button class="btn btn-danger btn-sm delete-supervisor-btn" data-id="${sv._id}"><i class="material-symbols-rounded">delete</i>Delete</button>
+        </div>
+      </td>`;
+    supervisorTable.querySelector('tbody').appendChild(tr);
+  });
+
+  document.querySelectorAll('.toggle-sv-pw').forEach((btn)=>{
+    btn.addEventListener('click', (e)=>{
+      const row = e.currentTarget.closest('tr');
+      const span = row.querySelector('.pw');
+      const isHidden = span.textContent === '********';
+      span.textContent = isHidden ? span.dataset.pw : '********';
+      e.currentTarget.textContent = isHidden ? 'Hide' : 'Show';
+    });
+  });
+
+  document.querySelectorAll('.delete-supervisor-btn').forEach((btn)=>{
+    btn.addEventListener('click', async (e)=>{
+      const id = e.currentTarget.dataset.id;
+      if (!confirm('Delete this supervisor?')) return;
+      const resp = await fetch(`/admin/delete-supervisor/${id}`, { method:'DELETE' });
+      if (resp.ok) e.currentTarget.closest('tr').remove();
+    });
+  });
+
+  document.querySelectorAll('.edit-supervisor-btn').forEach((btn)=>{
+    btn.addEventListener('click', async (e)=>{
+      const id = e.currentTarget.dataset.id;
+      const name = prompt('New name (leave blank to keep)');
+      const phone = prompt('New phone (leave blank to keep)');
+      const password = prompt('New password (leave blank to keep)');
+      const body = {};
+      if (name) body.name = name;
+      if (phone) body.phoneNumber = phone;
+      if (password) body.password = password;
+      const resp = await fetch(`/admin/get-supervisor/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+      if (resp.ok) loadSupervisors();
+    });
+  });
+}
+
+const addSupervisorForm = document.getElementById('addSupervisorForm');
+if (addSupervisorForm){
+  const toggleSvPw = document.getElementById('toggleSvPw');
+  const svPw = document.getElementById('svPassword');
+  if (toggleSvPw && svPw){
+    toggleSvPw.addEventListener('click', ()=>{
+      const isPw = svPw.type === 'password';
+      svPw.type = isPw ? 'text' : 'password';
+      toggleSvPw.innerHTML = isPw ? '<i class="material-symbols-rounded">visibility_off</i>' : '<i class="material-symbols-rounded">visibility</i>';
+    });
+  }
+  addSupervisorForm.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('svName').value;
+    const phoneNumber = document.getElementById('svPhone').value;
+    const password = document.getElementById('svPassword').value;
+    const resp = await fetch('/admin/add-supervisor', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, phoneNumber, password })});
+    if (resp.ok){
+      addSupervisorForm.reset();
+      loadSupervisors();
+    } else {
+      alert('Failed to add supervisor');
+    }
+  });
+  loadSupervisors();
+}

@@ -10,6 +10,7 @@ const cors = require('cors');
 const mainRoute = require('./routes/mainRoute');
 const adminRoute = require('./routes/adminRoute');
 const employeeRoute = require('./routes/employeeRoute');
+const superViserRoute = require('./routes/superViserRoute');
 
 // express app
 const app = express();
@@ -66,6 +67,7 @@ app.get('/assets/signing/digital-certificate.txt', (req, res) => {
 app.use('/', mainRoute);
 app.use('/admin', adminRoute);
 app.use('/employee', employeeRoute);
+app.use('/superviser', superViserRoute);
 
 app.use((req, res) => {
   res.status(404).render('404', { title: '404' });

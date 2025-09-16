@@ -104,6 +104,13 @@
                 <label for="editEmployeeSalary" class="form-label">Salary</label>
                 <input type="number" class="form-control border border-2 p-2" id="editEmployeeSalary" name="employeeSalary" required>
               </div>
+              <div class="mb-3">
+                <label for="editEmployeePassword" class="form-label">Password (leave blank to keep)</label>
+                <div class="input-group mb-3">
+                  <input type="password" class="form-control border border-2 p-2" id="editEmployeePassword" name="employeePassword">
+                  <button type="button" class="btn btn-outline-secondary" id="toggleEditPw">Show</button>
+                </div>
+              </div>
               <input type="hidden" id="editEmployeeId">
             </form>
           </div>
@@ -199,6 +206,7 @@
                       <div class="col-md-3">
                           <div class="input-group mb-3 border border-2 rounded">
                               <input type="password" class="form-control p-2 fs-5" placeholder="باسورد الحساب"  id="employeePassword" name="employeePassword" required>
+                              <button type="button" class="btn btn-outline-secondary" id="toggleAddPw">Show</button>
                           </div>
                       </div>
 
@@ -227,7 +235,6 @@
       <div class="row">
         <div class="col-12">
           <div class="card my-4">
-         
             <div class="card-body px-0 pb-2">
               <div class="table-responsive p-0">
                 <table class="table align-items-center mb-0" id="employeeTable">
@@ -243,6 +250,54 @@
                   <tbody>
         
                   </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supervisors Section: separate card below employees -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-header pb-0 px-3">
+              <h6 class="mb-0">Supervisors</h6>
+            </div>
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive p-0">
+                <div class="px-4 pb-3">
+                  <form id="addSupervisorForm" class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                      <label class="form-label">Name</label>
+                      <input type="text" class="form-control border border-2 p-2" id="svName" required>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Phone</label>
+                      <input type="text" class="form-control border border-2 p-2" id="svPhone" required>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Password</label>
+                      <div class="input-group">
+                        <input type="password" class="form-control border border-2 p-2" id="svPassword" required>
+                        <button type="button" class="btn btn-outline-secondary" id="toggleSvPw"><i class="material-symbols-rounded">visibility</i></button>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <button class="btn bg-gradient-dark" type="submit"><i class="material-symbols-rounded text-sm">add</i>&nbsp;&nbsp;Add Supervisor</button>
+                    </div>
+                  </form>
+                </div>
+                <table class="table align-items-center mb-0" id="supervisorTable">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-m font-weight-bolder opacity-7">Name</th>
+                      <th class="text-uppercase text-secondary text-m font-weight-bolder opacity-7">Phone</th>
+                      <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7">Password</th>
+                      <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
                 </table>
               </div>
             </div>

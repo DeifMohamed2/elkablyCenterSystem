@@ -52,6 +52,15 @@ router.get('/get-employee/:id', authMiddleware, adminController.getEmployee);
 
 router.put('/get-employee/:id', authMiddleware, adminController.updateEmployee);
 
+router.delete('/delete-employee/:id', authMiddleware, adminController.deleteEmployee);
+
+// Supervisor management
+router.post('/add-supervisor', authMiddleware, adminController.addSuperViser);
+router.get('/all-supervisors', authMiddleware, adminController.getSuperVisers);
+router.get('/get-supervisor/:id', authMiddleware, adminController.getSuperViser);
+router.put('/get-supervisor/:id', authMiddleware, adminController.updateSuperViser);
+router.delete('/delete-supervisor/:id', authMiddleware, adminController.deleteSuperViser);
+
 router.get('/employee-log/:id', authMiddleware, adminController.getEmployeeLog);
 
 // Render employee log page
@@ -114,5 +123,10 @@ router.get('/teachers', authMiddleware, adminController.getTeachers);
 router.get('/teacher-report', authMiddleware, adminController.teacherReport_Get);
 router.get('/teacher-report-data', authMiddleware, adminController.getTeacherReportData);
 router.get('/download-teacher-excel', authMiddleware, adminController.downloadTeacherExcel);
+
+// Admin Change Password
+router.get('/change-password', authMiddleware, adminController.changeAdminPassword_Get);
+router.post('/change-password/request-otp', authMiddleware, adminController.requestAdminOtp);
+router.post('/change-password/verify', authMiddleware, adminController.verifyAdminOtpAndChange);
 
 module.exports = router;

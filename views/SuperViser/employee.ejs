@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+    <%- include("../Admin/partials/head.ejs") %>
+<body class="g-sidenav-show rtl  bg-gray-100">
+    <%- include("../Admin/partials/aside.ejs") %>
+
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-3 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid pt-1 px-3">
+        <h4>الموظفين (Supervisor)</h4>
+      </div>
+    </nav>
+
+    <div class="container-fluid py-2">
+      <div class="row">
+        <div class="col-md-12 mb-lg-0 mb-4">
+          <form id="addEmployeeForm">
+            <div class="card mt-4">
+              <div class="card-header pb-0 p-3">
+                <div class="row">
+                  <div class="col-6 d-flex align-items-center">
+                    <h5 class="mb-0">اضف بيانات موظف جديد</h5>
+                  </div>
+                  <div class="col-6 text-start">
+                    <button type="submit" class="btn bg-gradient-dark mb-0" id="addNewEmployeeBtn"><i class="material-symbols-rounded text-sm">add</i>&nbsp;&nbsp;اضف</button>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body p-3">
+                <div class="row">
+                  <div class="col-md-3 ">
+                    <div class="input-group mb-3 border border-2 rounded">
+                      <input type="text" class="form-control p-2 fs-5" placeholder="اسم الموظف" id="employeeName" name="employeeName" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-3">
+                    <div class="input-group mb-3 border border-2 rounded">
+                      <input type="number" class="form-control p-2 fs-5" placeholder="رقم الهاتف" id="employeePhoneNumber" name="employeePhoneNumber" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-3">
+                    <div class="input-group mb-3 border border-2 rounded">
+                      <input type="number" class="form-control p-2 fs-5" placeholder="Salary" id="employeeSalary" name="employeeSalary" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-3">
+                    <div class="input-group mb-3 border border-2 rounded">
+                      <input type="password" class="form-control p-2 fs-5" placeholder="باسورد الحساب" id="employeePassword" name="employeePassword" required>
+                      <button type="button" class="btn btn-outline-secondary" id="toggleAddPw" aria-label="Toggle password visibility">
+                        <i class="material-symbols-rounded">visibility</i>
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="alert alert-success" role="alert" id="successMessage" style="display: none;">تم اضافة الموظف بنجاح</div>
+                    <div class="alert alert-danger" role="alert" id="errorMessage" style="display: none;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0" id="employeeTable">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-m font-weight-bolder opacity-7">اسم الموظف</th>
+                      <th class="text-uppercase text-secondary text-m font-weight-bolder opacity-7">رقم الهاتف</th>
+                      <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7">Password</th>
+                      <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7">Salary</th>
+                      <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Edit Employee Modal -->
+  <div class="modal fade hide" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editEmployeeModalLabel">Edit Employee</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editEmployeeForm">
+            <div class="mb-3">
+              <label for="editEmployeeName" class="form-label">Employee Name</label>
+              <input type="text" class="form-control border border-2 p-2" id="editEmployeeName" name="employeeName" required>
+            </div>
+            <div class="mb-3">
+              <label for="editEmployeePhone" class="form-label">Phone Number</label>
+              <input type="text" class="form-control border border-2 p-2" id="editEmployeePhone" name="employeePhoneNumber" required>
+            </div>
+            <div class="mb-3">
+              <label for="editEmployeeSalary" class="form-label">Salary</label>
+              <input type="number" class="form-control border border-2 p-2" id="editEmployeeSalary" name="employeeSalary" required>
+            </div>
+            <div class="mb-3">
+              <label for="editEmployeePassword" class="form-label">Password (leave blank to keep)</label>
+              <input type="password" class="form-control border border-2 p-2" id="editEmployeePassword" name="employeePassword">
+            </div>
+            <input type="hidden" id="editEmployeeId">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="saveEditEmployeeBtn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Add Employee Handler
+    (function(){
+      const form = document.getElementById('addEmployeeForm');
+      const successMessage = document.getElementById('successMessage');
+      const errorMessage = document.getElementById('errorMessage');
+      const addPw = document.getElementById('employeePassword');
+      const toggleAdd = document.getElementById('toggleAddPw');
+      if (toggleAdd && addPw){
+        toggleAdd.addEventListener('click', ()=>{
+          const isPw = addPw.type === 'password';
+          addPw.type = isPw ? 'text' : 'password';
+          toggleAdd.innerHTML = isPw ? '<i class="material-symbols-rounded">visibility_off</i>' : '<i class="material-symbols-rounded">visibility</i>';
+        });
+      }
+      if (form){
+        form.addEventListener('submit', async (e)=>{
+          e.preventDefault();
+          successMessage.style.display = 'none';
+          errorMessage.style.display = 'none';
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData);
+          const res = await fetch('/superviser/add-employee',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify(data)
+          });
+          if (res.ok){
+            successMessage.style.display = 'block';
+            form.reset();
+            getEmployees();
+          } else {
+            const err = await res.json().catch(()=>({message:'هناك خطأ'}));
+            errorMessage.textContent = err.message || 'هناك خطأ';
+            errorMessage.style.display = 'block';
+          }
+        });
+      }
+    })();
+
+    // Simple reuse but pointing to supervisor routes
+    async function getEmployees() {
+      const table = document.getElementById('employeeTable');
+      const body = table.querySelector('tbody');
+      body.innerHTML = '';
+      const response = await fetch('/superviser/all-employee');
+      const employees = await response.json();
+      const formatCurrency = (amount) => new Intl.NumberFormat('en-US',{style:'currency',currency:'EGP',minimumFractionDigits:0,maximumFractionDigits:0}).format(amount);
+      employees.forEach((employee)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="align-middle text-center"><h6 class="text-sm font-weight-bold">${employee.employeeName}</h6></td>
+          <td class="align-middle text-center">${employee.employeePhoneNumber}</td>
+          <td class="align-middle text-center"><span class="pw" data-pw="${employee.employeePassword}">********</span> <button class="btn btn-link btn-sm toggle-pw" data-id="${employee._id}">Show</button></td>
+          <td class="align-middle text-center">${formatCurrency(employee.employeeSalary)}</td>
+          <td class="align-middle text-center">
+            <div class="btn-group" role="group">
+              <button class="btn btn-warning btn-sm edit-employee-btn" data-id="${employee._id}" data-bs-toggle="modal" data-bs-target="#editEmployeeModal">
+                <i class="material-symbols-rounded">edit</i>
+                Edit
+              </button>
+              <button class="btn btn-danger btn-sm delete-employee-btn" data-id="${employee._id}">
+                <i class="material-symbols-rounded">delete</i>
+                Delete
+              </button>
+            </div>
+          </td>`;
+        body.appendChild(tr);
+      });
+
+      document.querySelectorAll('.edit-employee-btn').forEach((btn)=>btn.addEventListener('click', async (e)=>{
+        const id = e.currentTarget.dataset.id;
+        const res = await fetch(`/superviser/get-employee/${id}`);
+        const emp = await res.json();
+        document.getElementById('editEmployeeName').value = emp.employeeName;
+        document.getElementById('editEmployeePhone').value = emp.employeePhoneNumber;
+        document.getElementById('editEmployeeSalary').value = emp.employeeSalary;
+        document.getElementById('editEmployeeId').value = emp._id;
+        document.getElementById('editEmployeePassword').value = '';
+      }));
+
+      document.querySelectorAll('.delete-employee-btn').forEach((btn)=>btn.addEventListener('click', async (e)=>{
+        const id = e.currentTarget.dataset.id;
+        if(!confirm('Delete this employee?')) return;
+        const resp = await fetch(`/superviser/delete-employee/${id}`, { method: 'DELETE' });
+        if(resp.ok){ e.currentTarget.closest('tr').remove(); }
+      }));
+    }
+
+    document.getElementById('saveEditEmployeeBtn').addEventListener('click', async ()=>{
+      const id = document.getElementById('editEmployeeId').value;
+      const employeeName = document.getElementById('editEmployeeName').value;
+      const employeePhoneNumber = document.getElementById('editEmployeePhone').value;
+      const employeeSalary = parseFloat(document.getElementById('editEmployeeSalary').value);
+      const employeePassword = document.getElementById('editEmployeePassword').value;
+      await fetch(`/superviser/get-employee/${id}`,{
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ employeeName, employeePhoneNumber, employeeSalary, ...(employeePassword?{employeePassword}:{}) })
+      });
+      location.reload();
+    });
+
+    getEmployees();
+
+    document.addEventListener('click', (e)=>{
+      if (e.target && e.target.classList.contains('toggle-pw')){
+        const row = e.target.closest('tr');
+        const span = row.querySelector('.pw');
+        const isHidden = span.textContent === '********';
+        span.textContent = isHidden ? span.dataset.pw : '********';
+        e.target.textContent = isHidden ? 'Hide' : 'Show';
+      }
+    });
+  </script>
+
+  <script src="../assets/js/core/popper.min.js"></script>
+  <script src="../assets/js/core/bootstrap.min.js"></script>
+  <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+</body>
+</html>
+
+

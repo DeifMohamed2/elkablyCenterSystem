@@ -23,6 +23,9 @@ Form.addEventListener('submit', async (event) => {
         else if(responseData.role === 'Employee'){
             window.location.href = '/employee/dashboard';
         }
+        else if(responseData.role === 'Supervisor'){
+            window.location.href = '/superviser/employee';
+        }
 
     }else{
         alert('Account Not Found');

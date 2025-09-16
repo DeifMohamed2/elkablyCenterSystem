@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+    <%- include("../Admin/partials/head.ejs") %>
+<body class="g-sidenav-show rtl  bg-gray-100">
+    <%- include("../Admin/partials/aside.ejs") %>
+
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-3 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid pt-1 px-3">
+        <h4>الفواتير (Review Only)</h4>
+      </div>
+    </nav>
+
+    <div class="container-fluid py-2">
+      <div class="row">
+        <div class="col-lg-12">
+          <form id="filterBillsForm">
+            <div class="card mt-4">
+              <div class="card-header pb-0 p-3">
+                <div class="row">
+                  <div class="col-6 d-flex align-items-center">
+                    <h5 class="mb-0"> فلتره الفواتير والملاحظات </h5>
+                  </div>
+                  <div class="col-6 text-start">
+                    <button type="submit" class="btn bg-gradient-dark mb-0" id="filterBTN"><i class="material-symbols-rounded text-sm">search</i>&nbsp;&nbsp;Filter</button>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body p-3">
+                <div class="row">
+                  <div class="col-md-4">
+                    <label for="startDate" class="form-label">Start Date</label>
+                    <input type="date" class="form-control border border-2 p-2" id="startDate" name="startDate" >
+                  </div>
+                  <div class="col-md-4">
+                    <label for="endDate" class="form-label">End Date</label>
+                    <input type="date" class="form-control border border-2 p-2" id="endDate" name="endDate" >
+                  </div>
+                  <div class="col-md-4">
+                    <label for="employee" class="form-label">Employee</label>
+                    <select class="form-control border border-2 p-2" id="employee" name="employee" >
+                      <option value="">Select Employee</option>
+                      <% employees.forEach(employee => { %>
+                        <option value="<%= employee._id %>"><%= employee.employeeName %></option>
+                      <% }) %>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div id="spinner2" class="spinner mx-auto d-none"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="card">
+            <div class="card-header pb-0 px-3">
+              <h6 class="mb-0">Billing Information</h6>
+            </div>
+            <div class="card-body pt-4 p-3">
+              <ul class="list-group" id="allBills"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 mt-4">
+          <div class="card  mb-4">
+            <div class="card-header pb-0 px-3">
+              <div class="row">
+                <div class="col-md-3">
+                  <h6 class="mb-0"> Transactions</h6>
+                </div>
+              </div>
+            </div>
+            <div class="card-body pb-0 px-3">
+              <div class="row">
+                <div class="col-md-12">
+                  <h6 class="mb-3">Transactions Overview</h6>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-3 mb-3">
+                  <div class="card text-center" id="today-card">
+                    <div class="card-body">
+                      <h6 class="mb-2">New Bills Today <span class="badge bg-secondary" id="today-badge">--</span></h6>
+                      <h4 class="text-primary" id="today-count">--</h4>
+                      <small>Total: <span id="today-total">--</span></small><br/>
+                      <small>Income: <span id="today-income">--</span></small><br/>
+                      <small>Expenses: <span id="today-expenses">--</span></small><br/>
+                      <small>Balance: <span id="today-net">--</span></small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <div class="card text-center" id="week-card">
+                    <div class="card-body">
+                      <h6 class="mb-2">Bills This Week <span class="badge bg-secondary" id="week-badge">--</span></h6>
+                      <h4 class="text-primary" id="week-count">--</h4>
+                      <small>Total: <span id="week-total">--</span></small><br/>
+                      <small>Income: <span id="week-income">--</span></small><br/>
+                      <small>Expenses: <span id="week-expenses">--</span></small><br/>
+                      <small>Balance: <span id="week-net">--</span></small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <div class="card text-center" id="month-card">
+                    <div class="card-body">
+                      <h6 class="mb-2">Bills This Month <span class="badge bg-secondary" id="month-badge">--</span></h6>
+                      <h4 class="text-primary" id="month-count">--</h4>
+                      <small>Total: <span id="month-total">--</span></small><br/>
+                      <small>Income: <span id="month-income">--</span></small><br/>
+                      <small>Expenses: <span id="month-expenses">--</span></small><br/>
+                      <small>Balance: <span id="month-net">--</span></small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <div class="card text-center" id="all-card">
+                    <div class="card-body">
+                      <h6 class="mb-2">All-Time Bills <span class="badge bg-secondary" id="all-badge">--</span></h6>
+                      <h4 class="text-primary" id="all-count">--</h4>
+                      <small>Total: <span id="all-total">--</span></small><br/>
+                      <small>Income: <span id="all-income">--</span></small><br/>
+                      <small>Expenses: <span id="all-expenses">--</span></small><br/>
+                      <small>Balance: <span id="all-net">--</span></small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const spinner2 = document.getElementById('spinner2');
+    const allBills = document.getElementById('allBills');
+    const filterBillsForm = document.getElementById('filterBillsForm');
+
+    function formatCurrency(val){ return `${(val || 0).toLocaleString('en-US')} EGP`; }
+
+    function updateStats(type, data) {
+      document.getElementById(`${type}-count`).textContent = data.count || '--';
+      const totalEl = document.getElementById(`${type}-total`); if (totalEl) totalEl.textContent = formatCurrency(data.total);
+      const incomeEl = document.getElementById(`${type}-income`); if (incomeEl) incomeEl.textContent = formatCurrency(data.income);
+      const expensesEl = document.getElementById(`${type}-expenses`); if (expensesEl) expensesEl.textContent = formatCurrency(data.expenses);
+      const netEl = document.getElementById(`${type}-net`); if (netEl) netEl.textContent = formatCurrency(Math.abs(data.net || 0));
+    }
+
+    function populateBills(bills){
+      allBills.innerHTML = '';
+      bills.forEach((bill)=>{
+        const li = document.createElement('li');
+        li.className = 'list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg';
+        li.innerHTML = `
+          <div class="d-flex flex-column">
+            <h6 class="mb-3 text-sm">${new Date(bill.createdAt).toLocaleString()}</h6>
+            <span class="mb-2 text-dark SpanTitle">اسم الموظف : <span class="text-dark font-weight-bold me-sm-2">${bill.employee?.employeeName || 'N/A'}</span></span>
+            <span class="mb-2 text-dark SpanTitle">اسم المنتج : <span class="text-dark font-weight-bold me-sm-2">${bill.billName}</span></span>
+            <span class="mb-2 text-dark SpanTitle">المبلغ : <span class="text-dark font-weight-bold me-sm-2" dir='ltr'>${formatCurrency(bill.billAmount)}</span></span>
+            <span class="text-dark SpanTitle">ملاحظات : <span class="text-dark font-weight-bold me-sm-2">${bill.billNote || ''}</span></span>
+          </div>`;
+        allBills.appendChild(li);
+      });
+    }
+
+    filterBillsForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const formData = new FormData(filterBillsForm);
+      const params = new URLSearchParams();
+      for (const [key, value] of formData.entries()) { params.append(key, value); }
+      const res = await fetch(`/superviser/all-bills?${params.toString()}`);
+      const { filtered, today, week, month, all } = await res.json();
+      updateStats('today', today); updateStats('week', week); updateStats('month', month); updateStats('all', all);
+      populateBills(filtered.bills);
+    });
+
+    (async function init(){
+      const res = await fetch('/superviser/all-bills');
+      const { today, week, month, all } = await res.json();
+      updateStats('today', today); updateStats('week', week); updateStats('month', month); updateStats('all', all);
+      populateBills(all.bills);
+    })();
+  </script>
+
+  <script src="../assets/js/core/popper.min.js"></script>
+  <script src="../assets/js/core/bootstrap.min.js"></script>
+  <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+</body>
+</html>
+
+
