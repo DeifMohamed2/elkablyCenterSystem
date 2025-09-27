@@ -4,7 +4,7 @@ const FormData = require('form-data');
 // Wasender API configuration
 const BASE_URL = 'https://wasenderapi.com/api';
 // Access Token for authentication (this is used to access the API)
-const ACCESS_TOKEN = '1156|SJZ0o2rJ5PxSuWDX1g3ZcO8vKgVt4ekjMsnQgeYC0a5aca63';
+const ACCESS_TOKEN = '1185|Ly6teYxxGMI3zNdw6MDN4i5eg3D1bPW6j821KhSh321a51ed';
 
 class WasenderClient {
   constructor(accessToken = ACCESS_TOKEN) {
