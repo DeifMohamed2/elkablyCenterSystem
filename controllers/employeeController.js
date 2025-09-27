@@ -6,10 +6,8 @@ const Attendance = require('../models/attendance');
 const qrcode = require('qrcode');
 const ExcelJS = require('exceljs');
 
-
-const waziper = require('../utils/waziper');
+const waService = require('../utils/waService');
 const { StudentCodeUtils } = require('../utils/waziper');
-const instanceId = '68536629B61C9';
 
 
 
@@ -291,14 +289,11 @@ const getStudent = async (req, res) => {
 
 async function sendQRCode(chatId, message, studentCode) {
   try {
-    // Use a public QR code URL (align with working Elkably app)
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(studentCode)}`;
-    console.log('Generated QR Code URL:', qrCodeUrl);
-    console.log('Sending to Chat ID:', chatId);
-
-    const response = await waziper.sendMediaMessage(instanceId, chatId, message, qrCodeUrl, 'qrcode.png');
-
-    console.log('QR code sent successfully:', response.data);
+    const phone = String(chatId || '').replace(/@c\.us$|@s\.whatsapp\.net$/i, '');
+    const resp = await waService.sendQRMessage(studentCode, phone, waService.DEFAULT_ADMIN_PHONE, '20', message);
+    if (!resp.success) {
+      console.error('Error sending QR code:', resp.message);
+    }
   } catch (error) {
     console.error('Error sending QR code:', error);
   }
@@ -428,7 +423,7 @@ const addStudent = async (req, res) => {
                 });
 
                 // Send the message via WhatsApp or another service
-                sendQRCode(`2${populatedStudent.studentPhoneNumber}@c.us`, `Scan the QR code to check in\n\n${message}`, populatedStudent.studentCode);
+                sendQRCode(populatedStudent.studentPhoneNumber, `Scan the QR code to check in\n\n${message}`, populatedStudent.studentCode);
 
                 res.status(201).send(populatedStudent);
             })
@@ -642,7 +637,7 @@ const sendWa = async (req, res) => {
   );
 
   for (const student of students) {
-    const waNumber = `2${student.studentParentPhone}@c.us`;
+    const waPhone = student.studentParentPhone;
 
     const messageUpdate = `
 عزيزي ولي امر الطالب ${student.studentName}
@@ -655,14 +650,12 @@ ${message}
 تحياتنا
 `;
 
-    await waziper
-      .sendTextMessage(instanceId, waNumber, messageUpdate)
-      .then((response) => {
-        console.log('Message sent:', response.data);
-      })
-      .catch((error) => {
-        console.error('Error sending message:', error);
-      });
+    try {
+      const resp = await waService.sendWasenderMessage(messageUpdate, waPhone, waService.DEFAULT_ADMIN_PHONE);
+      if (!resp.success) console.error('Error sending message:', resp.message);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
 
     // Random delay between 1 to 3 seconds between each message
     const delay = Math.floor(Math.random() * 3000) + 1000;
@@ -714,7 +707,7 @@ const sendCodeAgain = async (req, res) => {
     });
 
     // Send the message via WhatsApp or another service
-    sendQRCode(`2${student.studentPhoneNumber}@c.us`, `Scan the QR code to check in\n\n${message}`, student.studentCode);
+    sendQRCode(student.studentPhoneNumber, `Scan the QR code to check in\n\n${message}`, student.studentCode);
 
     res.status(200).json({ message: 'QR code sent successfully' });
   } catch (error) {
@@ -792,7 +785,8 @@ ${notes ? `ملاحظات: ${notes}` : ''}
     `;
 
     try {
-      await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage);
+      const resp = await waService.sendWasenderMessage(parentMessage, student.studentParentPhone, waService.DEFAULT_ADMIN_PHONE);
+      if (!resp.success) console.error('Error sending WhatsApp message:', resp.message);
     } catch (error) {
       console.error('Error sending WhatsApp message:', error);
     }
@@ -1265,11 +1259,8 @@ const attendStudent = async (req, res) => {
 `;
 
     try {
-      await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage).then((response) => {
-        console.log('Message sent:', response.data);
-      }).catch((error) => {
-        console.error('Error sending message:', error);
-      });
+      const resp = await waService.sendWasenderMessage(parentMessage, student.studentParentPhone, waService.DEFAULT_ADMIN_PHONE);
+      if (!resp.success) console.error('Error sending message:', resp.message);
     } catch (error) {
       console.error('Error sending message:', error);
       // Continue with the process even if message sending fails
@@ -1787,19 +1778,11 @@ const downloadAttendanceExcel = async (req, res) => {
     const base64Excel = buffer.toString('base64');
     const fileName = `Attendance_Report_${attendance.teacher.teacherName}_${attendance.course}_${new Date().toISOString().split('T')[0]}.xlsx`;
     
-    await waziper.sendMediaMessage(
-      instanceId,
-      `2${attendance.teacher.teacherPhoneNumber}@c.us`,
-      `Attendance Report for ${attendance.teacher.teacherName} - ${attendance.course} - ${new Date().toDateString()}`,
-      base64Excel,
-      fileName
-    )
-    .then((response) => {
-      console.log('Excel sent:', response.data);
-    })
-    .catch((error) => {
-      console.error('Error sending Excel:', error);
-    });
+    try {
+      await waService.sendExcelFileSimple(buffer, fileName, attendance.teacher.teacherPhoneNumber, waService.DEFAULT_ADMIN_PHONE, '20');
+    } catch (e) {
+      console.error('Error sending Excel:', e);
+    }
 
     await workbook.xlsx.write(res);
     res.end();
@@ -2773,20 +2756,11 @@ const downloadAndSendExcelForTeacherByDate = async (req, res) => {
     const fileName = `Attendance_Report_${teacherName}_${startDate}_to_${endDate}.xlsx`;
 
     // Send file via WhatsApp API
-    await waziper
-      .sendMediaMessage(
-        instanceId,
-        `2${teacherPhoneNumber}@c.us`,
-        `Attendance Report for ${teacher.teacherName} (${startDate} to ${endDate})`,
-        base64Excel,
-        fileName
-      )
-      .then((response) => {
-        console.log('WhatsApp response:', response.data);
-      })
-      .catch((error) => {
-        console.error('Error sending Excel file via WhatsApp:', error);
-      });
+    try {
+      await waService.sendExcelFileSimple(buffer, fileName, teacherPhoneNumber, waService.DEFAULT_ADMIN_PHONE, '20');
+    } catch (error) {
+      console.error('Error sending Excel file via WhatsApp:', error);
+    }
 
     console.log('Excel file sent via WhatsApp');
 
@@ -2946,20 +2920,11 @@ const downloadAndSendExcelForEmployeeByDate = async (req, res) => {
 
     // Send file via WhatsApp API
 
-    await waziper
-      .sendMediaMessage(
-        instanceId,
-        `2${employeePhoneNumber}@c.us`,
-        `Attendance Report for ${employeeName} (${startDate} to ${endDate})`,
-        base64Excel,
-        fileName
-      )
-      .then((response) => {
-        console.log('WhatsApp response:', response.data);
-      })
-      .catch((error) => {
-        console.error('Error sending Excel file via WhatsApp:', error);
-      });
+    try {
+      await waService.sendExcelFileSimple(buffer, fileName, employeePhoneNumber, waService.DEFAULT_ADMIN_PHONE, '20');
+    } catch (error) {
+      console.error('Error sending Excel file via WhatsApp:', error);
+    }
 
     console.log('Excel file sent via WhatsApp');
 
@@ -3263,7 +3228,7 @@ const sendNotification = async (req, res) => {
     console.log(`Formatted phone number: ${formattedPhoneNumber}`);
     
     // Send WhatsApp message using the same method as sendWa (without status check)
-    const response = await waziper.sendTextMessage(instanceId, formattedPhoneNumber, message);
+    const response = await waService.sendWasenderMessage(message, formattedPhoneNumber, waService.DEFAULT_ADMIN_PHONE);
     
     if (response && response.data && response.data.status === 'success') {
       // Log the notification
@@ -3327,7 +3292,7 @@ const sendBulkNotifications = async (req, res) => {
           .replace('{amountRemaining}', student.amountRemaining)
           .replace('{totalCourseCost}', student.totalCourseCost);
         
-        const response = await waziper.sendTextMessage(instanceId, formattedPhoneNumber, personalizedMessage);
+        const response = await waService.sendWasenderMessage(personalizedMessage, formattedPhoneNumber, waService.DEFAULT_ADMIN_PHONE);
         
         if (response && response.data && response.data.status === 'success') {
           successCount++;
@@ -3526,7 +3491,8 @@ const blockStudent = async (req, res) => {
 `;
 
     try {
-      await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage);
+      const resp = await waService.sendWasenderMessage(parentMessage, student.studentParentPhone, waService.DEFAULT_ADMIN_PHONE);
+      if (!resp.success) console.error('Error sending WhatsApp message:', resp.message);
     } catch (error) {
       console.error('Error sending WhatsApp message:', error);
     }
@@ -3574,7 +3540,8 @@ const unblockStudent = async (req, res) => {
 `;
 
     try {
-      await waziper.sendTextMessage(instanceId, `2${student.studentParentPhone}@c.us`, parentMessage);
+      const resp = await waService.sendWasenderMessage(parentMessage, student.studentParentPhone, waService.DEFAULT_ADMIN_PHONE);
+      if (!resp.success) console.error('Error sending WhatsApp message:', resp.message);
     } catch (error) {
       console.error('Error sending WhatsApp message:', error);
     }
@@ -3586,6 +3553,63 @@ const unblockStudent = async (req, res) => {
   } catch (error) {
     console.error('Error unblocking student:', error);
     res.status(500).json({ message: 'An error occurred while unblocking student' });
+  }
+};
+
+// ======================== WhatsApp Admin Session Connect (Strict) ======================== //
+const connectWhatsApp_Get = async (req, res) => {
+  try {
+    // Only allow the single fixed number
+    const adminNumber = waService.DEFAULT_ADMIN_PHONE;
+    // Try to fetch session; if missing or not connected, show connect page
+    let sessionInfo = null;
+    try {
+      sessionInfo = await waService.getAdminSessionStrict();
+    } catch (e) {
+      sessionInfo = null;
+    }
+    const status = (sessionInfo && sessionInfo.status) ? sessionInfo.status : 'DISCONNECTED';
+    res.render('employee/connectWhatsapp', {
+      title: 'Connect WhatsApp',
+      path: '/employee/connect-whatsapp',
+      adminNumber,
+      status,
+    });
+  } catch (error) {
+    res.status(500).send('Error loading WhatsApp connect page');
+  }
+};
+
+const connectWhatsApp_Start = async (req, res) => {
+  try {
+    // Ensure only the fixed number is allowed
+    const connectResp = await waService.connectAdminSession();
+    if (!connectResp.success) {
+      return res.status(400).json({ success: false, message: connectResp.message || 'Failed to start connection' });
+    }
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error initiating connection' });
+  }
+};
+
+const connectWhatsApp_QR = async (req, res) => {
+  try {
+    const qrResp = await waService.getAdminQRCode();
+    if (!qrResp.success) {
+      return res.status(400).json({ success: false, message: qrResp.message || 'Failed to get QR code' });
+    }
+    // Wasender shape handling: try common places
+    const qrcode = qrResp.data?.qrcode || qrResp.data?.qrCode || qrResp.data?.qr || qrResp.qrcode || qrResp.qrCode || null;
+    if (!qrcode) {
+      // Fallback: if API returns a token/QR string in data
+      const token = qrResp.data?.token || qrResp.token || null;
+      if (token) return res.json({ success: true, qrcode: token });
+      return res.status(404).json({ success: false, message: 'QR code not available yet' });
+    }
+    res.json({ success: true, qrcode });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error getting QR code' });
   }
 };
 
@@ -3656,6 +3680,10 @@ module.exports = {
   logOut,
   blockStudent,
   unblockStudent,
+  // WhatsApp connect page handlers will be appended by next edit
+  connectWhatsApp_Get,
+  connectWhatsApp_Start,
+  connectWhatsApp_QR,
 };
 
 

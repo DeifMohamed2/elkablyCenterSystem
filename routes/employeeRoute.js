@@ -147,5 +147,10 @@ router.delete('/delete-notification-template/:templateId', employeeController.de
 
 router.get('/logout', authMiddleware, employeeController.logOut);
 
+// WhatsApp connect (strict single-number)
+router.get('/connect-whatsapp', authMiddleware, employeeController.connectWhatsApp_Get);
+router.post('/connect-whatsapp/start', authMiddleware, employeeController.connectWhatsApp_Start);
+router.get('/connect-whatsapp/qrcode', authMiddleware, employeeController.connectWhatsApp_QR);
+
 
 module.exports = router;

@@ -9,8 +9,7 @@ const Admin = require('../models/admin');
 const excelJS = require('exceljs');
 const schedule = require('node-schedule');
 const path = require('path');
-const waziper = require('../utils/waziper');
-const instanceId = '68536629B61C9';
+const waService = require('../utils/waService');
 
 // Helper function to get date range based on period
 const getDateRange = (period, customStart = null, customEnd = null) => {
@@ -1302,7 +1301,7 @@ const sendDailyBillExcel = async () => {
     await waapi.postInstancesIdClientActionSendMedia(
       {
         mediaUrl: fileUrl,
-        chatId: '2' + '01156012078' + '@c.us',
+        chatId: '2' + '01092257120' + '@c.us',
         mediaBase64: base64Excel,
         mediaName: fileName,
         mediaCaption: `Bill Report for ${new Date().toLocaleDateString()}`,
@@ -1668,9 +1667,9 @@ const requestAdminOtp = async (req, res) => {
     const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
     req.session.adminOtp = { phoneNumber, code, expiresAt };
 
-    // Send OTP via WhatsApp using waziper client (same as employeeController)
+    // Send OTP via WhatsApp using Wasender service
     try {
-      await waziper.sendTextMessage(instanceId, `2${phoneNumber}@c.us`, `Your OTP code is ${code}. It expires in 5 minutes.`);
+      await waService.sendWasenderMessage(`Your OTP code is ${code}. It expires in 5 minutes.`, phoneNumber, waService.DEFAULT_ADMIN_PHONE);
     } catch (e) {
       console.error('WA send error:', e.message || e);
       // proceed even if WA send fails for testing

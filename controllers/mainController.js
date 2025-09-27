@@ -2,7 +2,7 @@ const Admin = require('../models/admin');
 const Employee = require('../models/employee');
 const SuperViser = require('../models/superViser');
 const jwt = require('jsonwebtoken');
-const waziper = require('../utils/waziper');
+const waService = require('../utils/waService');
 
 const jwtSecret = process.env.JWT_SECRET;
 
