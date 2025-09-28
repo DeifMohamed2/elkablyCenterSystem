@@ -145,7 +145,13 @@ class WasenderClient {
       return { success: true, data: body.data ?? { id: sessionId, status: 'NEED_SCAN' } };
     } catch (error) {
       console.error('Wasender API Error:', error.response?.status, error.response?.data);
-      return { success: false, message: 'Failed to connect session', error: error.response?.data };
+      
+      // Extract the actual error message from the API response
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          'Failed to connect session';
+      
+      return { success: false, message: errorMessage, error: error.response?.data };
     }
   }
 
@@ -163,7 +169,13 @@ class WasenderClient {
       return { success: true, data: { qrcode } };
     } catch (error) {
       console.error('Wasender API Error:', error.response?.status, error.response?.data);
-      return { success: false, message: 'Failed to get QR code', error: error.response?.data };
+      
+      // Extract the actual error message from the API response
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          'Failed to get QR code';
+      
+      return { success: false, message: errorMessage, error: error.response?.data };
     }
   }
 
@@ -204,7 +216,13 @@ class WasenderClient {
       return { success: true, data: body.data ?? { id: sessionId, status: 'DISCONNECTED' } };
     } catch (error) {
       console.error('Wasender API Error:', error.response?.status, error.response?.data);
-      return { success: false, message: 'Failed to disconnect session', error: error.response?.data };
+      
+      // Extract the actual error message from the API response
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          'Failed to disconnect session';
+      
+      return { success: false, message: errorMessage, error: error.response?.data };
     }
   }
 

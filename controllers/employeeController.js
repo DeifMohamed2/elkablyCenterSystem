@@ -7,6 +7,7 @@ const qrcode = require('qrcode');
 const ExcelJS = require('exceljs');
 
 const waService = require('../utils/waService');
+const wasender = require('../utils/wasender');
 const { StudentCodeUtils } = require('../utils/waziper');
 
 
@@ -3559,31 +3560,32 @@ const unblockStudent = async (req, res) => {
 // ======================== WhatsApp Admin Session Connect (Strict) ======================== //
 const connectWhatsApp_Get = async (req, res) => {
   try {
-    // Only allow the single fixed number
-    const adminNumber = waService.DEFAULT_ADMIN_PHONE;
-    // Try to fetch session; if missing or not connected, show connect page
-    let sessionInfo = null;
-    try {
-      sessionInfo = await waService.getAdminSessionStrict();
-    } catch (e) {
-      sessionInfo = null;
-    }
-    const status = (sessionInfo && sessionInfo.status) ? sessionInfo.status : 'DISCONNECTED';
+    // Get session status using the new function
+    const statusResult = await waService.getSessionStatus(waService.DEFAULT_ADMIN_SESSION_API_KEY);
+    
     res.render('employee/connectWhatsapp', {
       title: 'Connect WhatsApp',
       path: '/employee/connect-whatsapp',
-      adminNumber,
-      status,
+      adminNumber: 'Session API Key Based',
+      status: statusResult.status || 'DISCONNECTED',
+      sessionInfo: statusResult.success ? statusResult.data : null
     });
   } catch (error) {
-    res.status(500).send('Error loading WhatsApp connect page');
+    console.error('Error loading WhatsApp connect page:', error);
+    res.render('employee/connectWhatsapp', {
+      title: 'Connect WhatsApp',
+      path: '/employee/connect-whatsapp',
+      adminNumber: 'Session API Key Based',
+      status: 'ERROR',
+      sessionInfo: null
+    });
   }
 };
 
 const connectWhatsApp_Start = async (req, res) => {
   try {
-    // Ensure only the fixed number is allowed
-    const connectResp = await waService.connectAdminSession();
+    // Connect using session API key
+    const connectResp = await waService.connectAdminSession(waService.DEFAULT_ADMIN_SESSION_API_KEY);
     if (!connectResp.success) {
       return res.status(400).json({ success: false, message: connectResp.message || 'Failed to start connection' });
     }
@@ -3595,7 +3597,7 @@ const connectWhatsApp_Start = async (req, res) => {
 
 const connectWhatsApp_QR = async (req, res) => {
   try {
-    const qrResp = await waService.getAdminQRCode();
+    const qrResp = await waService.getAdminQRCode(waService.DEFAULT_ADMIN_SESSION_API_KEY);
     if (!qrResp.success) {
       return res.status(400).json({ success: false, message: qrResp.message || 'Failed to get QR code' });
     }
