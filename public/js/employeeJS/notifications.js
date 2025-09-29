@@ -917,7 +917,7 @@ class NotificationManager {
         // Extract courses from students data for this teacher
         const teacherStudents = this.students.filter(s => s.teacherId === teacherId);
         const courses = [...new Set(teacherStudents.map(s => s.courseName))];
-        
+        console.log(teacherStudents);
         courses.forEach(course => {
           const option = document.createElement('option');
           option.value = course;

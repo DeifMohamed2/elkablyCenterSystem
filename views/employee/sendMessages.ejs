@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<%- include("./partials/head.ejs") %>
+
+<!-- SweetAlert2 for better notifications -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  /* Layout fixes for RTL and sidebar */
+  .main-content {
+    margin-right: 280px;
+    transition: margin-right 0.3s ease;
+  }
+  
+  @media (max-width: 1199px) {
+    .main-content {
+      margin-right: 0;
+    }
+  }
+  
+  /* Professional form styling - Black and White Theme */
+  .form-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 2rem;
+  }
+  
+  .form-header {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .form-header h4 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.25rem;
+  }
+  
+  .form-body {
+    padding: 2rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .form-select, .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background-color: #fff;
+  }
+  
+  .form-select:focus, .form-control:focus {
+    border-color: #2c3e50;
+    box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.25);
+    outline: none;
+  }
+  
+  .form-select:disabled {
+    background-color: #f8f9fa;
+    color: #6c757d;
+  }
+  
+  .form-control[readonly] {
+    background-color: #f8f9fa;
+    color: #495057;
+  }
+  
+  /* Professional buttons */
+  .btn-primary {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.3);
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.4);
+  }
+  
+  .btn-success {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+  }
+  
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(39, 174, 96, 0.4);
+  }
+  
+  .btn-warning {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+  }
+  
+  .btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(243, 156, 18, 0.4);
+  }
+  
+  /* Statistics cards */
+  .stats-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  .stats-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  }
+  
+  .stats-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  
+  .stats-icon.primary { background: linear-gradient(135deg, #2c3e50, #34495e); }
+  .stats-icon.success { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+  .stats-icon.warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+  .stats-icon.info { background: linear-gradient(135deg, #3498db, #2980b9); }
+  
+  .stats-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+  }
+  
+  .stats-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Progress bar */
+  .progress-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: none;
+  }
+  
+  .progress {
+    height: 12px;
+    border-radius: 6px;
+    background-color: #e9ecef;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  
+  .progress-bar {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    transition: width 0.3s ease;
+    border-radius: 6px;
+  }
+  
+  .progress-text {
+    text-align: center;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+  }
+  
+  .progress-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: #6c757d;
+  }
+  
+  /* Loading spinner */
+  .loading-spinner {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .spinner {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    border: 4.5px solid #0000;
+    border-radius: 50%;
+    border-color: #dbdcef #0000;
+    animation: spinner-e04l1k 1s infinite linear;
+  }
+  
+  .spinner::before,
+  .spinner::after {
+    content: "";
+    grid-area: 1/1;
+    margin: 2.2px;
+    border: inherit;
+    border-radius: 50%;
+  }
+  
+  .spinner::before {
+    border-color: #2c3e50 #0000;
+    animation: inherit;
+    animation-duration: 0.5s;
+    animation-direction: reverse;
+  }
+  
+  .spinner::after {
+    margin: 8.9px;
+  }
+  
+  @keyframes spinner-e04l1k {
+    100% {
+      transform: rotate(1turn);
+    }
+  }
+  
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #6c757d;
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .form-body {
+      padding: 1rem;
+    }
+    
+    .stats-card {
+      margin-bottom: 1rem;
+    }
+    
+    .btn-primary, .btn-success, .btn-warning {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #2c3e50;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #34495e;
+  }
+</style>
+
+<body class="g-sidenav-show rtl bg-gray-100">
+  <%- include("./partials/aside.ejs") %>
+
+  <!-- Main content -->
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="/employee/dashboard">لوحة التحكم</a></li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">إرسال الرسائل</li>
+          </ol>
+          <h6 class="font-weight-bolder mb-0">إرسال الرسائل</h6>
+        </nav>
+        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+          <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+            <div class="input-group input-group-outline">
+              <label class="form-label">البحث...</label>
+              <input type="text" class="form-control">
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="container-fluid py-4">
+      <!-- Statistics Cards -->
+      <div class="row mb-4">
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+          <div class="stats-card">
+            <div class="d-flex align-items-center">
+              <div class="stats-icon primary">
+                <i class="material-symbols-rounded text-white">group</i>
+              </div>
+              <div class="ms-3">
+                <div class="stats-number" id="totalStudentsCount">0</div>
+                <div class="stats-label">إجمالي الطلاب</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+          <div class="stats-card">
+            <div class="d-flex align-items-center">
+              <div class="stats-icon success">
+                <i class="material-symbols-rounded text-white">send</i>
+              </div>
+              <div class="ms-3">
+                <div class="stats-number" id="messagesSentCount">0</div>
+                <div class="stats-label">الرسائل المرسلة</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+          <div class="stats-card">
+            <div class="d-flex align-items-center">
+              <div class="stats-icon warning">
+                <i class="material-symbols-rounded text-white">schedule</i>
+              </div>
+              <div class="ms-3">
+                <div class="stats-number" id="estimatedTime">0</div>
+                <div class="stats-label">الوقت المتوقع (دقيقة)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6">
+          <div class="stats-card">
+            <div class="d-flex align-items-center">
+              <div class="stats-icon info">
+              <i class="material-symbols-rounded text-white">description</i>
+              </div>
+              <div class="ms-3">
+                <div class="stats-number" id="templatesCount">0</div>
+                <div class="stats-label">القوالب المتاحة</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Container -->
+      <div class="progress-container" id="progressContainer">
+        <div class="progress-text" id="progressText">جاري الإرسال...</div>
+        <div class="progress">
+          <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+        </div>
+        <div class="progress-details">
+          <span id="progressDetails">0 من 0</span>
+          <span id="progressTime">الوقت المتبقي: 0 دقيقة</span>
+        </div>
+      </div>
+
+      <!-- Main Form -->
+      <div class="row">
+        <div class="col-12">
+          <div class="form-container">
+            <div class="form-header">
+              <h4><i class="material-symbols-rounded me-2">send</i>إرسال الرسائل</h4>
+            </div>
+            <div class="form-body">
+              <form id="sendMessagesForm">
+                <div class="row">
+                  <!-- Teacher Selection -->
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="teacherSelect">
+                        <i class="material-symbols-rounded me-1">person</i>اختيار المدرس
+                      </label>
+                      <select class="form-select" id="teacherSelect" required>
+                        <option value="">اختر المدرس</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Course Selection -->
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="courseSelect">
+                        <i class="material-symbols-rounded me-1">school</i>اختيار الكورس
+                      </label>
+                      <select class="form-select" id="courseSelect" disabled required>
+                        <option value="">اختر الكورس</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <!-- Students Count Display -->
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label">
+                        <i class="material-symbols-rounded me-1">group</i>عدد الطلاب
+                      </label>
+                      <input type="text" class="form-control" id="studentsCount" readonly placeholder="0 طالب">
+                    </div>
+                  </div>
+
+                  <!-- Template Selection -->
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="templateSelect">
+                        <i class="material-symbols-rounded me-1">description</i>اختيار القالب
+                      </label>
+                      <select class="form-select" id="templateSelect" required>
+                        <option value="">اختر القالب</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Message Preview -->
+                <div class="form-group">
+                  <label class="form-label" for="messagePreview">
+                    <i class="material-symbols-rounded me-1">preview</i>معاينة الرسالة
+                  </label>
+                  <textarea class="form-control" id="messagePreview" rows="4" readonly placeholder="ستظهر معاينة الرسالة هنا بعد اختيار القالب..."></textarea>
+                </div>
+
+                <!-- Custom Message -->
+                <div class="form-group">
+                  <label class="form-label" for="customMessage">
+                    <i class="material-symbols-rounded me-1">edit</i>تعديل الرسالة (اختياري)
+                  </label>
+                  <textarea class="form-control" id="customMessage" rows="4" placeholder="يمكنك تعديل الرسالة هنا..."></textarea>
+                  <small class="form-text text-muted">استخدم {studentName}, {teacherName}, {courseName} للتخصيص</small>
+                </div>
+
+                <!-- Send Options -->
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="delayBetween">
+                        <i class="material-symbols-rounded me-1">schedule</i>التأخير بين الرسائل (ثانية)
+                      </label>
+                      <select class="form-select" id="delayBetween">
+                        <option value="5">5 ثواني</option>
+                        <option value="6" selected>6 ثواني</option>
+                        <option value="7">7 ثواني</option>
+                        <option value="8">8 ثواني</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="phoneType">
+                        <i class="material-symbols-rounded me-1">phone</i>نوع الرقم
+                      </label>
+                      <select class="form-select" id="phoneType">
+                        <option value="student">رقم الطالب</option>
+                        <option value="parent" selected>رقم ولي الأمر</option>
+                        <option value="both">كلا الرقمين</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-3 mt-4">
+                  <button type="button" class="btn btn-warning" id="previewBtn">
+                    <i class="material-symbols-rounded me-1">preview</i>معاينة الطلاب
+                  </button>
+                  <button type="submit" class="btn btn-success" id="sendBtn">
+                    <i class="material-symbols-rounded me-1">send</i>إرسال الرسائل
+                  </button>
+                  <button type="button" class="btn btn-primary" id="refreshBtn">
+                    <i class="material-symbols-rounded me-1">refresh</i>تحديث البيانات
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Preview Modal -->
+  <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="previewModalLabel">
+            <i class="material-symbols-rounded me-2">preview</i>معاينة الطلاب
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>كود الطالب</th>
+                  <th>اسم الطالب</th>
+                  <th>رقم الهاتف</th>
+                  <th>المدرس</th>
+                  <th>الكورس</th>
+                  <th>نوع الرقم</th>
+                </tr>
+              </thead>
+              <tbody id="previewTableBody">
+                <!-- Preview data will be loaded here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+          <button type="button" class="btn btn-success" id="sendFromPreviewBtn">
+            <i class="material-symbols-rounded me-1">send</i>إرسال الرسائل
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core JS Files -->
+  <script src="../assets/js/core/popper.min.js"></script>
+  <script src="../assets/js/core/bootstrap.min.js"></script>
+  <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="../assets/js/plugins/chartjs.min.js"></script>
+
+  <!-- Custom JS -->
+  <script src="../js/employeeJS/sendMessages.js"></script>
+
+  <!-- Material Dashboard JS -->
+  <script src="../assets/js/material-dashboard.min.js?v=3.2.0"></script>
+
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+
+  <!-- Github buttons -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+</body>
+
+</html>

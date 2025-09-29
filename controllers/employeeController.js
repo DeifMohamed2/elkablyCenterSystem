@@ -3461,6 +3461,91 @@ const updateNotificationTemplate = async (req, res) => {
   }
 };
 
+// ==================== SEND MESSAGES MANAGEMENT ====================
+
+const getSendMessagesPage = async (req, res) => {
+  try {
+    res.render('employee/sendMessages', {
+      title: 'إرسال الرسائل',
+      user: req.user,
+      path: '/employee/send-messages'
+    });
+  } catch (error) {
+    console.error('Error loading send messages page:', error);
+    res.status(500).json({ message: 'An error occurred while loading send messages page' });
+  }
+};
+
+const getAllStudentsForMessages = async (req, res) => {
+  try {
+    const Student = require('../models/student');
+    
+    // Fetch all students with their selectedTeachers populated
+    const students = await Student.find({})
+      .populate('selectedTeachers.teacherId', 'teacherName')
+      .lean();
+    
+    res.json({ 
+      success: true, 
+      students: students 
+    });
+  } catch (error) {
+    console.error('Error fetching all students for messages:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'حدث خطأ أثناء تحميل بيانات الطلاب' 
+    });
+  }
+};
+
+const sendMessage = async (req, res) => {
+  try {
+    const { studentId, message, phoneNumber, studentName } = req.body;
+    
+    // Validate required fields
+    if (!phoneNumber || !message) {
+      return res.status(400).json({
+        success: false,
+        message: 'رقم الهاتف والرسالة مطلوبان'
+      });
+    }
+    
+    console.log(`Attempting to send message to ${studentName} (${phoneNumber})`);
+    
+    // Use phone number directly - waService handles the formatting internally
+    // Just like the working sendWa function does
+    console.log(`Using phone number: ${phoneNumber}`);
+    
+    // Send WhatsApp message using the same method as sendWa
+    const response = await waService.sendWasenderMessage(message, phoneNumber);
+    
+    if (response && response.success) {
+      // Log the message
+      console.log(`Message sent successfully to ${studentName} (${phoneNumber})`);
+      
+      res.json({ 
+        success: true, 
+        message: 'تم إرسال الرسالة بنجاح',
+        response: response.data 
+      });
+    } else {
+      console.error('Wasender API returned error:', response?.message);
+      res.status(400).json({ 
+        success: false, 
+        message: 'فشل في إرسال الرسالة',
+        error: response?.message || 'Unknown error from Wasender API'
+      });
+    }
+  } catch (error) {
+    console.error('Error sending message:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'حدث خطأ أثناء إرسال الرسالة',
+      error: error.message 
+    });
+  }
+};
+
 const blockStudent = async (req, res) => {
   const { studentId } = req.params;
   const { reason } = req.body;
@@ -3682,6 +3767,11 @@ module.exports = {
   saveNotificationTemplate,
   deleteNotificationTemplate,
   updateNotificationTemplate,
+
+  // Send Messages Management
+  getSendMessagesPage,
+  getAllStudentsForMessages,
+  sendMessage,
 
   logOut,
   blockStudent,

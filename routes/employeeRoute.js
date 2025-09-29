@@ -143,6 +143,11 @@ router.post('/save-notification-template', employeeController.saveNotificationTe
 router.put('/update-notification-template/:templateId', employeeController.updateNotificationTemplate);
 router.delete('/delete-notification-template/:templateId', employeeController.deleteNotificationTemplate);
 
+// Send Messages Routes
+router.get('/send-messages', authMiddleware, employeeController.getSendMessagesPage);
+router.get('/api/all-students', authMiddleware, employeeController.getAllStudentsForMessages);
+router.post('/send-message', authMiddleware, employeeController.sendMessage);
+
 // LogOut
 
 router.get('/logout', authMiddleware, employeeController.logOut);
