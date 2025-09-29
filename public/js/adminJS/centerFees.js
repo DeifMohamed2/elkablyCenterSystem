@@ -3,6 +3,8 @@ const spinner = document.getElementById('spinner');
 const spinner2 = document.getElementById('spinner2');
 const attendanceRecords = document.getElementById('attendanceRecords');
 const collectSelectedBtn = document.getElementById('collectSelectedBtn');
+const collectAllBtn = document.getElementById('collectAllBtn');
+const refreshLogsBtn = document.getElementById('refreshLogsBtn');
 
 let selectedRecords = new Set();
 
@@ -28,6 +30,12 @@ function updateSummary(summary) {
   document.getElementById('totalCenterFees').textContent = formatCurrency(summary.totalCenterFees);
   document.getElementById('totalCollected').textContent = formatCurrency(summary.totalCollected);
   document.getElementById('totalPending').textContent = formatCurrency(summary.totalPending);
+  if (document.getElementById('totalExpenses')) document.getElementById('totalExpenses').textContent = formatCurrency(summary.totalExpenses);
+  if (document.getElementById('totalCanteenIn')) document.getElementById('totalCanteenIn').textContent = formatCurrency(summary.totalCanteenIn);
+  if (document.getElementById('totalCenterRevenue')) document.getElementById('totalCenterRevenue').textContent = formatCurrency(summary.totalCenterRevenue);
+  if (document.getElementById('totalEmployeeKPIs')) document.getElementById('totalEmployeeKPIs').textContent = formatCurrency(summary.totalEmployeeKPIs);
+  if (document.getElementById('totalTeacherInvoices')) document.getElementById('totalTeacherInvoices').textContent = formatCurrency(summary.totalTeacherInvoices);
+  if (document.getElementById('netProfit')) document.getElementById('netProfit').textContent = formatCurrency(summary.netProfit);
 }
 
 // Populate attendance records
@@ -241,8 +249,20 @@ async function loadData() {
     const formData = new FormData(filterForm);
     const params = new URLSearchParams();
     
-    for (const [key, value] of formData.entries()) {
-      if (value) params.append(key, value);
+    const period = formData.get('period');
+    const startDate = formData.get('startDate');
+    const endDate = formData.get('endDate');
+    const collected = formData.get('collected');
+
+    // if period selected and not custom, ignore manual dates
+    if (period && period !== 'custom') {
+      params.set('period', period);
+    } else {
+      if (startDate) params.set('startDate', startDate);
+      if (endDate) params.set('endDate', endDate);
+    }
+    if (collected !== null && collected !== undefined && collected !== '') {
+      params.set('collected', collected);
     }
     
     const response = await fetch(`/admin/center-fees-data?${params.toString()}`);
@@ -279,5 +299,92 @@ filterForm.addEventListener('submit', async (event) => {
 // Handle collect selected button
 collectSelectedBtn.addEventListener('click', collectSelectedRecords);
 
+// Collect all in period
+async function collectAllInPeriod() {
+  const formData = new FormData(filterForm);
+  const body = {};
+  const period = formData.get('period');
+  const startDate = formData.get('startDate');
+  const endDate = formData.get('endDate');
+  if (period && period !== 'custom') body.period = period; // server uses dates, but we still send for potential server logic later
+  if (startDate) body.startDate = startDate;
+  if (endDate) body.endDate = endDate;
+
+  try {
+    collectAllBtn.disabled = true;
+    const res = await fetch('/admin/collect-center-fees/all', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to collect all');
+    showToast('success', data.message || 'Collected');
+    await loadData();
+    await loadLogs();
+  } catch (e) {
+    console.error(e);
+    showToast('error', e.message);
+  } finally {
+    collectAllBtn.disabled = false;
+  }
+}
+
+if (collectAllBtn) collectAllBtn.addEventListener('click', collectAllInPeriod);
+
+// Logs loading
+function renderLogs(logs) {
+  const tbody = document.getElementById('collectionLogsBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  if (!logs || !logs.length) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td colspan="6" class="text-center text-muted">No logs</td>`;
+    tbody.appendChild(tr);
+    return;
+  }
+  logs.forEach(log => {
+    const tr = document.createElement('tr');
+    const period = `${formatDate(log.periodStart)} - ${formatDate(log.periodEnd)}`;
+    tr.innerHTML = `
+      <td>${formatDate(log.createdAt)}</td>
+      <td>${period}</td>
+      <td>${log.teacher?.teacherName || '-'}</td>
+      <td>${log.totalSessions}</td>
+      <td>${formatCurrency(log.totalCenterFees)}</td>
+      <td>${log.collectedBy?.name || log.collectedBy?.phoneNumber || '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function loadLogs() {
+  try {
+    const formData = new FormData(filterForm);
+    const params = new URLSearchParams();
+    const period = formData.get('period');
+    const startDate = formData.get('startDate');
+    const endDate = formData.get('endDate');
+    if (period && period !== 'custom') {
+      // For logs, approximate by leaving to server without dates
+      params.set('period', period);
+    } else {
+      if (startDate) params.set('startDate', startDate);
+      if (endDate) params.set('endDate', endDate);
+    }
+    const res = await fetch(`/admin/center-fees/logs?${params.toString()}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to load logs');
+    renderLogs(data.logs || []);
+  } catch (e) {
+    console.error('Error loading logs', e);
+  }
+}
+
+if (refreshLogsBtn) refreshLogsBtn.addEventListener('click', loadLogs);
+
 // Load initial data
-document.addEventListener('DOMContentLoaded', loadData);
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadData();
+  await loadLogs();
+});

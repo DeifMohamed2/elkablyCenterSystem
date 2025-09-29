@@ -47,6 +47,7 @@ async function addNewStudent(event) {
     document.getElementById('studentParentPhone').value;
   const schoolName = document.getElementById('schoolName').value;
   const paymentType = document.getElementById('paymentType').value;
+  const bookTaken = document.getElementById('bookTaken').checked;
 
   const selectedTeachers = [];
   document
@@ -87,6 +88,7 @@ async function addNewStudent(event) {
     studentParentPhone,
     schoolName,
     paymentType,
+    bookTaken,
     selectedTeachers,
   };
 
@@ -354,6 +356,10 @@ const openEditModal = async (id) => {
     document.getElementById('editStudentParentPhone').value =
       student.studentParentPhone;
     document.getElementById('editStudentId').value = student._id;
+    const editBookTaken = document.getElementById('editBookTaken');
+    if (editBookTaken) {
+      editBookTaken.checked = !!student.bookTaken;
+    }
 
     // Reset all checkboxes and fields
     document
@@ -539,6 +545,7 @@ const saveEditStudent = async () => {
     studentName,
     studentPhoneNumber: studentPhone,
     studentParentPhone,
+    bookTaken: document.getElementById('editBookTaken').checked,
     selectedTeachers,
   };
 

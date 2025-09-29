@@ -309,6 +309,7 @@ const addStudent = async (req, res) => {
         schoolName,
         paymentType,
         studentAmount,
+        bookTaken,
     } = req.body;
 
     if (studentName.length < 3) {
@@ -396,6 +397,7 @@ const addStudent = async (req, res) => {
             studentAmount: totalAmountRemaining, // Set studentAmount to the total course cost
             studentCode: studentCode,
             paymentType,
+            bookTaken: !!bookTaken,
         });
 
         student
@@ -452,6 +454,7 @@ const updateStudent = async (req, res) => {
     studentAmount,
     amountRemaining,
     selectedTeachers,
+    bookTaken,
   } = req.body;
 
   if (studentName.length < 3) {
@@ -552,6 +555,7 @@ const updateStudent = async (req, res) => {
     studentAmount: validatedStudentAmount,
     amountRemaining: validatedAmountRemaining,
     selectedTeachers: mergedSelectedTeachers,
+    bookTaken: !!bookTaken,
   }).populate('studentTeacher', 'teacherName');
   
   // Final check: Ensure all courses have totalCourseCost set

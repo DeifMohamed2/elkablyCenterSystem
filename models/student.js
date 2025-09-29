@@ -27,6 +27,10 @@ const studentSchema = new Schema(
       type: String,
       required: false,
     },
+    bookTaken: {
+      type: Boolean,
+      default: false,
+    },
     attendanceNumber: {
       type: Number,
       default: 0,

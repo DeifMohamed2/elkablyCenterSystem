@@ -101,6 +101,12 @@
       transform: rotate(1turn);
    }
 }
+
+/* Limit logs to ~5 rows then scroll */
+.logs-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+}
 </style>
 
 <body class="g-sidenav-show rtl  bg-gray-100">
@@ -149,6 +155,16 @@
                         <input type="date" class="form-control border border-2 p-2" id="endDate" name="endDate">
                       </div>
                       <div class="col-md-3">
+                        <label class="form-label">Period</label>
+                        <select class="form-control border border-2 p-2" id="period" name="period">
+                          <option value="custom" selected>Custom</option>
+                          <option value="today">Today</option>
+                          <option value="week">This Week</option>
+                          <option value="month">This Month</option>
+                          <option value="year">This Year</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3">
                         <label for="collected" class="form-label">Collection Status</label>
                         <select class="form-control border border-2 p-2" id="collected" name="collected">
                           <option value="">All Sessions</option>
@@ -156,9 +172,12 @@
                           <option value="true">Already Collected</option>
                         </select>
                       </div>
-                      <div class="col-md-3 d-flex align-items-end">
+                      <div class="col-md-3 d-flex align-items-end gap-2">
                         <button type="button" class="btn bg-gradient-success mb-0" id="collectSelectedBtn" style="display: none;">
                           <i class="material-symbols-rounded text-sm">payments</i>&nbsp;&nbsp;Collect Selected
+                        </button>
+                        <button type="button" class="btn bg-gradient-primary mb-0" id="collectAllBtn">
+                          <i class="material-symbols-rounded text-sm">done_all</i>&nbsp;&nbsp;Collect All (Period)
                         </button>
                       </div>
                     </div>
@@ -200,6 +219,129 @@
                 <div class="card-body">
                   <h6 class="mb-2">Pending</h6>
                   <h4 class="text-warning" id="totalPending">--</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dashboard-like Cards -->
+          <div class="row">
+            <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between p-3 pt-2">
+                  <div class="icon icon-md icon-shape bg-gradient-success shadow-success text-center border-radius-lg">
+                    <i class="material-symbols-rounded opacity-10">trending_up</i>
+                  </div>
+                  <div class="text-start pt-1">
+                    <p class="text-sm mb-0 text-capitalize">Center Revenue</p>
+                    <h4 class="mb-0" id="totalCenterRevenue">0</h4>
+                  </div>
+                </div>
+                <hr class="dark horizontal my-0">
+                <div class="card-footer p-3">
+                  <p class="mb-0 text-start"><span class="text-success text-sm font-weight-bolder ms-1">Center Fees </span>from Attendance</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between p-3 pt-2">
+                  <div class="icon icon-md icon-shape bg-gradient-danger shadow-danger text-center border-radius-lg">
+                    <i class="material-symbols-rounded opacity-10">receipt_long</i>
+                  </div>
+                  <div class="text-start pt-1">
+                    <p class="text-sm mb-0 text-capitalize">Center Expenses</p>
+                    <h4 class="mb-0" id="totalExpenses">0</h4>
+                  </div>
+                </div>
+                <hr class="dark horizontal my-0">
+                <div class="card-footer p-3">
+                  <p class="mb-0 text-start"><span class="text-danger text-sm font-weight-bolder ms-1">Center Bills </span>and Expenses</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between p-3 pt-2">
+                  <div class="icon icon-md icon-shape bg-gradient-warning shadow-warning text-center border-radius-lg">
+                    <i class="material-symbols-rounded opacity-10">store</i>
+                  </div>
+                  <div class="text-start pt-1">
+                    <p class="text-sm mb-0 text-capitalize">Canteen Revenue</p>
+                    <h4 class="mb-0" id="totalCanteenIn">0</h4>
+                  </div>
+                </div>
+                <hr class="dark horizontal my-0">
+                <div class="card-footer p-3">
+                  <p class="mb-0 text-start"><span class="text-warning text-sm font-weight-bolder ms-1">Revenue </span>from Canteen</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between p-3 pt-2">
+                  <div class="icon icon-md icon-shape bg-gradient-secondary shadow-secondary text-center border-radius-lg">
+                    <i class="material-symbols-rounded opacity-10">star</i>
+                  </div>
+                  <div class="text-start pt-1">
+                    <p class="text-sm mb-0 text-capitalize">Employee Bonuses</p>
+                    <h4 class="mb-0" id="totalEmployeeKPIs">0</h4>
+                  </div>
+                </div>
+                <hr class="dark horizontal my-0">
+                <div class="card-footer p-3">
+                  <p class="mb-0 text-start"><span class="text-secondary text-sm font-weight-bolder ms-1">Bonuses </span>for Employees</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between p-3 pt-2">
+                  <div class="icon icon-md icon-shape bg-gradient-info shadow-info text-center border-radius-lg">
+                    <i class="material-symbols-rounded opacity-10">account_balance_wallet</i>
+                  </div>
+                  <div class="text-start pt-1">
+                    <p class="text-sm mb-0 text-capitalize">Center Net Profit</p>
+                    <h4 class="mb-0" id="netProfit">0</h4>
+                  </div>
+                </div>
+                <hr class="dark horizontal my-0">
+                <div class="card-footer p-3">
+                  <p class="mb-0 text-start"><span class="text-info text-sm font-weight-bolder ms-1">Revenue - Expenses</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Collection Logs (Top) -->
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header pb-0 px-3 d-flex align-items-center justify-content-between">
+                  <h6 class="mb-0">Collection Logs</h6>
+                  <button type="button" class="btn btn-sm btn-outline-dark" id="refreshLogsBtn">
+                    <i class="material-symbols-rounded" style="font-size:16px;vertical-align:middle;">refresh</i>
+                    Refresh
+                  </button>
+                </div>
+                <div class="card-body pt-3 p-3">
+                  <div class="table-responsive logs-scroll">
+                    <table class="table align-items-center mb-0">
+                      <thead>
+                        <tr>
+                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Period</th>
+                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Teacher</th>
+                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sessions</th>
+                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total Center Fees</th>
+                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Collected By</th>
+                        </tr>
+                      </thead>
+                      <tbody id="collectionLogsBody">
+                        <!-- Logs will be populated here -->
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>

@@ -110,6 +110,8 @@ router.get('/logout', authMiddleware, adminController.logOut);
 router.get('/center-fees', authMiddleware, adminController.centerFees_Get);
 router.get('/center-fees-data', authMiddleware, adminController.getCenterFeesData);
 router.post('/collect-center-fees', authMiddleware, adminController.collectCenterFees);
+router.post('/collect-center-fees/all', authMiddleware, adminController.collectAllCenterFees);
+router.get('/center-fees/logs', authMiddleware, adminController.getCenterFeesLogs);
 
 // Attendance Details routes
 router.get('/attendance-details', authMiddleware, adminController.attendanceDetails_Get);

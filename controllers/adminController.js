@@ -6,6 +6,7 @@ const Attendance = require('../models/attendance');
 const Student = require('../models/student');
 const SuperViser = require('../models/superViser');
 const Admin = require('../models/admin');
+const CollectCenterFeesLog = require('../models/collectCenterFeesLog');
 const excelJS = require('exceljs');
 const schedule = require('node-schedule');
 const path = require('path');
@@ -1502,16 +1503,21 @@ const centerFees_Get = async (req, res) => {
 
 const getCenterFeesData = async (req, res) => {
   try {
-    const { startDate, endDate, collected, teacher } = req.query;
+    const { startDate, endDate, collected, teacher, period } = req.query;
     
     // Build query
     const query = {};
     
-    if (startDate && endDate) {
-      query.createdAt = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
-      };
+    // Support period shortcuts similar to dashboard
+    let rangeStart = startDate ? new Date(startDate) : null;
+    let rangeEnd = endDate ? new Date(endDate) : null;
+    if (period && !startDate && !endDate) {
+      const { startDate: s, endDate: e } = getDateRange(period);
+      rangeStart = s;
+      rangeEnd = e;
+    }
+    if (rangeStart && rangeEnd) {
+      query.createdAt = { $gte: rangeStart, $lte: rangeEnd };
     }
     
     if (collected !== undefined) {
@@ -1536,6 +1542,8 @@ const getCenterFeesData = async (req, res) => {
     let totalCenterFees = 0;
     let totalCollected = 0;
     let totalPending = 0;
+
+    let totalTeacherInvoices = 0;
 
     const processedRecords = attendanceRecords.map(record => {
       const sessionCenterFees = record.studentsPresent.reduce((sum, student) => {
@@ -1579,6 +1587,7 @@ const getCenterFeesData = async (req, res) => {
 
       totalSessions++;
       totalCenterFees += sessionCenterFees;
+      totalTeacherInvoices += (record.invoices || []).reduce((s, inv) => s + (inv.invoiceAmount || 0), 0);
       
       if (record.centerFeesCollected) {
         totalCollected += sessionCenterFees;
@@ -1600,13 +1609,70 @@ const getCenterFeesData = async (req, res) => {
       };
     });
 
+    // Also compute billing-based expenses and canteen income for the same range
+    let totalExpenses = 0;
+    let totalCanteenIn = 0;
+    let totalEmployeeKPIs = 0;
+    const expenseCategories = {
+      salaries: 0,
+      canteen_out: 0,
+      government_fees: 0,
+      electric_invoices: 0,
+      equipments: 0,
+      other: 0
+    };
+
+    const billQuery = {};
+    if (rangeStart && rangeEnd) {
+      billQuery.createdAt = { $gte: rangeStart, $lte: rangeEnd };
+    }
+
+    const billingData = await Billing.find(billQuery).select('billAmount billCategory category createdAt').lean();
+
+    billingData.forEach(bill => {
+      const category = bill.billCategory || (
+        bill.category === 'salaries_out' ? 'salaries' :
+        bill.category === 'canteen_out' ? 'canteen_out' :
+        bill.category === 'government_out' ? 'government_fees' :
+        bill.category === 'electric_out' ? 'electric_invoices' :
+        bill.category === 'income' ? 'canteen_in' : 'other'
+      );
+
+      if (category === 'canteen_in') {
+        totalCanteenIn += bill.billAmount;
+      } else {
+        if (expenseCategories[category] === undefined) expenseCategories[category] = 0;
+        expenseCategories[category] += bill.billAmount;
+        totalExpenses += bill.billAmount;
+      }
+    });
+
+    // Employee KPIs (bonuses) as part of expenses like dashboard
+    const kpiQuery = {};
+    if (rangeStart && rangeEnd) {
+      kpiQuery.createdAt = { $gte: rangeStart, $lte: rangeEnd };
+    }
+    const kpis = await KPI.find(kpiQuery).select('kpi').lean();
+    totalEmployeeKPIs = kpis.reduce((sum, k) => sum + (k.kpi || 0), 0);
+    totalExpenses += totalEmployeeKPIs;
+
+    const totalCenterRevenue = totalCenterFees + totalCanteenIn;
+    const netProfit = totalCenterRevenue - totalExpenses;
+
     res.json({
       records: processedRecords,
       summary: {
         totalSessions,
         totalCenterFees,
         totalCollected,
-        totalPending
+        totalPending,
+        totalExpenses,
+        totalCanteenIn,
+        totalCenterRevenue,
+        totalEmployeeKPIs,
+        netProfit,
+        totalTeacherInvoices,
+        expenseCategories
       }
     });
 
@@ -1630,6 +1696,29 @@ const collectCenterFees = async (req, res) => {
       { $set: { centerFeesCollected: true, collectedAt: new Date() } }
     );
 
+    // Create a collection log
+    try {
+      const sessions = await Attendance.find({ _id: { $in: attendanceIds } })
+        .select('createdAt studentsPresent teacher')
+        .lean();
+      const totalCenterFees = sessions.reduce((sum, r) => sum + (r.studentsPresent || []).reduce((s, st) => s + (st.feesApplied || 0), 0), 0);
+      const dates = sessions.map(s => new Date(s.createdAt)).sort((a,b) => a - b);
+      const periodStart = dates[0] || new Date();
+      const periodEnd = dates[dates.length - 1] || new Date();
+
+      await CollectCenterFeesLog.create({
+        periodStart,
+        periodEnd,
+        collectedBy: req.adminId,
+        attendanceIds,
+        totalSessions: sessions.length,
+        totalCenterFees,
+      });
+    } catch (e) {
+      console.error('collectCenterFees log error:', e);
+      // continue even if logging fails
+    }
+
     res.json({
       success: true,
       message: `Successfully collected center fees for ${result.modifiedCount} sessions`,
@@ -1639,6 +1728,76 @@ const collectCenterFees = async (req, res) => {
   } catch (error) {
     console.error('Error collecting center fees:', error);
     res.status(500).json({ error: 'Error collecting center fees' });
+  }
+};
+
+// Collect all pending within current filter and log
+const collectAllCenterFees = async (req, res) => {
+  try {
+    const { startDate, endDate, teacher } = req.body;
+
+    const query = { centerFeesCollected: { $ne: true } };
+    if (startDate && endDate) {
+      query.createdAt = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
+    if (teacher) query.teacher = teacher;
+
+    const sessions = await Attendance.find(query).select('createdAt studentsPresent teacher').lean();
+    if (!sessions.length) {
+      return res.status(400).json({ error: 'No pending sessions in selected period' });
+    }
+
+    const attendanceIds = sessions.map(s => s._id);
+    const totalCenterFees = sessions.reduce((sum, r) => sum + (r.studentsPresent || []).reduce((s, st) => s + (st.feesApplied || 0), 0), 0);
+    const dates = sessions.map(s => new Date(s.createdAt)).sort((a,b) => a - b);
+    const periodStart = startDate ? new Date(startDate) : (dates[0] || new Date());
+    const periodEnd = endDate ? new Date(endDate) : (dates[dates.length - 1] || new Date());
+
+    const result = await Attendance.updateMany(
+      { _id: { $in: attendanceIds } },
+      { $set: { centerFeesCollected: true, collectedAt: new Date() } }
+    );
+
+    await CollectCenterFeesLog.create({
+      periodStart,
+      periodEnd,
+      teacher: teacher || undefined,
+      collectedBy: req.adminId,
+      attendanceIds,
+      totalSessions: sessions.length,
+      totalCenterFees,
+      note: 'Bulk collect by filter'
+    });
+
+    res.json({
+      success: true,
+      message: `Collected ${result.modifiedCount} sessions. Total: ${totalCenterFees} EGP`,
+      modifiedCount: result.modifiedCount,
+      totalCenterFees
+    });
+  } catch (error) {
+    console.error('Error collecting all center fees:', error);
+    res.status(500).json({ error: 'Error collecting all center fees' });
+  }
+};
+
+// Fetch collection logs
+const getCenterFeesLogs = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const query = {};
+    if (startDate && endDate) {
+      query.createdAt = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
+    const logs = await CollectCenterFeesLog.find(query)
+      .populate('collectedBy', 'phoneNumber name')
+      .populate('teacher', 'teacherName')
+      .sort({ createdAt: -1 })
+      .lean();
+    res.json({ logs });
+  } catch (error) {
+    console.error('Error fetching center fees logs:', error);
+    res.status(500).json({ error: 'Error fetching center fees logs' });
   }
 };
 
@@ -2259,6 +2418,8 @@ module.exports = {
   centerFees_Get,
   getCenterFeesData,
   collectCenterFees,
+  collectAllCenterFees,
+  getCenterFeesLogs,
   attendanceDetails_Get,
   getAttendanceDetails,
   downloadAttendanceExcel,
