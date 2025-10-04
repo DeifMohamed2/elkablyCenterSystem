@@ -54,32 +54,33 @@ const studentSchema = new Schema(
           ref: 'Teacher',
           required: true,
         },
-        courses: [
-          {
-            courseName: { type: String, required: true },
-            amountPay: { type: Number, required: true },
-            registerPrice: { type: Number, required: true },
-            amountRemaining: { type: Number, required: true },
-            totalCourseCost: { 
-              type: Number, 
-              required: true,
-              default: 0 // Add default value to prevent validation errors
-            }, // Total cost of the course
-            installments: [
+            courses: [
               {
-                amount: { type: Number, required: true },
-                date: { type: Date, default: Date.now },
-                employee: {
-                  type: Schema.Types.ObjectId,
-                  ref: 'Employee',
+                courseName: { type: String, required: true },
+                amountPay: { type: Number, required: true },
+                registerPrice: { type: Number, required: true },
+                amountRemaining: { type: Number, required: true },
+                totalCourseCost: { 
+                  type: Number, 
                   required: true,
-                },
-                notes: { type: String, default: '' },
+                  default: 0 // Add default value to prevent validation errors
+                }, // Total cost of the course
+                freeSessions: { type: Number, default: 0 }, // Number of free sessions for this course
+                installments: [
+                  {
+                    amount: { type: Number, required: true },
+                    date: { type: Date, default: Date.now },
+                    employee: {
+                      type: Schema.Types.ObjectId,
+                      ref: 'Employee',
+                      required: true,
+                    },
+                    notes: { type: String, default: '' },
+                  },
+                ],
+                isCompleted: { type: Boolean, default: false }, // Course completion status
               },
             ],
-            isCompleted: { type: Boolean, default: false }, // Course completion status
-          },
-        ],
       },
     ],
     amountRemaining: {

@@ -68,12 +68,18 @@ async function addNewStudent(event) {
           const registerPrice = document.getElementById(
             `registerPrice_${courseName}_${teacherId}`
           ).value;
+          
+          // Get free session checkbox value
+          const freeSessionCheckbox = document.getElementById(
+            `freeSession_${courseName}_${teacherId}`
+          );
+          const freeSessions = freeSessionCheckbox && freeSessionCheckbox.checked ? "1" : "0";
 
-          console.log(`Course: ${courseName}, Amount: ${amountPay}, Register: ${registerPrice}`);
+          console.log(`Course: ${courseName}, Amount: ${amountPay}, Register: ${registerPrice}, Free Sessions: ${freeSessions}`);
 
           // Only include courses that have valid prices
           if (courseName && amountPay && parseFloat(amountPay) > 0) {
-            selectedCourses.push({ courseName, amountPay, registerPrice });
+            selectedCourses.push({ courseName, amountPay, registerPrice, freeSessions });
           }
         });
 
@@ -192,12 +198,18 @@ function toggleCoursePrice(courseCheckbox, teacherId, courseName) {
   const registerPriceInput = document.getElementById(
     `registerPrice_${courseName}_${teacherId}`
   );
+  const freeSessionCheckbox = document.getElementById(
+    `freeSession_${courseName}_${teacherId}`
+  );
+
+  console.log('toggleCoursePrice called:', { teacherId, courseName, checked: courseCheckbox.checked });
 
   if (courseCheckbox.checked) {
     priceInput.disabled = false;
     priceInput.required = true;
     registerPriceInput.disabled = false;
     registerPriceInput.required = true;
+    // Free session checkbox is always enabled - no need to enable/disable it
   } else {
     priceInput.disabled = true;
     priceInput.required = false;
@@ -206,6 +218,11 @@ function toggleCoursePrice(courseCheckbox, teacherId, courseName) {
     registerPriceInput.disabled = true;
     registerPriceInput.required = false;
     registerPriceInput.value = '';
+    
+    // Only uncheck the free session checkbox when course is deselected
+    if (freeSessionCheckbox) {
+      freeSessionCheckbox.checked = false;
+    }
   }
 }
 
@@ -463,10 +480,14 @@ function toggleEditCoursePrice(courseCheckbox, teacherId, courseName) {
   const totalCourseCostInput = document.getElementById(
     `edit_totalCourseCost_${courseName}_${teacherId}`
   );
+  const freeSessionsInput = document.getElementById(
+    `edit_freeSessions_${courseName}_${teacherId}`
+  );
 
   if (courseCheckbox.checked) {
     priceInput.disabled = false;
     registerPriceInput.disabled = false;
+    freeSessionsInput.disabled = false;
     amountRemainingInput.disabled = false;
     if (totalCourseCostInput) {
       totalCourseCostInput.disabled = false;
@@ -475,12 +496,14 @@ function toggleEditCoursePrice(courseCheckbox, teacherId, courseName) {
     priceInput.disabled = true;
     registerPriceInput.disabled = true;
     amountRemainingInput.disabled = true;
+    freeSessionsInput.disabled = true;
     if (totalCourseCostInput) {
       totalCourseCostInput.disabled = true;
     }
     priceInput.value = '';
     registerPriceInput.value = '';
     amountRemainingInput.value = '';
+    freeSessionsInput.value = '';
     if (totalCourseCostInput) {
       totalCourseCostInput.value = '';
     }
@@ -526,6 +549,14 @@ const saveEditStudent = async () => {
           const totalCourseCost = document.getElementById(
             `edit_totalCourseCost_${courseName}_${teacherId}`
           ).value;
+          
+          // Get free session checkbox value
+          const freeSessionCheckbox = document.getElementById(
+            `edit_freeSessions_${courseName}_${teacherId}`
+          );
+          const freeSessions = freeSessionCheckbox && freeSessionCheckbox.checked ? "2" : "0";
+
+          console.log(`Edit Course: ${courseName}, Free Sessions: ${freeSessions}`);
 
           selectedCourses.push({
             courseName,
@@ -533,6 +564,7 @@ const saveEditStudent = async () => {
             registerPrice: parseFloat(registerPrice) || 0,
             amountRemaining: parseFloat(amountRemaining) || 0,
             totalCourseCost: parseFloat(totalCourseCost) || 0,
+            freeSessions,
           });
         });
 
@@ -997,6 +1029,7 @@ function updateCourseTotals(teacherId, courseName, student) {
   const totalCostInput = document.getElementById(`edit_totalCourseCost_${courseName}_${teacherId}`);
   const totalPaidInput = document.getElementById(`edit_totalPaid_${courseName}_${teacherId}`);
   const remainingInput = document.getElementById(`edit_remainingAmount_${courseName}_${teacherId}`);
+  const freeSessionsCheckbox = document.getElementById(`edit_freeSessions_${courseName}_${teacherId}`);
   
   if (totalCostInput) totalCostInput.value = course.totalCourseCost || 0;
   
@@ -1004,6 +1037,10 @@ function updateCourseTotals(teacherId, courseName, student) {
   if (totalPaidInput) totalPaidInput.value = totalPaid;
   
   if (remainingInput) remainingInput.value = course.amountRemaining || 0;
+  if (freeSessionsCheckbox) {
+    // Check if student has 2 or more free sessions
+    freeSessionsCheckbox.checked = (course.freeSessions >= 2);
+  }
 }
 
 // Enhanced edit student function to show installment history
@@ -1020,6 +1057,48 @@ function editStudent(studentId) {
       // Show payment type
       document.getElementById('modalPaymentType').textContent = 
         student.paymentType === 'perCourse' ? 'Per Course' : 'Per Session';
+      
+      // Reset all checkboxes and inputs first
+      document.querySelectorAll('#editTeachersContainer input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      document.querySelectorAll('#editTeachersContainer input[type="number"]').forEach(input => {
+        input.disabled = true;
+        input.value = '';
+      });
+      
+      // Populate selected teachers and courses
+      student.selectedTeachers.forEach(({ teacherId, courses }) => {
+        // Check the teacher checkbox
+        const teacherCheckbox = document.getElementById(`edit_teacher_${teacherId._id}`);
+        if (teacherCheckbox) {
+          teacherCheckbox.checked = true;
+          toggleEditCourses(teacherId._id);
+        }
+        
+        // Check course checkboxes and populate data
+        courses.forEach(course => {
+          const courseCheckbox = document.getElementById(`edit_course_${course.courseName}_${teacherId._id}`);
+          if (courseCheckbox) {
+            courseCheckbox.checked = true;
+            toggleEditCoursePrice(courseCheckbox, teacherId._id, course.courseName);
+            
+            // Populate course data
+            const priceInput = document.getElementById(`edit_price_${course.courseName}_${teacherId._id}`);
+            const registerPriceInput = document.getElementById(`edit_registerPrice_${course.courseName}_${teacherId._id}`);
+            const amountRemainingInput = document.getElementById(`edit_amountRemaining_${course.courseName}_${teacherId._id}`);
+            const freeSessionsCheckbox = document.getElementById(`edit_freeSessions_${course.courseName}_${teacherId._id}`);
+            
+            if (priceInput) priceInput.value = course.amountPay || 0;
+            if (registerPriceInput) registerPriceInput.value = course.registerPrice || 0;
+            if (amountRemainingInput) amountRemainingInput.value = course.amountRemaining || 0;
+            if (freeSessionsCheckbox) {
+              // Check if student has 2 or more free sessions (checkbox checked)
+              freeSessionsCheckbox.checked = (course.freeSessions >= 2);
+            }
+          }
+        });
+      });
       
       // Show/hide installment section based on payment type
       const installmentSection = document.getElementById('perCourseInstallmentSection');
@@ -1097,7 +1176,7 @@ function openPayInstallmentModal(studentId) {
               <div class="card mb-3">
                 <div class="card-header">
                   <h6 class="mb-0">الكورس: ${course.courseName} - المعلم: ${teacherId.teacherName}</h6>
-                  ${course.totalCourseCost <= 0 ? '<span class="badge bg-warning">تحذير: تكلفة الكورس غير محددة</span>' : ''}
+                  ${course.totalCourseCost <= 0 ? '<span class="badge bg-secondary">تحذير: تكلفة الكورس غير محددة</span>' : ''}
                 </div>
                 <div class="card-body">
                   <div class="row">

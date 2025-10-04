@@ -250,70 +250,99 @@ input[type='number'] {
                 <input type="number" class="form-control border border-2 p-2" id="editAmountRemaining" name="editAmountRemaining" required>
               </div>
         -->
-           <h6>اختيار المعلمين والدورات</h6>
+           <h6 class="mb-3"><i class="material-symbols-rounded me-2">school</i>اختيار المعلمين والدورات</h6>
            <div id="editTeachersContainer">
              <% allTeachers.forEach(teacher => { %>
-             <div class="teacher-block">
-               <input type="checkbox" class="form-check-input" id="edit_teacher_<%= teacher.id %>" name="editTeachers[]" value="<%= teacher.id %>" onchange="toggleEditCourses('<%= teacher.id %>')">
-               <label style="font-weight: bolder; " for="edit_teacher_<%= teacher.id %>"><%= teacher.teacherName %></label>
+             <div class="card mb-3 teacher-block" style="border: 2px solid #e0e0e0;">
+               <div class="card-header bg-light">
+                 <div class="form-check">
+                   <input type="checkbox" class="form-check-input" id="edit_teacher_<%= teacher.id %>" name="editTeachers[]" value="<%= teacher.id %>" onchange="toggleEditCourses('<%= teacher.id %>')">
+                   <label class="form-check-label fw-bold fs-5" for="edit_teacher_<%= teacher.id %>">
+                     <i class="material-symbols-rounded me-1">person</i><%= teacher.teacherName %>
+                   </label>
+                 </div>
+               </div>
 
-               <div id="edit_courses_<%= teacher.id %>" class="courses-container" style="display: none; padding-left: 20px;">
+               <div id="edit_courses_<%= teacher.id %>" class="courses-container card-body" style="display: none;">
+                 <h6 class="text-muted mb-3"><i class="material-symbols-rounded me-1">book</i>الدورات المتاحة</h6>
                  <% teacher.courses.forEach(course => { %>
-                 <div class="row align-items-center mb-2">
-                   <div class="col-md-4">
-                     <input style="accent-color: #ff9847 !important;" type="checkbox" class="form-check-input" id="edit_course_<%= course %>_<%= teacher.id %>" name="editSelectedCourses[<%= teacher.id %>][]" value="<%= course %>" onchange="toggleEditCoursePrice(this, '<%= teacher.id %>', '<%= course %>')">
-                     <label for="edit_course_<%= course %>_<%= teacher.id %>"><%= course %></label>
+                 <div class="card mb-3" style="border: 1px solid #ff9847;">
+                   <div class="card-header bg-secondary bg-opacity-10 ">
+                     <div class="row align-items-center">
+                       <div class="col-md-4">
+                         <div class="form-check">
+                           <input style=" color: white !important;"  type="checkbox" class="form-check-input" id="edit_course_<%= course %>_<%= teacher.id %>" name="editSelectedCourses[<%= teacher.id %>][]" value="<%= course %>" onchange="toggleEditCoursePrice(this, '<%= teacher.id %>', '<%= course %>')">
+                           <label class="form-check-label fw-bold" for="edit_course_<%= course %>_<%= teacher.id %>" style="color: white;">
+                             <i class="material-symbols-rounded me-1">menu_book</i><%= course %>
+                           </label>
+                         </div>
+                       </div>
+                     </div>
                    </div>
-                   <div class="col-md-3">
-                     <input type="number" class="form-control" id="edit_price_<%= course %>_<%= teacher.id %>" name="editCoursePrices[<%= teacher.id %>][<%= course %>]" placeholder="سعر الدورة" min="0" step="0.01" disabled required>
+                   <div class="card-body">
+                     <div class="row g-3">
+                       <div class="col-md-3">
+                         <label class="form-label fw-bold">سعر الكورس</label>
+                         <input type="number" class="form-control" id="edit_price_<%= course %>_<%= teacher.id %>" name="editCoursePrices[<%= teacher.id %>][<%= course %>]" placeholder="سعر الدورة" min="0" step="0.01" disabled required>
+                       </div>
+                       <div class="col-md-3">
+                         <label class="form-label fw-bold">رسوم التسجيل</label>
+                         <input type="number" class="form-control" id="edit_registerPrice_<%= course %>_<%= teacher.id %>" name="editRegisterPrices[<%= teacher.id %>][<%= teacher.id %>]" placeholder="رسوم التسجيل" min="0" step="0.01" disabled required>
+                       </div>
+                       <div class="col-md-3">
+                         <label class="form-label fw-bold">المبلغ المتبقي</label>
+                         <input type="number" class="form-control" id="edit_amountRemaining_<%= course %>_<%= teacher.id %>" name="editAmountRemaining[<%= teacher.id %>][<%= course %>]" placeholder="المبلغ المتبقي" min="0" step="0.01" disabled required>
+                       </div>
+                       <div class="col-md-3">
+                         <label class="form-label fw-bold"> Free Sessions</label>
+                         <div class="form-check mt-2">
+                           <input class="form-check-input" type="checkbox" id="edit_freeSessions_<%= course %>_<%= teacher.id %>" name="editFreeSessions[<%= teacher.id %>][<%= course %>]" value="2" disabled>
+                           <label class="form-check-label" for="edit_freeSessions_<%= course %>_<%= teacher.id %>">
+                             2 Free Sessions
+                           </label>
+                         </div>
+                       </div>
+                     </div>
                    </div>
-                   <div class="col-md-3">
-                     <input type="number" class="form-control" id="edit_registerPrice_<%= course %>_<%= teacher.id %>" name="editRegisterPrices[<%= teacher.id %>][<%= teacher.id %>]" placeholder="رسوم التسجيل" min="0" step="0.01" disabled required>
+                   <!-- Course Installment History -->
+                   <div class="mt-3" id="edit_courseInstallmentHistory_<%= course %>_<%= teacher.id %>" style="display: none;">
+                     <div class="card border-success">
+                       <div class="card-header bg-success bg-opacity-10">
+                         <h6 class="mb-0"><i class="material-symbols-rounded me-1">account_balance_wallet</i>سجل أقساط الكورس: <%= course %></h6>
+                       </div>
+                       <div class="card-body">
+                         <div class="row g-3">
+                           <div class="col-md-6">
+                             <label class="form-label fw-bold">إجمالي تكلفة الكورس:</label>
+                             <input type="number" class="form-control" id="edit_totalCourseCost_<%= course %>_<%= teacher.id %>" name="editTotalCourseCost[<%= teacher.id %>][<%= course %>]" placeholder="إجمالي التكلفة" min="0" step="0.01" disabled>
+                           </div>
+                           <div class="col-md-6">
+                             <label class="form-label fw-bold">المبلغ المدفوع:</label>
+                             <input type="number" class="form-control" id="edit_totalPaid_<%= course %>_<%= teacher.id %>" placeholder="المبلغ المدفوع" readonly>
+                           </div>
+                           <div class="col-md-6">
+                             <label class="form-label fw-bold">المبلغ المتبقي:</label>
+                             <input type="number" class="form-control" id="edit_remainingAmount_<%= course %>_<%= teacher.id %>" placeholder="المبلغ المتبقي" readonly>
+                           </div>
+                           <div class="col-md-6">
+                             <label class="form-label fw-bold">إضافة قسط جديد:</label>
+                             <div class="input-group">
+                               <input type="number" class="form-control" id="edit_newInstallment_<%= course %>_<%= teacher.id %>" placeholder="مبلغ القسط" min="0" step="0.01">
+                               <button type="button" class="btn btn-success" onclick="addInstallment('<%= teacher.id %>', '<%= course %>')">
+                                 <i class="material-symbols-rounded">add</i>
+                               </button>
+                             </div>
+                           </div>
+                         </div>
+                         <div class="mt-3">
+                           <h6><i class="material-symbols-rounded me-1">history</i>سجل الأقساط:</h6>
+                           <div id="edit_installmentHistory_<%= course %>_<%= teacher.id %>" class="table-responsive">
+                             <!-- Installment history will be populated here -->
+                           </div>
+                         </div>
+                       </div>
+                     </div>
                    </div>
-                   <div class="col-md-2">
-                     <input type="number" class="form-control" id="edit_amountRemaining_<%= course %>_<%= teacher.id %>" name="editAmountRemaining[<%= teacher.id %>][<%= course %>]" placeholder="المبلغ المتبقي" min="0" step="0.01" disabled required>
-                   </div>
-                  <!-- Course Installment History -->
-                  <div class="col-md-12 mt-2" id="edit_courseInstallmentHistory_<%= course %>_<%= teacher.id %>" style="display: none;">
-                    <div class="card">
-                      <div class="card-header">
-                        <h6 class="mb-0">سجل أقساط الكورس: <%= course %></h6>
-                      </div>
-                      <div class="card-body">
-                        <div class="row">
-                          <div class="col-md-6">
-                            <label class="form-label">إجمالي تكلفة الكورس:</label>
-                            <input type="number" class="form-control" id="edit_totalCourseCost_<%= course %>_<%= teacher.id %>" name="editTotalCourseCost[<%= teacher.id %>][<%= course %>]" placeholder="إجمالي التكلفة" min="0" step="0.01" disabled>
-                          </div>
-                          <div class="col-md-6">
-                            <label class="form-label">المبلغ المدفوع:</label>
-                            <input type="number" class="form-control" id="edit_totalPaid_<%= course %>_<%= teacher.id %>" placeholder="المبلغ المدفوع" readonly>
-                          </div>
-                        </div>
-                        <div class="row mt-2">
-                          <div class="col-md-6">
-                            <label class="form-label">المبلغ المتبقي:</label>
-                            <input type="number" class="form-control" id="edit_remainingAmount_<%= course %>_<%= teacher.id %>" placeholder="المبلغ المتبقي" readonly>
-                          </div>
-                          <div class="col-md-6">
-                            <label class="form-label">إضافة قسط جديد:</label>
-                            <div class="input-group">
-                              <input type="number" class="form-control" id="edit_newInstallment_<%= course %>_<%= teacher.id %>" placeholder="مبلغ القسط" min="0" step="0.01">
-                              <button type="button" class="btn btn-success" onclick="addInstallment('<%= teacher.id %>', '<%= course %>')">
-                                <i class="material-symbols-rounded">add</i>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="mt-3">
-                          <h6>سجل الأقساط:</h6>
-                          <div id="edit_installmentHistory_<%= course %>_<%= teacher.id %>" class="table-responsive">
-                            <!-- Installment history will be populated here -->
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                  </div>
                  <% }) %>
                </div>
@@ -531,10 +560,18 @@ input[type='number'] {
                                   <input type="number" style="border: 1px solid black; text-align: center;" class="form-control course-price" id="price_<%= course %>_<%= teacher.id %>" name="coursePrices[<%= teacher.id %>][<%= course %>]" placeholder="سعر الكورس" min="0" step="0.01" disabled required>
                                   <small class="text-muted">سعر الكورس الإجمالي</small>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                   <input type="number" style="border: 1px solid black; text-align: center;" class="form-control register-price" id="registerPrice_<%= course %>_<%= teacher.id %>" name="registerPrices[<%= teacher.id %>][<%= course %>]" placeholder="رسوم التسجيل" min="0" step="0.01" disabled required>
                                   <small class="text-muted">رسوم التسجيل (للدفع بالجلسة)</small>
                                 </div>
+                                 <div class="col-md-1 d-flex align-items-center">
+                                   <div class="form-check">
+                                     <input class="form-check-input" type="checkbox" id="freeSession_<%= course %>_<%= teacher.id %>" name="freeSessions[<%= teacher.id %>][<%= course %>]" value="1">
+                                     <label class="form-check-label" for="freeSession_<%= course %>_<%= teacher.id %>" style="font-size: 0.8rem;">
+                                       Free Session
+                                     </label>
+                                   </div>
+                                 </div>
                                 <!-- Per Course Total Cost Display -->
                                 <div class="col-md-12 mt-2" id="courseTotal_<%= course %>_<%= teacher.id %>" style="display: none;">
                                   <div class="alert alert-success">

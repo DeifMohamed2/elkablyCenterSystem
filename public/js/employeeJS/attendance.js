@@ -65,6 +65,16 @@ async function attendStudent(event) {
         message.textContent = responseData.message;
         printReceipt(responseData.studentData);
           searchStudent.focus();
+          
+          // Show free session notification if student has free sessions
+          if (responseData.studentData.freeSessions > 0) {
+            Swal.fire({
+              icon: 'warning',
+              title: ' Free Sessions Remaining ',
+              html: `الطالب <b>${responseData.studentData.studentName}</b> لديه <b>${responseData.studentData.freeSessions}</b>   Free Sessions`,
+            });
+          }
+          
           if (responseData.studentData.amountRemaining > 0) {
             Swal.fire({
               icon: 'warning',

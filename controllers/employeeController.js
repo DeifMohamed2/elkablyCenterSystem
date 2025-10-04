@@ -353,11 +353,21 @@ const addStudent = async (req, res) => {
 
         // Process each selected teacher and their courses
         const processedTeachers = selectedTeachers.map(({ teacherId, courses }) => {
-            const processedCourses = courses.map(({ courseName, amountPay, registerPrice }) => {
+            const processedCourses = courses.map(({ courseName, amountPay, registerPrice, freeSessions }) => {
                 // For perCourse payment, the total course cost is the amountPay
                 // For perSession payment, the total course cost is 0 (paid per session)
                 const totalCourseCost = paymentType === 'perCourse' ? amountPay : 0;
                 const amountRemaining = paymentType === 'perCourse' ? amountPay : 0;
+                
+                // Handle free sessions checkbox - if checked it sends "1", if unchecked it's undefined
+                const freeSessionsCount = (freeSessions === "1" || freeSessions === 1) ? 1 : 0;
+                console.log('Free Sessions Debug:', { 
+                    courseName, 
+                    freeSessions, 
+                    freeSessionsType: typeof freeSessions, 
+                    freeSessionsCount 
+                });
+                
                 console.log('Amount Remaining:', amountRemaining);
                 return {
                   courseName,
@@ -365,6 +375,7 @@ const addStudent = async (req, res) => {
                   registerPrice: registerPrice || 0, // Use 0 as default if not provided
                   amountRemaining: amountRemaining > 0 ? amountRemaining : 0, // Ensure it doesn't go negative
                   totalCourseCost: totalCourseCost,
+                  freeSessions: freeSessionsCount,
                   installments: [], // Initialize empty installments array
                   isCompleted: false, // Course is not completed initially
                 };
@@ -523,7 +534,11 @@ const updateStudent = async (req, res) => {
             // Keep existing amountRemaining if it's not being updated
             amountRemaining: newCourse.amountRemaining !== undefined ? 
               parseFloat(newCourse.amountRemaining) || 0 : 
-              existingCourse.amountRemaining
+              existingCourse.amountRemaining,
+            // Handle free sessions - checkbox value (2 when checked, 0 when unchecked)
+            freeSessions: newCourse.freeSessions !== undefined ? 
+              parseInt(newCourse.freeSessions) || 0 : 
+              existingCourse.freeSessions || 0
           };
         }
         // For new courses, ensure totalCourseCost is set
@@ -531,7 +546,8 @@ const updateStudent = async (req, res) => {
           ...newCourse,
           totalCourseCost: newCourse.totalCourseCost || newCourse.amountPay || 0,
           installments: [],
-          isCompleted: false
+          isCompleted: false,
+          freeSessions: parseInt(newCourse.freeSessions) || 0
         };
       });
       
@@ -1214,20 +1230,29 @@ const attendStudent = async (req, res) => {
     // Calculate payment details
     const isPerSession = student.paymentType === 'perSession';
     let amountPaid;
+    let hasFreeSession = false;
     
-    // Handle fixed amount with proper type checking
-    if ((fixedAmountCheck === true || fixedAmountCheck === "true") && fixedAmount) {
-      console.log('Using fixed amount:', fixedAmount);
-      amountPaid = parseFloat(fixedAmount);
-      if (isNaN(amountPaid)) {
-        console.error('Invalid fixed amount value:', fixedAmount);
-        amountPaid = isPerSession ? course.amountPay : 0; // Per-course students pay 0 per session
-      }
+    // Check if student has free sessions for this course
+    if (course.freeSessions && course.freeSessions > 0) {
+      hasFreeSession = true;
+      amountPaid = 0; // Student doesn't pay for free session
+      console.log(`Student has free session available: ${course.freeSessions}`);
     } else {
-      // Handle mock check or regular amount
-      amountPaid = (mockCheck === true || mockCheck === "true") ? mockAmount : (isPerSession ? course.amountPay : 0); // Per-course students pay 0 per session
+      // Handle fixed amount with proper type checking
+      if ((fixedAmountCheck === true || fixedAmountCheck === "true") && fixedAmount) {
+        console.log('Using fixed amount:', fixedAmount);
+        amountPaid = parseFloat(fixedAmount);
+        if (isNaN(amountPaid)) {
+          console.error('Invalid fixed amount value:', fixedAmount);
+          amountPaid = isPerSession ? course.amountPay : 0; // Per-course students pay 0 per session
+        }
+      } else {
+        // Handle mock check or regular amount
+        amountPaid = (mockCheck === true || mockCheck === "true") ? mockAmount : (isPerSession ? course.amountPay : 0); // Per-course students pay 0 per session
+      }
     }
-    // For per-course students, always apply teacher fees (they pay 0 but center still pays teacher)
+    
+    // For per-course students or free sessions, always apply teacher fees (they pay 0 but center still pays teacher)
     const feesApplied = mockCheck === "true" ? mockFees : teacher.teacherFees;
     const teacherProfit = isPerSession ? amountPaid - feesApplied : 0;
 
@@ -1251,6 +1276,13 @@ const attendStudent = async (req, res) => {
 
     // Save the attendance record
     await attendance.save();
+
+    // Update student's free sessions if they used a free session
+    if (hasFreeSession && course.freeSessions > 0) {
+      course.freeSessions -= 1;
+      await student.save();
+      console.log(`Updated free sessions for student ${student.studentName}: ${course.freeSessions}`);
+    }
 
     // Send message to parent in Arabic
     const parentMessage = `
@@ -1287,6 +1319,7 @@ const attendStudent = async (req, res) => {
         studentName: student.studentName,
         studentCode: student.studentCode,
         amountRemaining: course.amountRemaining,
+        freeSessions: course.freeSessions || 0,
         studentTeacher: {
           teacherName: teacher.teacherName,
           subjectName: courseName,
@@ -1294,6 +1327,7 @@ const attendStudent = async (req, res) => {
         amountPaid,
         feesApplied,
         attendanceCount: attendanceCount + 1,
+        hasFreeSession,
       },
       students: updatedAttendance.studentsPresent,
     });
