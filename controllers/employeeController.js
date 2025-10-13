@@ -272,6 +272,104 @@ const getAddStudent = async (req, res) => {
 
 
 const getAllStudents = async (req, res) => {
+    // Function to resend data and QR for all students created since October 1, 2025
+    // const resendQRForRecentStudents = async (req, res) => {
+    //   try {
+    //     // Define the start date (October 1, 2025)
+    //     const startDate = new Date('2025-10-01T00:00:00.000Z');
+    //     const currentDate = new Date();
+        
+    //     // Find all students created between the start date and now
+    //     const students = await Student.find({
+    //       createdAt: { $gte: startDate, $lte: currentDate }
+    //     }).populate({
+    //       path: 'selectedTeachers.teacherId',
+    //       select: 'teacherName'
+    //     });
+    //     console.log(`Found ${students.length} students in the specified date range`);
+    //     if (students.length === 0) {
+    //       console.log('No students found in the specified date range');
+    //       return;
+    //     }
+        
+    //     // Debug: Log the first student's structure to understand the data
+    //     if (students.length > 0) {
+    //       console.log('Sample student structure:', JSON.stringify(students[0].selectedTeachers[0], null, 2));
+    //     }
+        
+    //     // Counter for successful QR code sends
+    //     let successCount = 0;
+        
+    //     // Process each student
+    //     for (let i = 0; i < students.length; i++) {
+    //       const student = students[i];
+    //       const studentNumber = i + 1;
+          
+    //       console.log(`\n🔄 Processing student ${studentNumber}/${students.length}: ${student.studentName} (${student.studentCode})`);
+          
+    //       let message = `📌 *تفاصيل تسجيل الطالب*\n\n`;
+    //       message += `👤 *اسم الطالب:* ${student.studentName}\n`;
+    //       message += `🏫 *المدرسة:* ${student.schoolName}\n`;
+    //       message += `📞 *رقم الهاتف:* ${student.studentPhoneNumber}\n`;
+    //       message += `📞 *رقم ولي الأمر:* ${student.studentParentPhone}\n`;
+    //       message += `🆔 *كود الطالب:* ${student.studentCode.substring(1)}\n\n`;
+
+    //       message += `📚 *تفاصيل الكورسات المسجلة:*\n`;
+
+    //       student.selectedTeachers.forEach(({ teacherId, courses }) => {
+    //           // Check if teacherId exists and has teacherName
+    //           if (teacherId && teacherId.teacherName) {
+    //               message += `\n👨‍🏫 *المعلم:* ${teacherId.teacherName}\n`;
+    //           } else {
+    //               message += `\n👨‍🏫 *المعلم:* غير محدد\n`;
+    //           }
+              
+    //           if (courses && Array.isArray(courses)) {
+    //               courses.forEach(({ courseName, totalCourseCost, amountRemaining }) => {
+    //                   message += `   ➖ *الكورس:* ${courseName || 'غير محدد'}\n`;
+    //                   if (student.paymentType === 'perCourse') {
+    //                       message += `   💰 *إجمالي التكلفة:* ${totalCourseCost || 0} ج.م\n`;
+    //                       message += `   💳 *المبلغ المتبقي:* ${amountRemaining || 0} ج.م\n`;
+    //                   }
+    //               });
+    //           }
+    //       });
+          
+    //       console.log(`📝 Message prepared for ${student.studentName}`);
+          
+    //       // Send QR code to student's phone
+    //       if (student.studentPhoneNumber) {
+    //         try {
+    //           console.log(`📤 Sending QR code to ${student.studentName} (${student.studentPhoneNumber})...`);
+    //           await sendQRCode(student.studentPhoneNumber, `Scan the QR code to check in\n\n${message}`, student.studentCode);
+    //           successCount++;
+    //           console.log(`✅ Successfully sent QR code to ${student.studentName}`);
+    //         } catch (error) {
+    //           console.log(`❌ Failed to send QR code to ${student.studentName}:`, error.message);
+    //         }
+    //       } else {
+    //         console.log(`⚠️ No phone number found for ${student.studentName}, skipping...`);
+    //       }
+          
+    //       // Add delay between messages (5-8 seconds)
+    //       if (i < students.length - 1) { // Don't delay after the last student
+    //         const delay = Math.floor(Math.random() * 4000) + 5000; // Random delay between 5-8 seconds
+    //         console.log(`⏳ Waiting ${delay/1000} seconds before processing next student...`);
+    //         await new Promise(resolve => setTimeout(resolve, delay));
+    //       }
+    //     }
+        
+    //    console.log(`\n🎉 Process completed! QR codes resent successfully for ${successCount}/${students.length} students`);
+    //   } catch (error) {
+    //     console.error('Error resending QR codes:', error);
+    //     console.log('An error occurred while resending QR codes');
+    //   }
+    // };
+
+
+    // resendQRForRecentStudents(req, res);
+
+  try {
     const allStudents = await Student.find().populate({
       path: 'selectedTeachers.teacherId',
 
@@ -280,6 +378,10 @@ const getAllStudents = async (req, res) => {
   
     });
     res.send(allStudents);
+  } catch (error) {
+    console.error('Error fetching students:', error);
+    res.status(500).send({ error: 'An error occurred while fetching students' });
+  }
 }
 
 const getStudent = async (req, res) => {
@@ -291,7 +393,7 @@ const getStudent = async (req, res) => {
 async function sendQRCode(chatId, message, studentCode) {
   try {
     const phone = String(chatId || '').replace(/@c\.us$|@s\.whatsapp\.net$/i, '');
-    const resp = await waService.sendQRMessage(studentCode, phone, waService.DEFAULT_ADMIN_PHONE, '20', message);
+    const resp = await waService.sendQRMessage(studentCode, phone, '20', message);
     if (!resp.success) {
       console.error('Error sending QR code:', resp.message);
     }
