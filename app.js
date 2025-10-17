@@ -22,9 +22,15 @@ app.use(express.json());
 // const dbURI = 'mongodb://localhost:27017/ElkablyCenter';
 
 
+
+
 const dbURI ='mongodb+srv://deif:1qaz2wsx@3devway.aa4i6ga.mongodb.net/elkablyCenter?retryWrites=true&w=majority&appName=Cluster0';
 mongoose
-  .connect(dbURI)
+  .connect(dbURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    maxPoolSize: 10, // limit number of connections
+  })
   .then((result) => {
     app.listen(8600);
 
