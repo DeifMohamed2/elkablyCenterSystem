@@ -10,6 +10,28 @@ const DEFAULT_ADMIN_SESSION_API_KEY = 'a7f245143432998561312ebab2dfc1819ddff96d4
 // Base URL to serve public files (Excel, etc.)
 const APP_BASE_URL =  'https://elkablycentersystem.online';
 
+const DEFAULT_WA_MESSAGE_DELAY_MIN_MS = 2000;
+const DEFAULT_WA_MESSAGE_DELAY_MAX_MS = 8000;
+
+function sleepMs(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function randomInterMessageDelayMs(minMs, maxMs) {
+  const lo = Math.min(minMs, maxMs);
+  const hi = Math.max(minMs, maxMs);
+  return lo + Math.floor(Math.random() * (hi - lo + 1));
+}
+
+function getWhatsAppInterMessageDelayMs() {
+  const min = parseInt(process.env.WA_MESSAGE_DELAY_MIN_MS || String(DEFAULT_WA_MESSAGE_DELAY_MIN_MS), 10);
+  const max = parseInt(process.env.WA_MESSAGE_DELAY_MAX_MS || String(DEFAULT_WA_MESSAGE_DELAY_MAX_MS), 10);
+  if (Number.isNaN(min) || Number.isNaN(max)) {
+    return randomInterMessageDelayMs(DEFAULT_WA_MESSAGE_DELAY_MIN_MS, DEFAULT_WA_MESSAGE_DELAY_MAX_MS);
+  }
+  return randomInterMessageDelayMs(min, max);
+}
+
 function normalizeEgyptNumber(rawPhone, countryCode = '20') {
   const phoneAsString = (typeof rawPhone === 'string' ? rawPhone : String(rawPhone || '')).trim();
   if (!phoneAsString) return null;
@@ -220,6 +242,9 @@ module.exports = {
   sendExcelFileSimple,
   validateSessionApiKey,
   getSessionStatus,
+  sleepMs,
+  randomInterMessageDelayMs,
+  getWhatsAppInterMessageDelayMs,
 };
 
 

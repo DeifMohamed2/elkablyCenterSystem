@@ -16,6 +16,163 @@ const addNewStudentBtn = document.getElementById('addNewStudentBtn');
 
 let sequenceOfStudets = 0;
 
+let addStudentQzConnected = false;
+
+window.addEventListener('beforeunload', () => {
+  if (addStudentQzConnected && typeof qz !== 'undefined' && qz.websocket) {
+    qz.websocket
+      .disconnect()
+      .then(() => console.log('QZ Tray disconnected (add student).'))
+      .catch((e) => console.error(e));
+  }
+});
+
+function showQzStatus(text) {
+  if (messageToast && successToast) {
+    messageToast.textContent = text;
+    successToast.classList.add('show');
+    setTimeout(() => successToast.classList.remove('show'), 4000);
+  }
+}
+
+/**
+ * Thermal receipt via QZ Tray — same ESC/POS flow as attendance printReceipt.
+ */
+function printRegistrationReceipt(student = {}) {
+  const englishLabels = {
+    title: 'GTA CENTER',
+    phone: '01092257120',
+    date: 'Date',
+    studentName: 'Student Name',
+    studentCode: 'Student Code',
+    thankYou: 'Thank you for choosing our GTA Center!',
+  };
+
+  const ESC_ALIGN_CENTER = '\x1B\x61\x01';
+  const ESC_BOLD = '\x1B\x45\x01';
+  const ESC_DOUBLE_SIZE = '\x1B\x21\x30';
+  const ESC_NORMAL_SIZE = '\x1B\x21\x00';
+  const ESC_CUT = '\x1D\x56\x42\x00';
+  const ESC_FEED_LINE = '\x0A';
+  const ESC_RESET = '\x1B\x40';
+
+  const lineSeparator = '-'.repeat(49);
+  const headerSeparator = '='.repeat(49);
+
+  function formatTableRow(field, value) {
+    const left = String(field).slice(0, 22).padEnd(22, ' ');
+    const right = String(value).slice(0, 22).padStart(22, ' ');
+    return `| ${left}|${right} |`;
+  }
+
+  const created = student.createdAt ? new Date(student.createdAt) : new Date();
+  const dateStr =
+    created.toLocaleDateString() + ' ' + created.toLocaleTimeString();
+
+  let receiptContent =
+    ESC_RESET +
+    ESC_ALIGN_CENTER +
+    ESC_BOLD +
+    ESC_DOUBLE_SIZE +
+    englishLabels.title +
+    ESC_FEED_LINE +
+    ESC_NORMAL_SIZE +
+    ESC_FEED_LINE +
+    ESC_ALIGN_CENTER +
+    englishLabels.phone +
+    ESC_FEED_LINE +
+    ESC_FEED_LINE +
+    headerSeparator +
+    ESC_FEED_LINE +
+    formatTableRow('Receipt', 'Registration') +
+    ESC_FEED_LINE +
+    formatTableRow(englishLabels.date, dateStr) +
+    ESC_FEED_LINE +
+    lineSeparator +
+    ESC_FEED_LINE +
+    formatTableRow(englishLabels.studentName, student.studentName || 'N/A') +
+    ESC_FEED_LINE +
+    formatTableRow(englishLabels.studentCode, student.studentCode || 'N/A') +
+    ESC_FEED_LINE +
+    lineSeparator +
+    ESC_FEED_LINE +
+    formatTableRow('Student Phone', student.studentPhoneNumber || 'N/A') +
+    ESC_FEED_LINE +
+    formatTableRow('Parent Phone', student.studentParentPhone || 'N/A') +
+    ESC_FEED_LINE +
+    formatTableRow('School', (student.schoolName || 'N/A').toString().slice(0, 22)) +
+    ESC_FEED_LINE +
+    formatTableRow(
+      'Payment',
+      student.paymentType === 'perCourse' ? 'Per Course' : 'Per Session'
+    ) +
+    ESC_FEED_LINE +
+    formatTableRow('Book Taken', student.bookTaken ? 'Yes' : 'No') +
+    ESC_FEED_LINE +
+    headerSeparator +
+    ESC_FEED_LINE;
+
+  const isPerCourse = student.paymentType === 'perCourse';
+  (student.selectedTeachers || []).forEach(({ teacherId, courses }) => {
+    const tName =
+      teacherId && typeof teacherId === 'object' && teacherId.teacherName
+        ? teacherId.teacherName
+        : 'N/A';
+    (courses || []).forEach((c) => {
+      receiptContent +=
+        formatTableRow('Teacher', tName.slice(0, 22)) +
+        ESC_FEED_LINE +
+        formatTableRow('Course', (c.courseName || '').slice(0, 22)) +
+        ESC_FEED_LINE +
+        formatTableRow('Reg. Price', `${Number(c.registerPrice || 0)} EGP`) +
+        ESC_FEED_LINE;
+      if (isPerCourse) {
+        receiptContent +=
+          formatTableRow('Course Total', `${Number(c.totalCourseCost || 0)} EGP`) +
+          ESC_FEED_LINE +
+          formatTableRow('Remaining', `${Number(c.amountRemaining || 0)} EGP`) +
+          ESC_FEED_LINE;
+      }
+      receiptContent += lineSeparator + ESC_FEED_LINE;
+    });
+  });
+
+  receiptContent +=
+    ESC_ALIGN_CENTER +
+    ESC_BOLD +
+    ESC_NORMAL_SIZE +
+    englishLabels.thankYou +
+    ESC_FEED_LINE +
+    ESC_FEED_LINE;
+
+  if (!addStudentQzConnected || typeof qz === 'undefined') {
+    showQzStatus('QZ Tray is not connected. Receipt not printed.');
+    console.warn('QZ Tray is not connected.');
+    return;
+  }
+
+  const config = qz.configs.create('XP-80C');
+  const printData = [
+    { type: 'raw', format: 'command', data: receiptContent },
+    { type: 'raw', format: 'command', data: ESC_CUT },
+  ];
+
+  qz.print(config, printData)
+    .then(() => console.log('Registration receipt printed.'))
+    .catch((error) => console.error('Print error:', error));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof qz === 'undefined' || !qz.websocket) return;
+  qz.websocket
+    .connect()
+    .then(() => {
+      addStudentQzConnected = true;
+      console.log('QZ Tray connected (add student page).');
+    })
+    .catch((error) => console.error('Error connecting to QZ Tray:', error));
+});
+
 // Toast function for showing messages
 function showToast(message, type = 'success') {
   if (type === 'success') {
@@ -132,6 +289,7 @@ async function addNewStudent(event) {
 
     const responseData = await response.json();
     if (response.ok) {
+      printRegistrationReceipt(responseData);
       successToast.classList.add('show');
       messageToast.innerHTML = 'تم إضافة الطالب بنجاح';
       addStudentForm.reset();

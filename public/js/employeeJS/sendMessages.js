@@ -1,4 +1,17 @@
 // Professional Send Messages Management System
+
+function randomDelayMsAroundBaseSeconds(baseSec) {
+  const lo = Math.max(1000, (baseSec - 2) * 1000);
+  const hi = (baseSec + 3) * 1000;
+  return lo + Math.floor(Math.random() * (hi - lo + 1));
+}
+
+function averageDelaySecondsAroundBase(baseSec) {
+  const lo = Math.max(1000, (baseSec - 2) * 1000);
+  const hi = (baseSec + 3) * 1000;
+  return ((lo + hi) / 2) / 1000;
+}
+
 class SendMessagesManager {
   constructor() {
     this.teachers = [];
@@ -379,8 +392,9 @@ class SendMessagesManager {
   }
 
   calculateEstimatedTime() {
-    const delayBetween = parseInt(document.getElementById('delayBetween').value);
-    const totalTime = this.filteredStudents.length * delayBetween;
+    const baseSec = parseInt(document.getElementById('delayBetween').value, 10);
+    const avgDelaySec = averageDelaySecondsAroundBase(baseSec);
+    const totalTime = this.filteredStudents.length * avgDelaySec;
     const estimatedMinutes = Math.ceil(totalTime / 60);
     
     document.getElementById('estimatedTime').textContent = estimatedMinutes;
@@ -482,8 +496,8 @@ class SendMessagesManager {
     this.disableForm(true);
 
     try {
-      const delayBetween = parseInt(document.getElementById('delayBetween').value) * 1000;
-      
+      const baseSec = parseInt(document.getElementById('delayBetween').value, 10);
+
       for (let i = 0; i < this.filteredStudents.length; i++) {
         const student = this.filteredStudents[i];
         const phoneNumber = this.getStudentPhoneNumber(student, document.getElementById('phoneType').value);
@@ -524,9 +538,10 @@ class SendMessagesManager {
         this.sendingProgress.current = i + 1;
         this.updateProgress();
 
-        // Add delay between messages (except for the last one)
         if (i < this.filteredStudents.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, delayBetween));
+          await new Promise((resolve) =>
+            setTimeout(resolve, randomDelayMsAroundBaseSeconds(baseSec))
+          );
         }
       }
 

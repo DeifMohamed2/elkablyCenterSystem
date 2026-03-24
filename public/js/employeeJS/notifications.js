@@ -1107,9 +1107,9 @@ class NotificationManager {
           })));
         }
 
-        // Add delay between batches
         if (i + batchSize < students.length) {
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          const batchDelayMs = 1500 + Math.floor(Math.random() * (4000 - 1500 + 1));
+          await new Promise((resolve) => setTimeout(resolve, batchDelayMs));
         }
       }
 

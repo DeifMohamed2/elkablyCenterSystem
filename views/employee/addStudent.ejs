@@ -429,10 +429,6 @@ input[type='number'] {
       </div>
     </div>
 
-
-
-
-
    <!-- Navbar -->
     <nav class="navbar navbar-main navbar-expand-lg px-0  mx-3 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
       <div class="container-fluid py-1 px-3">
@@ -749,7 +745,14 @@ input[type='number'] {
 
     </div>
   </main>
+  <select id="deviceSelect" class="d-none" aria-hidden="true">
+    <option value="device1">Device 1</option>
+    <option value="device2">Device 2</option>
+  </select>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/qz-tray"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/11.1.0/jsrsasign-all-min.js"></script>
+  <%- include('./partials/qzTraySetup.ejs') %>
   <!--   Core JS Files   -->
   <script src="/js/employeeJS/addStudent.js"></script>
   <script src="../assets/js/core/popper.min.js"></script>

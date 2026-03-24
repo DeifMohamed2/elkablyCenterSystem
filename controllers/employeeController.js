@@ -267,6 +267,7 @@ const getAddStudent = async (req, res) => {
     title: 'Add Student',
     path: '/employee/add-student',
     allTeachers,
+    device: req.employee?.device,
   });
 }
 
@@ -3422,7 +3423,8 @@ const sendBulkNotifications = async (req, res) => {
     let successCount = 0;
     let failureCount = 0;
     
-    for (const student of students) {
+    for (let i = 0; i < students.length; i++) {
+      const student = students[i];
       try {
         const phoneNumber = student.parentPhone || student.studentPhone;
         const formattedPhoneNumber = `2${phoneNumber}@c.us`;
@@ -3454,10 +3456,6 @@ const sendBulkNotifications = async (req, res) => {
             message: response?.data?.message || 'فشل في الإرسال'
           });
         }
-        
-        // Add delay between messages to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
       } catch (error) {
         failureCount++;
         results.push({
@@ -3467,6 +3465,9 @@ const sendBulkNotifications = async (req, res) => {
           status: 'error',
           message: error.message
         });
+      }
+      if (i < students.length - 1) {
+        await waService.sleepMs(waService.getWhatsAppInterMessageDelayMs());
       }
     }
     
