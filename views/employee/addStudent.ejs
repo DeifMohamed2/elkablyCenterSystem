@@ -75,6 +75,24 @@ hr {
   transition: all ease 0.3s !important;
 }
 
+.print-registration-receipt-btn {
+  background-color: #344767 !important;
+  color: white !important;
+  border: 1px solid transparent !important;
+  padding: 5px 10px !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+  transition: all ease 0.3s !important;
+  font-size: 0.8rem !important;
+}
+
+.print-registration-receipt-btn:hover {
+  scale: 1.05;
+  background-color: white !important;
+  color: #344767 !important;
+  border: 1px solid #344767 !important;
+}
+
 .delete-student-btn:hover{
   scale: 1.07;
   color: #ff3d71 !important;
@@ -224,6 +242,10 @@ input[type='number'] {
               <div class="mb-3 form-check">
                 <input class="form-check-input" type="checkbox" id="editBookTaken" name="editBookTaken">
                 <label class="form-check-label" for="editBookTaken">تم استلام الكتاب</label>
+              </div>
+              <div class="mb-3 form-check">
+                <input class="form-check-input" type="checkbox" id="editBookPaid" name="editBookPaid">
+                <label class="form-check-label" for="editBookPaid">تم دفع ثمن الكتاب</label>
               </div>
               <!-- <div class="mb-3">
                 <label for="editStudentAmount" class="form-label">قيمه المبلغ</label>
@@ -526,10 +548,14 @@ input[type='number'] {
                       <input type="text" class="form-control p-2 fs-5 text-center" placeholder="اسم المدرسه " id="schoolName" name="schoolName" required>
                     </div>
                   </div>
-                  <div class="col-md-3 d-flex align-items-center">
+                  <div class="col-md-3 d-flex align-items-center flex-wrap gap-2">
                     <div class="form-check mx-2">
                       <input class="form-check-input" type="checkbox" id="bookTaken" name="bookTaken">
                       <label class="form-check-label" for="bookTaken">تم استلام الكتاب</label>
+                    </div>
+                    <div class="form-check mx-2">
+                      <input class="form-check-input" type="checkbox" id="bookPaid" name="bookPaid">
+                      <label class="form-check-label" for="bookPaid">تم دفع ثمن الكتاب</label>
                     </div>
                   </div>
                   
@@ -687,6 +713,7 @@ input[type='number'] {
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7"></th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">Pay Installment</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7"></th>
+                      <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">طباعة الإيصال</th>
                       <th class="text-center text-uppercase text-secondary text-m  font-weight-bolder opacity-7">Block/Unblock</th>
 
                       

@@ -1,3 +1,156 @@
+let studentLogsQzConnected = false;
+
+window.addEventListener('beforeunload', () => {
+  if (studentLogsQzConnected && typeof qz !== 'undefined' && qz.websocket) {
+    qz.websocket.disconnect().catch(() => {});
+  }
+});
+
+function showQzStatusLogs(text) {
+  const el = document.getElementById('message');
+  if (el) {
+    el.textContent = text;
+    setTimeout(() => {
+      if (el.textContent === text) el.textContent = '';
+    }, 5000);
+  }
+}
+
+/** Thermal registration receipt via QZ Tray (same pattern as addStudent.js). */
+function printRegistrationReceiptFromLogs(student = {}) {
+  const englishLabels = {
+    title: 'GTA CENTER',
+    phone: '01092257120',
+    date: 'Date',
+    studentName: 'Student Name',
+    studentCode: 'Student Code',
+    thankYou: 'Thank you for choosing our GTA Center!',
+  };
+
+  const ESC_ALIGN_CENTER = '\x1B\x61\x01';
+  const ESC_BOLD = '\x1B\x45\x01';
+  const ESC_DOUBLE_SIZE = '\x1B\x21\x30';
+  const ESC_NORMAL_SIZE = '\x1B\x21\x00';
+  const ESC_CUT = '\x1D\x56\x42\x00';
+  const ESC_FEED_LINE = '\x0A';
+  const ESC_RESET = '\x1B\x40';
+
+  const lineSeparator = '-'.repeat(49);
+  const headerSeparator = '='.repeat(49);
+
+  function formatTableRow(field, value) {
+    const left = String(field).slice(0, 22).padEnd(22, ' ');
+    const right = String(value).slice(0, 22).padStart(22, ' ');
+    return `| ${left}|${right} |`;
+  }
+
+  const created = student.createdAt ? new Date(student.createdAt) : new Date();
+  const dateStr =
+    created.toLocaleDateString() + ' ' + created.toLocaleTimeString();
+
+  let receiptContent =
+    ESC_RESET +
+    ESC_ALIGN_CENTER +
+    ESC_BOLD +
+    ESC_DOUBLE_SIZE +
+    englishLabels.title +
+    ESC_FEED_LINE +
+    ESC_NORMAL_SIZE +
+    ESC_FEED_LINE +
+    ESC_ALIGN_CENTER +
+    englishLabels.phone +
+    ESC_FEED_LINE +
+    ESC_FEED_LINE +
+    headerSeparator +
+    ESC_FEED_LINE +
+    formatTableRow('Receipt', 'Registration') +
+    ESC_FEED_LINE +
+    formatTableRow(englishLabels.date, dateStr) +
+    ESC_FEED_LINE +
+    lineSeparator +
+    ESC_FEED_LINE +
+    formatTableRow(englishLabels.studentName, student.studentName || 'N/A') +
+    ESC_FEED_LINE +
+    formatTableRow(englishLabels.studentCode, student.studentCode || 'N/A') +
+    ESC_FEED_LINE +
+    lineSeparator +
+    ESC_FEED_LINE +
+    formatTableRow('Student Phone', student.studentPhoneNumber || 'N/A') +
+    ESC_FEED_LINE +
+    formatTableRow('Parent Phone', student.studentParentPhone || 'N/A') +
+    ESC_FEED_LINE +
+    formatTableRow('School', (student.schoolName || 'N/A').toString().slice(0, 22)) +
+    ESC_FEED_LINE +
+    formatTableRow(
+      'Payment',
+      student.paymentType === 'perCourse' ? 'Per Course' : 'Per Session'
+    ) +
+    ESC_FEED_LINE +
+    formatTableRow('Book Taken', student.bookTaken ? 'Yes' : 'No') +
+    ESC_FEED_LINE +
+    formatTableRow('Book Paid', student.bookPaid ? 'Yes' : 'No') +
+    ESC_FEED_LINE +
+    headerSeparator +
+    ESC_FEED_LINE;
+
+  const isPerCourse = student.paymentType === 'perCourse';
+  (student.selectedTeachers || []).forEach(({ teacherId, courses }) => {
+    const tName =
+      teacherId && typeof teacherId === 'object' && teacherId.teacherName
+        ? teacherId.teacherName
+        : 'N/A';
+    (courses || []).forEach((c) => {
+      receiptContent +=
+        formatTableRow('Teacher', tName.slice(0, 22)) +
+        ESC_FEED_LINE +
+        formatTableRow('Course', (c.courseName || '').slice(0, 22)) +
+        ESC_FEED_LINE +
+        formatTableRow('Reg. Price', `${Number(c.registerPrice || 0)} EGP`) +
+        ESC_FEED_LINE;
+      if (isPerCourse) {
+        receiptContent +=
+          formatTableRow('Course Total', `${Number(c.totalCourseCost || 0)} EGP`) +
+          ESC_FEED_LINE +
+          formatTableRow('Remaining', `${Number(c.amountRemaining || 0)} EGP`) +
+          ESC_FEED_LINE;
+      }
+      receiptContent += lineSeparator + ESC_FEED_LINE;
+    });
+  });
+
+  receiptContent +=
+    ESC_ALIGN_CENTER +
+    ESC_BOLD +
+    ESC_NORMAL_SIZE +
+    englishLabels.thankYou +
+    ESC_FEED_LINE +
+    ESC_FEED_LINE;
+
+  if (!studentLogsQzConnected || typeof qz === 'undefined') {
+    showQzStatusLogs('QZ Tray is not connected. Receipt not printed.');
+    console.warn('QZ Tray is not connected.');
+    return;
+  }
+
+  const config = qz.configs.create('XP-80C');
+  const printData = [
+    { type: 'raw', format: 'command', data: receiptContent },
+    { type: 'raw', format: 'command', data: ESC_CUT },
+  ];
+
+  qz.print(config, printData)
+    .then(() => {
+      console.log('Registration receipt printed (student logs).');
+      showQzStatusLogs('تم طباعة الإيصال بنجاح');
+    })
+    .catch((error) => {
+      console.error('Print error:', error);
+      showQzStatusLogs(
+        'فشل في طباعة الإيصال: ' + (error?.message || 'خطأ غير معروف')
+      );
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   // DOM Elements
   const searchInput = document.getElementById('searchInput');
@@ -9,6 +162,19 @@ document.addEventListener('DOMContentLoaded', function() {
   const backToSearchBtn = document.getElementById('backToSearch');
   const spinner = document.getElementById('spinner');
   const message = document.getElementById('message');
+
+  if (typeof qz !== 'undefined' && qz.websocket) {
+    qz.websocket
+      .connect()
+      .then(() => {
+        studentLogsQzConnected = true;
+        console.log('QZ Tray connected (student logs).');
+      })
+      .catch((error) => {
+        console.error('Error connecting to QZ Tray:', error);
+        showQzStatusLogs('QZ Tray connection failed - thermal printing disabled');
+      });
+  }
   
   // Table loading elements
   const attendanceTableLoading = document.getElementById('attendanceTableLoading');
@@ -68,6 +234,37 @@ document.addEventListener('DOMContentLoaded', function() {
     searchResults.style.display = 'block';
     currentStudentId = null;
   });
+
+  const saveBookStatusBtn = document.getElementById('saveBookStatus');
+  if (saveBookStatusBtn) {
+    saveBookStatusBtn.addEventListener('click', async function () {
+      if (!currentStudentId) return;
+      const takenEl = document.getElementById('editBookTaken');
+      const paidEl = document.getElementById('editBookPaid');
+      const bookTaken = takenEl ? takenEl.checked : false;
+      const bookPaid = paidEl ? paidEl.checked : false;
+      try {
+        const res = await fetch('/employee/update-book-status', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            studentId: currentStudentId,
+            bookTaken,
+            bookPaid,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'فشل الحفظ');
+        message.textContent = 'تم حفظ حالة الكتاب';
+        setTimeout(() => {
+          if (message.textContent === 'تم حفظ حالة الكتاب') message.textContent = '';
+        }, 3000);
+      } catch (err) {
+        console.error(err);
+        message.textContent = err.message || 'حدث خطأ أثناء الحفظ';
+      }
+    });
+  }
 
   // Apply filters
   applyFiltersBtn.addEventListener('click', function() {
@@ -181,6 +378,11 @@ document.addEventListener('DOMContentLoaded', function() {
               <td class="text-center">
                 <button class="view-student-btn" data-id="${student._id}">عرض</button>
               </td>
+              <td class="text-center">
+                <button type="button" class="print-receipt-btn" data-student-id="${student._id}" title="طباعة إيصال التسجيل">
+                  <i class="fas fa-print"></i> طباعة
+                </button>
+              </td>
             `;
             searchResultsBody.appendChild(row);
           });
@@ -190,6 +392,22 @@ document.addEventListener('DOMContentLoaded', function() {
             button.addEventListener('click', function() {
               const studentId = this.getAttribute('data-id');
               loadStudentData(studentId);
+            });
+          });
+
+          document.querySelectorAll('.print-receipt-btn').forEach((btn) => {
+            btn.addEventListener('click', async function () {
+              const studentId = this.getAttribute('data-student-id');
+              if (!studentId) return;
+              try {
+                const response = await fetch(`/employee/get-student/${studentId}`);
+                if (!response.ok) throw new Error('تعذر تحميل بيانات الطالب');
+                const fullStudent = await response.json();
+                printRegistrationReceiptFromLogs(fullStudent);
+              } catch (err) {
+                console.error(err);
+                message.textContent = err.message || 'خطأ أثناء الطباعة';
+              }
             });
           });
           
@@ -267,6 +485,15 @@ document.addEventListener('DOMContentLoaded', function() {
           month: '2-digit',
           day: '2-digit'
         });
+
+        const editBookTakenEl = document.getElementById('editBookTaken');
+        const editBookPaidEl = document.getElementById('editBookPaid');
+        if (editBookTakenEl) {
+          editBookTakenEl.checked = !!data.student.bookTaken;
+        }
+        if (editBookPaidEl) {
+          editBookPaidEl.checked = !!data.student.bookPaid;
+        }
         
         // Update statistics
         document.getElementById('totalAttendance').textContent = data.statistics.totalAttendance;

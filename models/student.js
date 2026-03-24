@@ -31,6 +31,10 @@ const studentSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    bookPaid: {
+      type: Boolean,
+      default: false,
+    },
     attendanceNumber: {
       type: Number,
       default: 0,

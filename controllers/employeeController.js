@@ -413,6 +413,7 @@ const addStudent = async (req, res) => {
         paymentType,
         studentAmount,
         bookTaken,
+        bookPaid,
     } = req.body;
 
     if (studentName.length < 3) {
@@ -512,6 +513,7 @@ const addStudent = async (req, res) => {
             studentCode: studentCode,
             paymentType,
             bookTaken: !!bookTaken,
+            bookPaid: !!bookPaid,
         });
 
         student
@@ -569,6 +571,7 @@ const updateStudent = async (req, res) => {
     amountRemaining,
     selectedTeachers,
     bookTaken,
+    bookPaid,
   } = req.body;
 
   if (studentName.length < 3) {
@@ -665,7 +668,7 @@ const updateStudent = async (req, res) => {
   // Debug: Log the merged teachers to check totalCourseCost
   console.log('Merged selectedTeachers:', JSON.stringify(mergedSelectedTeachers, null, 2));
 
-  const student = await Student.findByIdAndUpdate(req.params.id, {
+  const updateDoc = {
     studentName,
     studentPhoneNumber,
     studentParentPhone,
@@ -675,7 +678,15 @@ const updateStudent = async (req, res) => {
     amountRemaining: validatedAmountRemaining,
     selectedTeachers: mergedSelectedTeachers,
     bookTaken: !!bookTaken,
-  }).populate('studentTeacher', 'teacherName');
+  };
+  if (typeof bookPaid !== 'undefined') {
+    updateDoc.bookPaid = !!bookPaid;
+  }
+
+  const student = await Student.findByIdAndUpdate(req.params.id, updateDoc).populate(
+    'studentTeacher',
+    'teacherName'
+  );
   
   // Final check: Ensure all courses have totalCourseCost set
   if (student) {
@@ -3111,6 +3122,30 @@ const logOut = (req, res) => {
 
 // ======================================== Student Logs ======================================== //
 
+const updateStudentBookStatus = async (req, res) => {
+  try {
+    const { studentId, bookTaken, bookPaid } = req.body;
+    if (!studentId) {
+      return res.status(400).json({ message: 'معرف الطالب مطلوب' });
+    }
+    const student = await Student.findByIdAndUpdate(
+      studentId,
+      {
+        bookTaken: !!bookTaken,
+        bookPaid: !!bookPaid,
+      },
+      { new: true }
+    ).populate('selectedTeachers.teacherId', 'teacherName');
+    if (!student) {
+      return res.status(404).json({ message: 'الطالب غير موجود' });
+    }
+    return res.status(200).json({ success: true, student });
+  } catch (error) {
+    console.error('updateStudentBookStatus', error);
+    res.status(500).json({ message: 'حدث خطأ أثناء تحديث حالة الكتاب' });
+  }
+};
+
 const getStudentLogs = async (req, res) => {
   try {
     const allTeachers = await Teacher.find({}, { teacherName: 1, courses: 1 });
@@ -3118,7 +3153,8 @@ const getStudentLogs = async (req, res) => {
     res.render('employee/studentLogs', {
       title: 'Student Logs',
       path: '/employee/student-logs',
-      allTeachers
+      allTeachers,
+      device: req.employee?.device,
     });
   } catch (error) {
     console.error('Error loading student logs page:', error);
@@ -3891,6 +3927,7 @@ module.exports = {
   downloadAndSendExcelForEmployeeByDate,
 
   // Student Logs
+  updateStudentBookStatus,
   getStudentLogs,
   getStudentLogsData,
 

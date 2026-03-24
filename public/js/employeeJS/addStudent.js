@@ -109,6 +109,8 @@ function printRegistrationReceipt(student = {}) {
     ESC_FEED_LINE +
     formatTableRow('Book Taken', student.bookTaken ? 'Yes' : 'No') +
     ESC_FEED_LINE +
+    formatTableRow('Book Paid', student.bookPaid ? 'Yes' : 'No') +
+    ESC_FEED_LINE +
     headerSeparator +
     ESC_FEED_LINE;
 
@@ -217,6 +219,8 @@ async function addNewStudent(event) {
   const schoolName = document.getElementById('schoolName').value;
   const paymentType = document.getElementById('paymentType').value;
   const bookTaken = document.getElementById('bookTaken').checked;
+  const bookPaidEl = document.getElementById('bookPaid');
+  const bookPaid = bookPaidEl ? bookPaidEl.checked : false;
 
   const selectedTeachers = [];
   document
@@ -264,6 +268,7 @@ async function addNewStudent(event) {
     schoolName,
     paymentType,
     bookTaken,
+    bookPaid,
     selectedTeachers,
   };
 
@@ -456,6 +461,12 @@ const addStudentToTable = (student) => {
     </td>
 
     <td class="align-middle text-center">
+      <button type="button" class="print-registration-receipt-btn mt-2" data-print-student-id="${
+        student._id
+      }" title="طباعة إيصال التسجيل (حراري)">طباعة الإيصال</button>
+    </td>
+
+    <td class="align-middle text-center">
       ${student.isBlocked ? 
         `<button class="unblock-student-btn mt-2" data-id="${student._id}" 
          data-bs-toggle="modal" data-bs-target="#unblockStudentModal">Unblock</button>` : 
@@ -497,6 +508,23 @@ const addStudentToTable = (student) => {
         openUnblockModal(student._id);
       } else {
         openBlockModal(student._id);
+      }
+    });
+  }
+
+  const printRegReceiptBtn = tr.querySelector('.print-registration-receipt-btn');
+  if (printRegReceiptBtn) {
+    printRegReceiptBtn.addEventListener('click', async () => {
+      const sid = printRegReceiptBtn.getAttribute('data-print-student-id');
+      if (!sid) return;
+      try {
+        const res = await fetch(`/employee/get-student/${sid}`);
+        if (!res.ok) throw new Error('fetch failed');
+        const fullStudent = await res.json();
+        printRegistrationReceipt(fullStudent);
+      } catch (e) {
+        console.error(e);
+        showToast('تعذر تحميل بيانات الطالب للطباعة', 'error');
       }
     });
   }
@@ -546,6 +574,10 @@ const openEditModal = async (id) => {
     const editBookTaken = document.getElementById('editBookTaken');
     if (editBookTaken) {
       editBookTaken.checked = !!student.bookTaken;
+    }
+    const editBookPaid = document.getElementById('editBookPaid');
+    if (editBookPaid) {
+      editBookPaid.checked = !!student.bookPaid;
     }
 
     // Reset all checkboxes and fields
@@ -743,11 +775,13 @@ const saveEditStudent = async () => {
       }
     });
 
+  const editBookPaidEl = document.getElementById('editBookPaid');
   const data = {
     studentName,
     studentPhoneNumber: studentPhone,
     studentParentPhone,
     bookTaken: document.getElementById('editBookTaken').checked,
+    bookPaid: editBookPaidEl ? editBookPaidEl.checked : false,
     selectedTeachers,
   };
 

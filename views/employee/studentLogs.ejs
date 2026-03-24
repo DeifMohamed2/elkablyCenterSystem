@@ -62,6 +62,24 @@ hr {
   border: 1px solid #ff9847 !important;
 }
 
+.print-receipt-btn {
+  background-color: #344767 !important;
+  color: white !important;
+  border: 1px solid transparent !important;
+  padding: 5px 10px !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+  transition: all ease 0.3s !important;
+  font-size: 0.85rem !important;
+}
+
+.print-receipt-btn:hover {
+  scale: 1.05;
+  background-color: white !important;
+  color: #344767 !important;
+  border: 1px solid #344767 !important;
+}
+
 .table-responsive {
   max-height: 500px;
   overflow: auto;
@@ -185,6 +203,7 @@ hr {
                       <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7">رقم الهاتف</th>
                       <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7">المدرسة</th>
                       <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7">عرض</th>
+                      <th class="text-center text-uppercase text-secondary text-m font-weight-bolder opacity-7">طباعة الإيصال</th>
                     </tr>
                   </thead>
                   <tbody id="searchResultsBody">
@@ -227,6 +246,18 @@ hr {
                     <p><strong>المدرسة:</strong> <span id="schoolName"></span></p>
                     <p><strong>نوع الدفع:</strong> <span id="paymentType"></span></p>
                     <p><strong>تاريخ التسجيل:</strong> <span id="registrationDate"></span></p>
+                    <p class="mb-2"><strong>حالة الكتاب:</strong></p>
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                      <div class="form-check mb-0">
+                        <input class="form-check-input" type="checkbox" id="editBookTaken" name="editBookTaken">
+                        <label class="form-check-label" for="editBookTaken">تم أخذ الكتاب</label>
+                      </div>
+                      <div class="form-check mb-0">
+                        <input class="form-check-input" type="checkbox" id="editBookPaid" name="editBookPaid">
+                        <label class="form-check-label" for="editBookPaid">تم دفع ثمن الكتاب</label>
+                      </div>
+                      <button type="button" id="saveBookStatus" class="btn btn-sm bg-gradient-primary mb-0">حفظ</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -491,12 +522,20 @@ hr {
     </div>
   </main>
 
+  <select id="deviceSelect" class="d-none" aria-hidden="true">
+    <option value="device1">Device 1</option>
+    <option value="device2">Device 2</option>
+  </select>
+
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="../assets/js/material-dashboard.min.js"></script>
+  <script src="https://unpkg.com/qz-tray"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/11.1.0/jsrsasign-all-min.js"></script>
+  <%- include('./partials/qzTraySetup.ejs') %>
   <script src="../js/employeeJS/studentLogs.js"></script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;

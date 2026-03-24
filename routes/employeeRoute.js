@@ -131,6 +131,7 @@ router.get('/download-sendExcelEmployeeByDate/:id', authMiddleware, employeeCont
 // Student Logs
 router.get('/student-logs', authMiddleware, employeeController.getStudentLogs);
 router.get('/student-logs-data/:studentId', authMiddleware, employeeController.getStudentLogsData);
+router.patch('/update-book-status', authMiddleware, employeeController.updateStudentBookStatus);
 
 // Notification Management Routes
 router.get('/notifications', employeeController.getNotificationsPage);
