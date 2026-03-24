@@ -124,7 +124,7 @@ const devices = {
 
 
 const deviceData = <%- JSON.stringify((typeof device !== 'undefined' && device) ? device : 'device1') %>;
-console.log(deviceData);
+console.log('QZ Device:', deviceData);
 var deviceSelectEl = document.getElementById('deviceSelect');
 if (deviceSelectEl) deviceSelectEl.value = deviceData;
 let selectedDevice = devices[deviceData] || devices.device1;

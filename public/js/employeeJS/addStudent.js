@@ -158,19 +158,31 @@ function printRegistrationReceipt(student = {}) {
   ];
 
   qz.print(config, printData)
-    .then(() => console.log('Registration receipt printed.'))
-    .catch((error) => console.error('Print error:', error));
+    .then(() => {
+      console.log('Registration receipt printed.');
+      showQzStatus('تم طباعة الإيصال بنجاح');
+    })
+    .catch((error) => {
+      console.error('Print error:', error);
+      showQzStatus('فشل في طباعة الإيصال: ' + (error?.message || 'خطأ غير معروف'));
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (typeof qz === 'undefined' || !qz.websocket) return;
+  if (typeof qz === 'undefined' || !qz.websocket) {
+    showQzStatus('QZ Tray not available - thermal printing disabled');
+    return;
+  }
   qz.websocket
     .connect()
     .then(() => {
       addStudentQzConnected = true;
       console.log('QZ Tray connected (add student page).');
     })
-    .catch((error) => console.error('Error connecting to QZ Tray:', error));
+    .catch((error) => {
+      console.error('Error connecting to QZ Tray:', error);
+      showQzStatus('QZ Tray connection failed - thermal printing disabled');
+    });
 });
 
 // Toast function for showing messages
