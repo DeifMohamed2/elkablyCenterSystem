@@ -527,6 +527,9 @@ hr {
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 
+  <script>
+    window.__RECEIPT_EMPLOYEE_NAME__ = <%- JSON.stringify(typeof employeeName !== 'undefined' ? employeeName : '') %>;
+  </script>
   <script src="/js/employeeJS/attendance.js"></script>
   
   <script src="../assets/js/core/popper.min.js"></script>

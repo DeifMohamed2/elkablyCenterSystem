@@ -133,6 +133,14 @@ window.addEventListener('beforeunload', () => {
     }
 });
 
+function receiptEmployeeDisplayNameAttendance() {
+  if (typeof window !== 'undefined' && window.__RECEIPT_EMPLOYEE_NAME__) {
+    const n = String(window.__RECEIPT_EMPLOYEE_NAME__).trim();
+    if (n) return n.slice(0, 22);
+  }
+  return 'N/A';
+}
+
 function printReceipt(data = {}) {
   const {
     attendanceCount = 0,
@@ -224,6 +232,10 @@ function printReceipt(data = {}) {
     lineSeparator +
     ESC_FEED_LINE +
     formatTableRow('Sessions Count', attendanceCount) +
+    ESC_FEED_LINE +
+    lineSeparator +
+    ESC_FEED_LINE +
+    formatTableRow('Admin', receiptEmployeeDisplayNameAttendance()) +
     ESC_FEED_LINE +
     lineSeparator +
     ESC_FEED_LINE +

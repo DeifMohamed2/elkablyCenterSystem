@@ -536,6 +536,9 @@ hr {
   <script src="https://unpkg.com/qz-tray"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/11.1.0/jsrsasign-all-min.js"></script>
   <%- include('./partials/qzTraySetup.ejs') %>
+  <script>
+    window.__RECEIPT_EMPLOYEE_NAME__ = <%- JSON.stringify(typeof employeeName !== 'undefined' ? employeeName : '') %>;
+  </script>
   <script src="../js/employeeJS/studentLogs.js"></script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;

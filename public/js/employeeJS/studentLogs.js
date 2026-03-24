@@ -16,6 +16,14 @@ function showQzStatusLogs(text) {
   }
 }
 
+function receiptEmployeeDisplayNameFromLogs() {
+  if (typeof window !== 'undefined' && window.__RECEIPT_EMPLOYEE_NAME__) {
+    const n = String(window.__RECEIPT_EMPLOYEE_NAME__).trim();
+    if (n) return n.slice(0, 22);
+  }
+  return 'N/A';
+}
+
 /** Thermal registration receipt via QZ Tray (same pattern as addStudent.js). */
 function printRegistrationReceiptFromLogs(student = {}) {
   const englishLabels = {
@@ -89,6 +97,8 @@ function printRegistrationReceiptFromLogs(student = {}) {
     formatTableRow('Book Taken', student.bookTaken ? 'Yes' : 'No') +
     ESC_FEED_LINE +
     formatTableRow('Book Paid', student.bookPaid ? 'Yes' : 'No') +
+    ESC_FEED_LINE +
+    formatTableRow('Admin', receiptEmployeeDisplayNameFromLogs()) +
     ESC_FEED_LINE +
     headerSeparator +
     ESC_FEED_LINE;

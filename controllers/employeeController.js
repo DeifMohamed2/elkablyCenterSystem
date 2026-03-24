@@ -268,6 +268,7 @@ const getAddStudent = async (req, res) => {
     path: '/employee/add-student',
     allTeachers,
     device: req.employee?.device,
+    employeeName: req.employee?.employeeName || '',
   });
 }
 
@@ -1200,7 +1201,8 @@ const getAttendance = async(req, res) => {
         title: 'Attendance',
         path: '/employee/attendance',
         allTeachers :allTeachers,
-        device : employee.device
+        device : employee.device,
+        employeeName: employee?.employeeName || '',
     });
 }
 
@@ -3155,6 +3157,7 @@ const getStudentLogs = async (req, res) => {
       path: '/employee/student-logs',
       allTeachers,
       device: req.employee?.device,
+      employeeName: req.employee?.employeeName || '',
     });
   } catch (error) {
     console.error('Error loading student logs page:', error);

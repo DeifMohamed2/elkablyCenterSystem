@@ -780,6 +780,9 @@ input[type='number'] {
   <script src="https://unpkg.com/qz-tray"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/11.1.0/jsrsasign-all-min.js"></script>
   <%- include('./partials/qzTraySetup.ejs') %>
+  <script>
+    window.__RECEIPT_EMPLOYEE_NAME__ = <%- JSON.stringify(typeof employeeName !== 'undefined' ? employeeName : '') %>;
+  </script>
   <!--   Core JS Files   -->
   <script src="/js/employeeJS/addStudent.js"></script>
   <script src="../assets/js/core/popper.min.js"></script>

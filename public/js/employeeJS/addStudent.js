@@ -35,6 +35,14 @@ function showQzStatus(text) {
   }
 }
 
+function receiptEmployeeDisplayName() {
+  if (typeof window !== 'undefined' && window.__RECEIPT_EMPLOYEE_NAME__) {
+    const n = String(window.__RECEIPT_EMPLOYEE_NAME__).trim();
+    if (n) return n.slice(0, 22);
+  }
+  return 'N/A';
+}
+
 /**
  * Thermal receipt via QZ Tray — same ESC/POS flow as attendance printReceipt.
  */
@@ -110,6 +118,8 @@ function printRegistrationReceipt(student = {}) {
     formatTableRow('Book Taken', student.bookTaken ? 'Yes' : 'No') +
     ESC_FEED_LINE +
     formatTableRow('Book Paid', student.bookPaid ? 'Yes' : 'No') +
+    ESC_FEED_LINE +
+    formatTableRow('Admin', receiptEmployeeDisplayName()) +
     ESC_FEED_LINE +
     headerSeparator +
     ESC_FEED_LINE;
